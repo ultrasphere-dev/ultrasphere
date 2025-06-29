@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle
 from networkx.algorithms.dag import dag_longest_path
-
+import numpy as np
 
 import warnings
 

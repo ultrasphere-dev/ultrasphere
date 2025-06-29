@@ -1,10 +1,11 @@
-from typing import Any, Callable
+from typing import Any, Callable, Literal, overload
 from .coordinates import BranchingType, SphericalCoordinates, TSpherical, get_child, TEuclidean
 from array_api._2024_12 import Array, ArrayNamespace
 from array_api_compat import array_namespace
 import array_api_extra as xpx
 
 from collections.abc import Mapping
+from scipy.special import roots_jacobi
 
 
 def roots(
@@ -44,7 +45,6 @@ def roots(
         If the branching type is invalid.
 
     """
-    from scipy.special import roots_jacobi
 
     xs = {}
     ws = {}
@@ -189,7 +189,7 @@ def integrate(
             # we add axis to the last dimension
             # theta(node),u1,...,uM
             xpx.broadcast_shapes(value.shape[:1], ws[node].shape)
-            w = xp.reshape(ws[node], [-1] + [1] * (value.ndim - 1))
+            w = xp.reshape(ws[node], (-1,) + (1,) * (value.ndim - 1))
             result[node] = xp.sum(value * w, axis=0)
         # we don't know how to einsum the result
         return result

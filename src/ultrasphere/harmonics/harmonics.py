@@ -5,6 +5,8 @@ from array_api_compat import array_namespace
 from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical, get_child
 from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
 import array_api_extra as xpx
+
+from ultrasphere.harmonics.expansion import concat_harmonics
 from .eigenfunction import type_a, type_b, type_bdash, type_c
 @overload
 def harmonics(

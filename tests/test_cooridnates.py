@@ -407,7 +407,7 @@ def test_harmonics_regular_singular_j_expansion(
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    expected = szv(0, c.e_ndim, k * xp.vector_norm(x - y, axis=0), type=type)
+    expected = szv(0, c.e_ndim, k * xp.linalg.vector_norm(x - y, axis=0), type=type)
     x_Y = harmonics(c,   # type: ignore
         x_spherical,
         n_end=n,
@@ -607,7 +607,7 @@ def test_harmonics_translation_coef(
     if type == "singular":
         # |t| < |x|
         t *= xp.random.random_uniform(low=0.05, high=0.1, shape=shape)
-        assert (xp.vector_norm(t, axis=0) < xp.vector_norm(x, axis=0)).all()
+        assert (xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)).all()
     # t = xp.zeros_like(t)
     y = x + t
     x_spherical = c.from_euclidean(x)
@@ -789,11 +789,11 @@ def test_harmonics_translation_coef_using_triplet(
     if (from_, to_) == ("singular", "singular"):
         # |t| < |x| (if too close, the result would be inaccurate)
         t = t * xp.random.random_uniform(low=0.05, high=0.1, shape=shape)
-        assert (xp.vector_norm(t, axis=0) < xp.vector_norm(x, axis=0)).all()
+        assert (xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)).all()
     elif (from_, to_) == ("regular", "singular"):
         # |t| > |x| (if too close, the result would be inaccurate)
         t = t * xp.random.random_uniform(low=10, high=20, shape=shape)
-        assert (xp.vector_norm(t, axis=0) > xp.vector_norm(x, axis=0)).all()
+        assert (xp.linalg.vector_norm(t, axis=0) > xp.linalg.vector_norm(x, axis=0)).all()
 
     # t = xp.zeros_like(t)
     y = x + t

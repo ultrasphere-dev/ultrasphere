@@ -95,7 +95,7 @@ def harmonics_regular_singular(
         get_n_end_and_include_negative_m_from_expansion(c, harmonics)
     )
     n = index_array_harmonics(c, 
-        c.root, n_end=n_end, include_negative_m=include_negative_m
+        c.root, n_end=n_end, include_negative_m=include_negative_m, xp=xp
     )[(None,) * spherical["r"].ndim + (slice(None),)]
     kr = k * spherical["r"]
     kr = kr[..., None]

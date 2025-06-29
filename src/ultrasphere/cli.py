@@ -303,8 +303,8 @@ from array_api._2024_12 import Array
         print(f"xp: {t1.elapsed}")
 
     # scipy
-    m = xp.arange(-n_end, n_end + 1).reshape([1] * theta.ndim + [-1, 1])
-    n = xp.arange(n_end + 1).reshape([1] * theta.ndim + [1, -1])
+    m = xp.reshape(xp.arange(-n_end, n_end + 1),[1] * theta.ndim + [-1, 1])
+    n = xp.reshape(xp.arange(n_end + 1),[1] * theta.ndim + [1, -1])
     theta = theta[..., None, None]
     phi = phi[..., None, None]
     m, n, phi, theta = (
@@ -418,7 +418,7 @@ def benchmark_c2s(
                 continue
             ts[name].append(t.elapsed)
             x_, y_, z_ = forward(r, theta, phi)
-            diff = xp.vector_norm([x - x_, y - y_, z - z_], axis=0)
+            diff = xp.linalg.vector_norm([x - x_, y - y_, z - z_], axis=0)
             errors[name].append(xp.mean(diff))
     print(
         "Time: ",

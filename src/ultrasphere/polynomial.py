@@ -1,6 +1,6 @@
 from array_api_compat import array_namespace
 import array_api_extra as xpx
-from array_api._2024_12 import Array
+from array_api._2024_12 import Array, ArrayNamespace
 
 
 from .special import binom
@@ -36,6 +36,7 @@ def jacobi(
         The values of the Jacobi polynomials at the points x of order {1,...,n_end-1}.
 
     """
+    xp = array_namespace(x, alpha, beta)
     x, alpha, beta = xp.broadcast_arrays(x, alpha, beta)
 
     ps = []
@@ -88,6 +89,7 @@ def log_jacobi_normalization_constant(
         The log of the normalization constant.
 
     """
+    xp = array_namespace(alpha, beta, n)
     logupper = (
         xp.log(2 * n + alpha + beta + 1)
         + xp.lgamma(n + alpha + beta + 1.0)
@@ -102,7 +104,7 @@ def log_jacobi_normalization_constant(
 
 
 def jacobi_normalization_constant(
-    *, alpha: Array, beta: Array, n: Array
+    *, alpha: Array, beta: Array, n: Array, xp: ArrayNamespace
 ) -> Array:
     """
     Computes the normalization constant of
@@ -152,6 +154,7 @@ def gegenbauer(
         at the points x of order {1,...,n_end-1}.
 
     """
+    xp = array_namespace(x, alpha)
     x, alpha = xp.broadcast_arrays(x, alpha)
     n = xp.arange(0, n_end, dtype=x.dtype, device=x.device)[
         (None,) * x.ndim + (slice(None),)
@@ -191,6 +194,7 @@ def legendre(x: Array, *, ndim: Array, n_end: int) -> Array:
     """
     # return jacobi(x, alpha=xp.asarray((ndim-3)/2),
     # beta=xp.asarray((ndim-3)/2), n_end=n_end)
+    xp = array_namespace(x, ndim)
     x, ndim = xp.broadcast_arrays(x, ndim)
     n = xp.arange(0, n_end, dtype=x.dtype, device=x.device)[
         (None,) * x.ndim + (slice(None),)
@@ -266,6 +270,9 @@ def jacobi_triplet_integral(
         If beta3 is not None and beta3 is not beta1 + beta2.
 
     """
+    xp = array_namespace(
+        alpha1, alpha2, alpha3, beta1, beta2, beta3, n1, n2, n3
+    )
     from py3nj import wigner3j
 
     if alpha3 is None:
@@ -297,7 +304,7 @@ def jacobi_triplet_integral(
         )
     # round and cast to int
     Ls2, Ms2, Ns2 = xp.round(Ls2), xp.round(Ms2), xp.round(Ns2)
-    Ls2, Ms2, Ns2 = Ls2.astype(int), Ms2.astype(int), Ns2.astype(int)
+    Ls2, Ms2, Ns2 = xp.astype(Ls2, int), xp.astype(Ms2, int), xp.astype(Ns2, int)
 
     # coefficients
     # note that there is no need to sqrt the normalization constant

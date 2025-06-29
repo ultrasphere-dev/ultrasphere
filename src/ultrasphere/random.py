@@ -1,5 +1,10 @@
 from collections.abc import Sequence
+from typing import Any, Literal, Mapping, overload
+from array_api._2024_12 import Array, ArrayNamespace
+import numpy as np
+from numpy._typing import NDArray
 
+from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
 
 def random_sphere(
     shape: Sequence[int],
@@ -49,6 +54,7 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
+    xp: ArrayNamespace,
     device: Any | None = ...,
     dtype: Any | None = ...,
     type: Literal["uniform"] = ...,
@@ -60,6 +66,7 @@ def random_points(  # type: ignore
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
+    xp: ArrayNamespace,
     device: Any | None = ...,
     dtype: Any | None = ...,
     type: Literal["spherical"] = ...,
@@ -71,6 +78,7 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
+    xp: ArrayNamespace,
     device: Any | None = ...,
     dtype: Any | None = ...,
     type: Literal["spherical"] = ...,
@@ -81,6 +89,7 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
+    xp: ArrayNamespace,
     device: Any | None = None,
     dtype: Any | None = None,
     type: Literal["uniform", "spherical"] = "uniform",
@@ -121,6 +130,7 @@ def random_points(
         arXiv, math/0503650. Retrieved from https://arxiv.org/abs/math/0503650v1
 
     """
+    rng = np.random.default_rng() if rng is None else rng
     if type == "uniform":
         return xp.asarray(
             random_sphere(shape, dim=c.e_ndim, surface=surface, rng=rng),
@@ -137,13 +147,13 @@ def random_points(
         result: dict[TSpherical | Literal["r"], Array] = {}
         for node in c.s_nodes:
             low, high = d[c.branching_types[node]]
-            result[node] = xp.random_uniform(
-                low=low, high=high, shape=shape, device=device, dtype=dtype
-            )
+            result[node] = xp.asarray(rng.uniform(
+                low=low, high=high, size=shape
+            ), device=device, dtype=dtype)
         if not surface:
-            result["r"] = xp.random_uniform(
-                low=0, high=1, shape=shape, device=device, dtype=dtype
-            )
+            result["r"] = xp.asarray(rng.uniform(
+                low=0, high=1, size=shape
+            ), device=device, dtype=dtype)
         return result
     else:
         raise ValueError(f"Invalid type {type}.")

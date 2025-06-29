@@ -149,10 +149,10 @@ def test_type_b() -> None:
 #         (1, 0, 1): xp.sqrt(3 / 2) * xp.cos(theta),
 #     }
 #     s_beta, l_beta, l = xp.asarray(list(expected.keys())).T
-#     s_beta_ = s_beta.reshape(s_beta.shape + (1,) * theta.ndim)
-#     l_beta_ = l_beta.reshape(l_beta.shape + (1,) * theta.ndim)
-#     l_ = l.reshape(l.shape + (1,) * theta.ndim)
-#     theta_ = theta.reshape((1,) * s_beta.ndim + theta.shape)
+#     s_beta_ = xp.reshape(s_beta,s_beta.shape + (1,) * theta.ndim)
+#     l_beta_ = xp.reshape(l_beta,l_beta.shape + (1,) * theta.ndim)
+#     l_ = xp.reshape(l,l.shape + (1,) * theta.ndim)
+#     theta_ = xp.reshape(theta,(1,) * s_beta.ndim + theta.shape)
 #     actual = type_b(theta=theta, s_beta=s_beta_, l_beta_, l_)
 #     expected = xp.asarray(list(expected.values()), dtype=theta.dtype)
 #     assert xp.allclose(

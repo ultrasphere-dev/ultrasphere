@@ -368,6 +368,7 @@ def expand_dim_harmoncis(
         same or broadcastable.
 
     """
+    xp = array_namespace(harmonics)
     idx_node = c.s_nodes.index(node)
     branching_type = c.branching_types[node]
     if branching_type == BranchingType.A:
@@ -451,6 +452,7 @@ def concat_harmonics(
         The concatenated harmonics.
 
     """
+    xp = array_namespace(*harmonics.values())
     try:
         if c.s_ndim == 0:
             return xp.asarray(1)

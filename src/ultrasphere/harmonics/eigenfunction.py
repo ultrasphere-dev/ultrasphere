@@ -65,7 +65,7 @@ def type_a(
 
     """
     xp = array_namespace(theta)
-    m = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    m = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [-1]
     )
     if include_negative_m:
@@ -128,10 +128,10 @@ def type_b(
     if isinstance(s_beta, int):
         s_beta = xp.asarray(s_beta)
     # using broadcasting may cause problems, we have to be very careful here
-    l_beta = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    l_beta = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [-1]
     )
-    n = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    n = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [1, -1]
     )
     alpha = l_beta + s_beta[..., None] / 2
@@ -195,10 +195,10 @@ def type_bdash(
     xp = array_namespace(theta)
     if isinstance(s_alpha, int):
         s_alpha = xp.asarray(s_alpha)
-    l_alpha = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    l_alpha = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [-1]
     )
-    n = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    n = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [1, -1]
     )
     beta = l_alpha + s_alpha[..., None] / 2
@@ -267,13 +267,13 @@ def type_c(
         s_alpha = xp.asarray(s_alpha)
     if isinstance(s_beta, int):
         s_beta = xp.asarray(s_beta)
-    l_alpha = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    l_alpha = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [-1, 1]
     )  # 2d
-    l_beta = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    l_beta = xp.reshape(xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [1, -1]
     )  # 2d
-    n = xp.arange(0, (n_end + 1) // 2, dtype=theta.dtype, device=theta.device).reshape(
+    n = xp.reshape(xp.arange(0, (n_end + 1) // 2, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [1, 1, -1]
     )  # 3d
     alpha = l_alpha + s_alpha[..., None, None] / 2  # 2d

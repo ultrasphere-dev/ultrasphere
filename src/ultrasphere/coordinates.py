@@ -1,3 +1,4 @@
+from math import lgamma
 import sys
 import warnings
 from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -7,6 +8,7 @@ from array_api_compat import array_namespace
 import array_api_extra as xpx
 from array_api._2024_12 import Array
 import networkx as nx
+import numpy as np
 
 from joblib.memory import Memory
 from shift_nth_row_n_steps import create_slice
@@ -487,8 +489,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         """
         return (
             2
-            * (xp.pi ** (self.e_ndim / 2))
-            / xp.exp(xp.lgamma(self.e_ndim / 2.0))
+            * (np.pi ** (self.e_ndim / 2))
+            / np.exp(lgamma(self.e_ndim / 2.0))
             * r**self.s_ndim
         )
 
@@ -508,8 +510,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
 
         """
         return (
-            (xp.pi ** (self.e_ndim / 2))
-            / xp.exp(xp.lgamma(self.e_ndim / 2.0 + 1.0))
+            (np.pi ** (self.e_ndim / 2))
+            / np.exp(lgamma(self.e_ndim / 2.0 + 1.0))
             * r**self.e_ndim
         )
 
@@ -555,7 +557,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         Boundary Integral Equations. p.251
 
         """
-        return harm_n_ndim(n, e_ndim=c.e_ndim)
+        return harm_n_ndim(n, e_ndim=self.e_ndim)
 
     def from_euclidean(
         self, euclidean: Mapping[TEuclidean, Array]
@@ -574,9 +576,10 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The spherical coordinates.
 
         """
+        xp = array_namespace(*euclidean.values())
         r = (
-            xp.vector_norm(
-                xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes]), axis=0
+            xp.linalg.vector_norm(
+                xp.stack(xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes])), axis=0
             )
             if self.s_ndim > 0
             else euclidean[self.e_nodes[0]]
@@ -593,7 +596,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             cos = tmp[cos_child]
             sin = tmp[sin_child]
             result[node] = xp.atan2(sin, cos)
-            tmp[node] = xp.vector_norm(xp.broadcast_arrays(sin, cos), axis=0)
+            tmp[node] = xp.linalg.vector_norm(xp.stack(xp.broadcast_arrays(sin, cos)), axis=0)
         return result
 
     @overload
@@ -641,6 +644,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The Euclidean coordinates.
 
         """
+        xp = array_namespace(*spherical.values())
         result = {self.root: spherical.get("r", 1)}  # type: ignore
         for node in nx.topological_sort(self.G):
             if node in self.e_nodes:
@@ -693,7 +697,11 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The Jacobian of the spherical coordinates.
 
         """
-        jacobian = xp.get(spherical, "r", 1)
+        xp = array_namespace(*spherical.values())
+        if "r" in spherical:
+            jacobian = spherical["r"]
+        else:
+            jacobian = 1
         for node in self.s_nodes:
             cos = xp.cos(spherical[node])
             sin = xp.sin(spherical[node])
