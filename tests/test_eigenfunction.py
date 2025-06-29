@@ -1,7 +1,7 @@
 import ivy
 import pytest
 
-from ultrasphere.eigenfunction import type_b, type_bdash, type_c
+from ultrasphere.harmonics.eigenfunction import type_b, type_bdash, type_c
 
 
 def type_b_scalar(theta: float, s_beta: float, l_beta: int, l: int) -> float:

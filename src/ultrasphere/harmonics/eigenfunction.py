@@ -22,8 +22,8 @@ import ivy
 from ivy import Array, NativeArray
 from shift_nth_row_n_steps import shift_nth_row_n_steps
 
-from .polynomial import jacobi, jacobi_normalization_constant
-from .symmetry import to_symmetric
+from ..polynomial import jacobi, jacobi_normalization_constant
+from ..symmetry import to_symmetric
 
 
 def type_a(

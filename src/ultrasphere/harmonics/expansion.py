@@ -1,0 +1,628 @@
+
+@overload
+def expand_evaluate(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    expansion: Mapping[TSpherical, Array | NativeArray],
+    spherical: Mapping[TSpherical, Array | NativeArray],
+    *,
+    condon_shortley_phase: bool,
+) -> Mapping[TSpherical, Array]: ...
+
+@overload
+def expand_evaluate(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    expansion: Array | NativeArray,
+    spherical: Mapping[TSpherical, Array | NativeArray],
+    *,
+    condon_shortley_phase: bool,
+) -> Array: ...
+
+def expand_evaluate(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    expansion: Mapping[TSpherical, Array | NativeArray] | Array | NativeArray,
+    spherical: Mapping[TSpherical, Array | NativeArray],
+    *,
+    condon_shortley_phase: bool,
+) -> Array | Mapping[TSpherical, Array]:
+    """
+    Evaluate the expansion at the spherical coordinates.
+
+    Parameters
+    ----------
+    expansion : Mapping[TSpherical, Array  |  NativeArray] | Array | NativeArray
+        The expansion coefficients.
+        If mapping, assume that the expansion is not expanded.
+    spherical : Mapping[TSpherical, Array  |  NativeArray]
+        The spherical coordinates.
+    condon_shortley_phase : bool
+        Whether to apply the Condon-Shortley phase,
+        which just multiplies the result by (-1)^m.
+
+        It seems to be mainly used in quantum mechanics for convenience.
+
+        Note that scipy.special.sph_harm (or scipy.special.lpmv)
+        uses the Condon-Shortley phase.
+
+        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
+
+        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
+        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+
+
+    Returns
+    -------
+    Array | Mapping[TSpherical, Array]
+        The evaluated value.
+
+    """
+    is_mapping = isinstance(expansion, Mapping)
+    n_end, _ = c.get_n_end_and_include_negative_m_from_expansion(expansion)
+    harmonics = c.harmonics(  # type: ignore
+        spherical,
+        n_end,
+        condon_shortley_phase=condon_shortley_phase,
+        expand_dims=not is_mapping,
+        concat=not is_mapping,
+    )
+    if is_mapping:
+        result: dict[TSpherical, Array] = {}
+        for node in c.s_nodes:
+            expansion_ = expansion[node]
+            harmonics_ = harmonics[node]
+            # expansion: f1,...,fL,harm1,...,harmN
+            # harmonics: u1,...,uM,harm1,...,harmN
+            # result: u1,...,uM,f1,...,fL
+            ndim_harmonics = c.ndim_harmonics(node)
+            ndim_expansion = expansion_.ndim - ndim_harmonics
+            ndim_extra_harmonics = harmonics_.ndim - ndim_harmonics
+            expansion_ = harmonics_[
+                (None,) * (ndim_extra_harmonics)
+                + (slice(None),) * (ndim_expansion + ndim_harmonics)
+            ]
+            harmonics = harmonics_[
+                (slice(None),) * ndim_extra_harmonics
+                + (None,) * ndim_expansion
+                + (slice(None),) * ndim_harmonics
+            ]
+            result_ = harmonics_ * expansion_
+            for _ in range(ndim_harmonics):
+                result_ = ivy.sum(result_, axis=-1)
+            result[node] = result
+        return result
+    if isinstance(expansion, Mapping):
+        raise AssertionError()
+    # expansion: f1,...,fL,harm1,...,harmN
+    # harmonics: u1,...,uM,harm1,...,harmN
+    # result: u1,...,uM,f1,...,fL
+    ndim_harmonics = c.s_ndim
+    ndim_expansion = expansion.ndim - ndim_harmonics
+    ndim_extra_harmonics = harmonics.ndim - ndim_harmonics
+    expansion = expansion[
+        (None,) * (ndim_extra_harmonics)
+        + (slice(None),) * (ndim_expansion + ndim_harmonics)
+    ]
+    harmonics = harmonics[
+        (slice(None),) * ndim_extra_harmonics
+        + (None,) * ndim_expansion
+        + (slice(None),) * ndim_harmonics
+    ]
+    result = harmonics * expansion
+    for _ in range(ndim_harmonics):
+        result = ivy.sum(result, axis=-1)
+    return result
+
+@overload
+def expand(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    f: (
+        Callable[
+            [Mapping[TSpherical, Array | NativeArray]],
+            Mapping[TSpherical, Array | NativeArray] | Array | NativeArray,
+        ]
+        | Mapping[TSpherical, Array | NativeArray]
+        | Array
+        | NativeArray
+    ),
+    does_f_support_separation_of_variables: Literal[True],
+    n_end: int,
+    n: int,
+    *,
+    condon_shortley_phase: bool,
+    device: ivy.Device | ivy.NativeDevice | None = None,
+    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+) -> Mapping[TSpherical, Array]: ...
+
+@overload
+def expand(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    f: (
+        Callable[
+            [Mapping[TSpherical, Array | NativeArray]],
+            Mapping[TSpherical, Array | NativeArray] | Array | NativeArray,
+        ]
+        | Mapping[TSpherical, Array | NativeArray]
+        | Array
+        | NativeArray
+    ),
+    does_f_support_separation_of_variables: Literal[False],
+    n_end: int,
+    n: int,
+    *,
+    condon_shortley_phase: bool,
+    device: ivy.Device | ivy.NativeDevice | None = None,
+    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+) -> Array: ...
+
+def expand(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    f: (
+        Callable[
+            [Mapping[TSpherical, Array | NativeArray]],
+            Mapping[TSpherical, Array | NativeArray] | Array | NativeArray,
+        ]
+        | Mapping[TSpherical, Array | NativeArray]
+        | Array
+        | NativeArray
+    ),
+    does_f_support_separation_of_variables: bool,
+    n_end: int,
+    n: int,
+    *,
+    condon_shortley_phase: bool,
+    device: ivy.Device | ivy.NativeDevice | None = None,
+    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+) -> Array | Mapping[TSpherical, Array]:
+    """
+    Calculate the expansion coefficients of the function
+    over the hypersphere.
+
+    Parameters
+    ----------
+    f : Callable[ [Mapping[TSpherical, Array  |  NativeArray]],
+        Mapping[TSpherical, Array  |  NativeArray]  |  Array  |  NativeArray, ]
+        |  Mapping[TSpherical, Array  |  NativeArray]  |  Array  |  NativeArray
+        The function to integrate or the values of the function.
+        In case of vectorized function, the function should add extra
+        axis to the last dimension, not the first dimension.
+    does_f_support_separation_of_variables : bool
+        Whether the function supports separation of variables.
+        This could significantly reduce the computational cost.
+    n : int
+        The number of integration points.
+
+        Must be equal to or larger than n_end.
+
+        Must be large enough against f, as this method
+        does not use adaptive integration. For example,
+        consider expanding $f(θ) = e^(2Nθ)$ with $n=N$.
+
+        >>> from ultrasphere import SphericalCoordinates
+        >>> from ultrasphere.coordinates import SphericalCoordinates
+        >>> import numpy as np
+        >>> n = 5
+        >>> expansion = SphericalCoordinates.standard(1).expand(
+        >>>     lambda x: np.exp(1j * (2 * n) * x["theta0"]) / np.sqrt(2 * np.pi),
+        >>>     does_f_support_separation_of_variables=False,
+        >>>     n=n,
+        >>>     n_end=n,
+        >>>     condon_shortley_phase=False
+        >>> )
+        >>> print(np.round(expansion, 2).real.tolist())
+        [1.0, 0.0, 0.0, 0.0, 0.0, -0.0, -0.0, -0.0, -0.0]
+
+        This result claims that f(θ) = 1, which is incorrect.
+    n_end : int
+        The maximum degree of the harmonic.
+    condon_shortley_phase : bool
+        Whether to apply the Condon-Shortley phase,
+        which just multiplies the result by (-1)^m.
+
+        It seems to be mainly used in quantum mechanics for convenience.
+
+        Note that scipy.special.sph_harm (or scipy.special.lpmv)
+        uses the Condon-Shortley phase.
+
+        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
+
+        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
+        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    device : ivy.Device | ivy.NativeDevice, optional
+        The device, by default None
+    dtype : ivy.Dtype | ivy.NativeDtype, optional
+        The data type, by default None
+
+    Returns
+    -------
+    Array | Mapping[TSpherical, Array]
+        The expanded value.
+        Last `c.s_ndim` axis [-c.s_ndim, -1]
+        corresponds to the quantum numbers.
+
+        The dimensions are not expanded if Mapping is returned.
+        Use `c.expand_dims_harmonics()`
+        and `c.concat_harmonics()`
+        to expand the dimensions and to concat values.
+
+    """
+    if n < n_end:
+        raise ValueError(
+            f"n={n} < n_end={n_end}, which would lead to incorrect results."
+        )
+
+    def inner(
+        xs: Mapping[TSpherical, Array | NativeArray],
+    ) -> Mapping[TSpherical, Array | NativeArray]:
+        # calculate f
+        if isinstance(f, Callable):  # type: ignore
+            try:
+                val = f(xs)  # type: ignore
+            except Exception as e:
+                raise RuntimeError(f"Error occurred while evaluating {f=}") from e
+        else:
+            val = f
+
+        # calculate harmonics
+        harmonics = c.harmonics(  # type: ignore
+            xs,
+            n_end,
+            condon_shortley_phase=condon_shortley_phase,
+            expand_dims=not does_f_support_separation_of_variables,
+            concat=not does_f_support_separation_of_variables,
+        )
+
+        # multiply f and harmonics
+        # (C,complex conjugate) is star-algebra
+        if isinstance(val, Mapping):
+            if not does_f_support_separation_of_variables:
+                raise ValueError(
+                    "val is Mapping but "
+                    "does_f_support_separation_of_variables "
+                    "is False."
+                )
+            result = {}
+            for node in c.s_nodes:
+                value = val[node]
+                # val: theta(node),u1,...,uM
+                # harmonics: theta(node),harm1,...,harmN
+                # result: theta(node),u1,...,uM,harm1,...,harmN
+                ivy.broadcast_shapes(
+                    ivy.shape(value)[:1], ivy.shape(harmonics[node])[:1]
+                )
+                ndim_val = value.ndim - 1
+                ndim_harm = c.ndim_harmonics(node)
+                value = value[(...,) + (None,) * (ndim_harm)]
+                harm = harmonics[node][
+                    (slice(None),) + (None,) * ndim_val + (slice(None),) * ndim_harm
+                ]
+                result[node] = value * harm.conj()
+        else:
+            if does_f_support_separation_of_variables:
+                raise ValueError(
+                    "val is not Mapping but "
+                    "does_f_support_separation_of_variables "
+                    "is True."
+                )
+            # val: theta1,...,thetaN,u1,...,uM
+            # harmonics: theta1,...,thetaN,harm1,...,harmN
+            # res: theta1,...,thetaN,u1,...,uM,harm1,...,harmN
+            ivy.broadcast_shapes(
+                ivy.shape(val)[: c.s_ndim], ivy.shape(harmonics)[: c.s_ndim]
+            )
+            ndim_val = val.ndim - c.s_ndim
+            val = val[
+                (slice(None),) * (c.s_ndim + ndim_val) + (None,) * c.s_ndim
+            ]
+            harmonics = harmonics[
+                (slice(None),) * c.s_ndim
+                + (None,) * ndim_val
+                + (slice(None),) * c.s_ndim
+            ]
+            result = val * harmonics.conj()
+
+        return result
+
+    return c.integrate(  # type: ignore
+        inner, does_f_support_separation_of_variables, n, device=device, dtype=dtype
+    )
+
+def expand_dim_harmoncis(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    node: TSpherical,
+    harmonics: Array | NativeArray,
+) -> Array:
+    """
+    Expand the dimension of the harmonics.
+
+    Expand the dimension so that
+    all values of the harmonics() result dictionary
+    are commomly indexed by the same s_nodes, by default False
+
+    For example, if spherical coordinates,
+    if True, the result will be indexed {"phi": [m], "theta": [m, n]}
+    if False, the result will be indexed {"phi": [m, n], "theta": [m, n]}
+
+    Note that the values will not be repeated
+    therefore the computational cost will be the same
+
+    Parameters
+    ----------
+    node : TSpherical
+        The node of the spherical coordinates.
+    harmonics : Array | NativeArray
+        The harmonics (eigenfunctions).
+
+    Returns
+    -------
+    Array
+        The expanded harmonics.
+        The shapes does not need to be either
+        same or broadcastable.
+
+    """
+    idx_node = c.s_nodes.index(node)
+    branching_type = c.branching_types[node]
+    if branching_type == BranchingType.A:
+        moveaxis = {0: idx_node}
+    elif branching_type == BranchingType.B:
+        idx_sin_child = c.s_nodes.index(get_child(c.G, node, "sin"))
+        moveaxis = {
+            0: idx_sin_child,
+            1: idx_node,
+        }
+    elif branching_type == BranchingType.BP:
+        idx_cos_child = c.s_nodes.index(get_child(c.G, node, "cos"))
+        moveaxis = {
+            0: idx_cos_child,
+            1: idx_node,
+        }
+    elif branching_type == BranchingType.C:
+        idx_cos_child = c.s_nodes.index(get_child(c.G, node, "cos"))
+        idx_sin_child = c.s_nodes.index(get_child(c.G, node, "sin"))
+        moveaxis = {0: idx_cos_child, 1: idx_sin_child, 2: idx_node}
+    value_additional_ndim = harmonics.ndim - len(moveaxis)
+    moveaxis = {
+        k + value_additional_ndim: v + value_additional_ndim
+        for k, v in moveaxis.items()
+    }
+    adding_ndim = c.s_ndim - len(moveaxis)
+    harmonics = harmonics[(...,) + (None,) * adding_ndim]
+    return ivy.moveaxis(harmonics, list(moveaxis.keys()), list(moveaxis.values()))
+
+def expand_dims_harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    harmonics: Mapping[TSpherical, Array | NativeArray],
+) -> Mapping[TSpherical, Array]:
+    """
+    Expand dimensions of the harmonics.
+
+    Expand dimensions so that
+    all values of the harmonics() result dictionary
+    are commomly indexed by the same s_nodes, by default False
+
+    For example, if spherical coordinates,
+    if True, the result will be indexed {"phi": [m], "theta": [m, n]}
+    if False, the result will be indexed {"phi": [m, n], "theta": [m, n]}
+
+    Note that the values will not be repeated
+    therefore the computational cost will be the same
+
+    Parameters
+    ----------
+    harmonics : Mapping[TSpherical, Array  |  NativeArray]
+        The dictionary of harmonics (eigenfunctions).
+
+    Returns
+    -------
+    Mapping[TSpherical, Array]
+        The expanded harmonics.
+        The shapes does not need to be either
+        same or broadcastable.
+
+    """
+    result: dict[TSpherical, Array] = {}
+    for node in c.s_nodes:
+        result[node] = c.expand_dim_harmoncis(node, harmonics[node])
+    return result
+
+def concat_harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    harmonics: Mapping[TSpherical, Array | NativeArray],
+) -> Array:
+    """
+    Concatenate the mapping of expanded harmonics.
+
+    Parameters
+    ----------
+    harmonics : Mapping[TSpherical, Array  |  NativeArray]
+        The expanded harmonics.
+
+    Returns
+    -------
+    Array
+        The concatenated harmonics.
+
+    """
+    try:
+        if c.s_ndim == 0:
+            return ivy.array(1)
+        return ivy.prod(
+            ivy.stack(ivy.broadcast_arrays(*harmonics.values()), axis=0), axis=0
+        )
+    except Exception as e:
+        shapes = {k: v.shape for k, v in harmonics.items()}
+        raise RuntimeError(f"Error occurred while concatenating {shapes=}") from e
+
+def ndim_harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    node: TSpherical,
+) -> int:
+    """
+    The number of dimensions of the eigenfunction
+    corresponding to the node.
+
+    Parameters
+    ----------
+    node : TSpherical
+        The node of the spherical coordinates.
+
+    Returns
+    -------
+    int
+        The number of dimensions.
+
+    """
+    return {
+        BranchingType.A: 1,
+        BranchingType.B: 2,
+        BranchingType.BP: 2,
+        BranchingType.C: 3,
+    }[c.branching_types[node]]
+
+
+@overload
+def harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    spherical: Mapping[TSpherical, Array | NativeArray],
+    n_end: int,
+    *,
+    condon_shortley_phase: bool,
+    include_negative_m: bool = True,
+    index_with_surrogate_quantum_number: bool = False,
+    expand_dims: Literal[True] = ...,
+    concat: Literal[True] = ...,
+) -> Array: ...
+
+@overload
+def harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    spherical: Mapping[TSpherical, Array | NativeArray],
+    n_end: int,
+    *,
+    condon_shortley_phase: bool,
+    include_negative_m: bool = True,
+    index_with_surrogate_quantum_number: bool = False,
+    expand_dims: bool = True,
+    concat: Literal[False] = ...,
+) -> Mapping[TSpherical, Array]: ...
+
+def harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    spherical: Mapping[TSpherical, Array | NativeArray],
+    n_end: int,
+    *,
+    condon_shortley_phase: bool,
+    include_negative_m: bool = True,
+    index_with_surrogate_quantum_number: bool = False,
+    expand_dims: bool = False,
+    concat: bool = False,
+) -> Mapping[TSpherical, Array] | Array:
+    """
+    Calculate the spherical harmonics.
+
+    Parameters
+    ----------
+    spherical : Mapping[TSpherical, Array | NativeArray]
+        The spherical coordinates.
+    n_end : int
+        The maximum degree of the harmonic.
+    condon_shortley_phase : bool, optional
+        Whether to apply the Condon-Shortley phase,
+        which just multiplies the result by (-1)^m.
+
+        It seems to be mainly used in quantum mechanics for convenience.
+
+        Note that scipy.special.sph_harm (or scipy.special.lpmv)
+        uses the Condon-Shortley phase.
+
+        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
+
+        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
+        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    include_negative_m : bool, optional
+        Whether to include negative m values, by default True
+        If True, the m values are [0, 1, ..., n_end-1, -n_end+1, ..., -1],
+        and starts from 0, not -n_end+1.
+    index_with_surrogate_quantum_number : bool, optional
+        Whether to index with surrogate quantum number, by default False
+    expand_dims : bool, optional
+        Whether to expand dimensions so that
+        all values of the result dictionary
+        are commomly indexed by the same s_nodes, by default False
+
+        For example, if spherical coordinates,
+        if True, the result will be indexed {"phi": [m], "theta": [m, n]}
+        if False, the result will be indexed {"phi": [m, n], "theta": [m, n]}
+
+        Note that the values will not be repeated
+        therefore the computational cost will be the same
+    concat : bool, optional
+        Whether to concatenate the results, by default True
+
+
+    Returns
+    -------
+    Array
+        The spherical harmonics.
+
+    """
+    if concat and not expand_dims:
+        raise ValueError("expand_dims must be True if concat is True.")
+    from .harmonics.eigenfunction import type_a, type_b, type_bdash, type_c
+
+    result = {}
+    for node in c.s_nodes:
+        value = spherical[node]
+        if node == "r":
+            continue
+        if node not in c.s_nodes:
+            raise ValueError(f"Key {node} is not in c.s_nodes {c.s_nodes}.")
+        if c.branching_types[node] == BranchingType.A:
+            result[node] = type_a(
+                value,
+                n_end=n_end,
+                condon_shortley_phase=condon_shortley_phase,
+                include_negative_m=include_negative_m,
+            )
+        elif c.branching_types[node] == BranchingType.B:
+            result[node] = type_b(
+                value,
+                n_end=n_end,
+                s_beta=c.S[get_child(c.G, node, "sin")],
+                index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
+                is_beta_type_a_and_include_negative_m=include_negative_m
+                and c.branching_types[get_child(c.G, node, "sin")]
+                == BranchingType.A,
+            )
+        elif c.branching_types[node] == BranchingType.BP:
+            result[node] = type_bdash(
+                value,
+                n_end=n_end,
+                s_alpha=c.S[get_child(c.G, node, "cos")],
+                index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
+                is_alpha_type_a_and_include_negative_m=include_negative_m
+                and c.branching_types[get_child(c.G, node, "cos")]
+                == BranchingType.A,
+            )
+        elif c.branching_types[node] == BranchingType.C:
+            result[node] = type_c(
+                value,
+                n_end=n_end,
+                s_alpha=c.S[get_child(c.G, node, "cos")],
+                s_beta=c.S[get_child(c.G, node, "sin")],
+                index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
+                is_alpha_type_a_and_include_negative_m=include_negative_m
+                and c.branching_types[get_child(c.G, node, "cos")]
+                == BranchingType.A,
+                is_beta_type_a_and_include_negative_m=include_negative_m
+                and c.branching_types[get_child(c.G, node, "sin")]
+                == BranchingType.A,
+            )
+        else:
+            raise ValueError(
+                f"Invalid branching type {c.branching_types[node]}."
+            )
+    if expand_dims:
+        result = c.expand_dims_harmonics(result)  # type: ignore
+    if concat:
+        result = c.concat_harmonics(result)
+    return result
