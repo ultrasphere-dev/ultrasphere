@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from functools import lru_cache
 from ultrasphere.coordinates import BranchingType, SphericalCoordinates, get_digraph_from_branching_type
-
+import numpy as np
 
 import networkx as nx
 

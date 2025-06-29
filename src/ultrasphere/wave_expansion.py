@@ -1,20 +1,22 @@
-import ivy
-from ivy import Array, NativeArray
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
+
 
 from .special import binom
 
 
 def homogeneous_ndim(
-    n: int | Array | NativeArray, *, e_ndim: int | Array | NativeArray
+    n: int | Array, *, e_ndim: int | Array
 ) -> int | Array:
     """
     The dimension of the homogeneous polynomials of degree n.
 
     Parameters
     ----------
-    n : int | Array | NativeArray
+    n : int | Array
         The degree.
-    e_ndim : int | Array | NativeArray
+    e_ndim : int | Array
         The dimension of the Euclidean space.
 
     Returns
@@ -28,22 +30,21 @@ def homogeneous_ndim(
     Boundary Integral Equations. p.250
 
     """
-    n = ivy.array(n)
     s_ndim = e_ndim - 1
     return binom(n + s_ndim, s_ndim)
 
 
 def harm_n_ndim(
-    n: int | Array | NativeArray, *, e_ndim: int | Array | NativeArray
+    n: int | Array, *, e_ndim: int | Array
 ) -> int | Array:
     """
     The dimension of the spherical harmonics of degree n.
 
     Parameters
     ----------
-    n : int | Array | NativeArray
+    n : int | Array
         The degree.
-    e_ndim : int | Array | NativeArray
+    e_ndim : int | Array
         The dimension of the Euclidean space.
 
     Returns
@@ -57,26 +58,26 @@ def harm_n_ndim(
     Boundary Integral Equations. p.251
 
     """
-    n = ivy.array(n, dtype=float)
+    xp = array_namespace(n, e_ndim)
     if e_ndim == 1:
-        return ivy.where(n <= 1, 1, 0)
+        return xp.where(n <= 1, 1, 0)
     elif e_ndim == 2:
-        return ivy.where(n == 0, 1, 2)
+        return xp.where(n == 0, 1, 2)
     else:
         return (2 * n + e_ndim - 2) / (e_ndim - 2) * binom(n + e_ndim - 3, e_ndim - 3)
 
 
 def plane_wave_expansion_coef(
-    n: int | Array | NativeArray, *, e_ndim: int | Array | NativeArray
+    n: int | Array, *, e_ndim: int | Array
 ) -> Array:
     """
     The coefficients of the plane wave expansion.
 
     Parameters
     ----------
-    n : int | Array | NativeArray
+    n : int | Array
         The degree.
-    e_ndim : int | Array | NativeArray
+    e_ndim : int | Array
         The dimension of the Euclidean space.
 
     Returns
@@ -86,10 +87,11 @@ def plane_wave_expansion_coef(
         of degree n.
 
     """
+    xp = array_namespace(n, e_ndim)
     return (
         1j**n
         * (2 * n + e_ndim - 2)
         / (e_ndim - 2)
-        * ivy.exp(ivy.lgamma(e_ndim / 2.0) + ivy.log(2) * ((e_ndim - 1) / 2))
-        / ivy.sqrt(ivy.pi)
+        * xp.exp(xp.lgamma(e_ndim / 2.0) + xp.log(2) * ((e_ndim - 1) / 2))
+        / xp.sqrt(xp.pi)
     )

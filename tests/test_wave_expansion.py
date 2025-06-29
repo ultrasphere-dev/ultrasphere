@@ -1,4 +1,6 @@
-import ivy
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
 import pytest
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
@@ -9,7 +11,7 @@ from ultrasphere.wave_expansion import plane_wave_expansion_coef
 
 @pytest.fixture(autouse=True, scope="session", params=["numpy", "torch"])
 def setup(request: pytest.FixtureRequest) -> None:
-    ivy.set_backend(request.param)
+    xp.set_backend(request.param)
 
 
 @pytest.mark.parametrize(
@@ -25,23 +27,23 @@ def test_plane_wave_decomposition(
     n_end: int,
 ) -> None:
     shape = (5,)
-    r = ivy.random.random_uniform(low=0, high=2, shape=shape)
-    gamma = ivy.random.random_uniform(low=0, high=ivy.pi, shape=shape)
-    k = ivy.ones_like(r)
-    expected = ivy.exp(1j * k * r * ivy.cos(gamma))
-    n = ivy.arange(n_end)[(None,) * len(shape) + (slice(None),)]
+    r = xp.random.random_uniform(low=0, high=2, shape=shape)
+    gamma = xp.random.random_uniform(low=0, high=xp.pi, shape=shape)
+    k = xp.ones_like(r)
+    expected = xp.exp(1j * k * r * xp.cos(gamma))
+    n = xp.arange(n_end)[(None,) * len(shape) + (slice(None),)]
     coef = plane_wave_expansion_coef(n, e_ndim=c.e_ndim)
-    actual = ivy.sum(
+    actual = xp.sum(
         coef
         * sjv(
             n,
-            ivy.asarray(c.e_ndim),
+            xp.asarray(c.e_ndim),
             k[..., None] * r[..., None],
         )
-        # * legendre(ivy.cos(gamma), ndim=c.e_ndim, n_end=n_end)
+        # * legendre(xp.cos(gamma), ndim=c.e_ndim, n_end=n_end)
         * gegenbauer(
-            ivy.cos(gamma), alpha=ivy.asarray((c.e_ndim - 2) / 2), n_end=n_end
+            xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end
         ),
         axis=-1,
     )
-    assert ivy.allclose(actual, expected, rtol=1e-3, atol=1e-3)
+    assert xp.allclose(actual, expected, rtol=1e-3, atol=1e-3)

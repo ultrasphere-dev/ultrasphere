@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-import ivy
-from ivy import Array, NativeArray
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
+
 
 
 def is_same_shape(*shapes: tuple[int, ...]) -> bool:
@@ -15,13 +17,13 @@ def is_same_shape(*shapes: tuple[int, ...]) -> bool:
 
     """
     try:
-        ivy.broadcast_shapes(*shapes)
+        xpx.broadcast_shapes(*shapes)
     except ValueError:
         return False
     return True
 
 
-def check_same_shape(*shapes: tuple[int, ...] | Array | NativeArray) -> None:
+def check_same_shape(*shapes: tuple[int, ...] | Array) -> None:
     """
     Check if the shapes are the same shape, ignoring 1s.
 

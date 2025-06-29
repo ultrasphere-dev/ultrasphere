@@ -1,5 +1,8 @@
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, get_child
-
+from typing import Any, Callable
+from .coordinates import BranchingType, SphericalCoordinates, TSpherical, get_child, TEuclidean
+from array_api._2024_12 import Array, ArrayNamespace
+from array_api_compat import array_namespace
+import array_api_extra as xpx
 
 from collections.abc import Mapping
 
@@ -10,8 +13,9 @@ def roots(
     *,
     expand_dims_x: bool,
     expand_dims_w: bool = False,
-    device: ivy.Device | ivy.NativeDevice | None = None,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+    device: Any | None = None,
+    dtype: Any | None = None,
+    xp: ArrayNamespace,
 ) -> tuple[Mapping[TSpherical, Array], Mapping[TSpherical, Array]]:
     """
     Gauss-Jacobi quadrature roots and weights.
@@ -24,9 +28,9 @@ def roots(
         Whether to expand dimensions of the roots, by default False
     expand_dims_w : bool, optional
         Whether to expand dimensions of the weights, by default False
-    device : ivy.Device | ivy.NativeDevice, optional
+    device : Any, optional
         The device, by default None
-    dtype : ivy.Dtype | ivy.NativeDtype, optional
+    dtype : Any, optional
         The data type, by default None
 
     Returns
@@ -47,18 +51,18 @@ def roots(
     for i, node in enumerate(c.s_nodes):
         branching_type = c.branching_types[node]
         if branching_type == BranchingType.A:
-            x = ivy.arange(2 * n, device=device, dtype=dtype) * ivy.pi / n
-            w = ivy.ones(2 * n, device=device, dtype=dtype) * ivy.pi / n
+            x = xp.arange(2 * n, device=device, dtype=dtype) * xp.pi / n
+            w = xp.ones(2 * n, device=device, dtype=dtype) * xp.pi / n
         elif branching_type == BranchingType.B:
             s_beta = c.S[get_child(c.G, node, "sin")]
             beta = s_beta / 2
             x, w = roots_jacobi(n, beta, beta)
-            x = ivy.acos(x)
+            x = xp.acos(x)
         elif branching_type == BranchingType.BP:
             s_alpha = c.S[get_child(c.G, node, "cos")]
             alpha = s_alpha / 2
             x, w = roots_jacobi(n, alpha, alpha)
-            x = ivy.asin(x)
+            x = xp.asin(x)
         elif branching_type == BranchingType.C:
             s_alpha = c.S[get_child(c.G, node, "cos")]
             s_beta = c.S[get_child(c.G, node, "sin")]
@@ -66,11 +70,11 @@ def roots(
             beta = s_beta / 2
             x, w = roots_jacobi(n, alpha, beta)
             w /= 2 ** (alpha + beta + 2)
-            x = ivy.acos(x) / 2
+            x = xp.acos(x) / 2
         else:
             raise ValueError(f"Invalid branching type {branching_type}.")
-        x = ivy.array(x, device=device, dtype=dtype)
-        w = ivy.array(w, device=device, dtype=dtype)
+        x = xp.asarray(x, device=device, dtype=dtype)
+        w = xp.asarray(w, device=device, dtype=dtype)
         if expand_dims_x:
             x = x[(None,) * i + (slice(None),) + (None,) * (c.s_ndim - i - 1)]
         if expand_dims_w:
@@ -85,16 +89,16 @@ def integrate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
         Callable[
-            [Mapping[TSpherical, Array | NativeArray]],
-            Mapping[TSpherical, Array | NativeArray],
+            [Mapping[TSpherical, Array]],
+            Mapping[TSpherical, Array],
         ]
-        | Mapping[TSpherical, Array | NativeArray]
+        | Mapping[TSpherical, Array]
     ),
     does_f_support_separation_of_variables: Literal[True],
     n: int,
     *,
-    device: ivy.Device | ivy.NativeDevice | None = None,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+    device: Any | None = None,
+    dtype: Any | None = None,
 ) -> Mapping[TSpherical, Array]: ...
 
 @overload
@@ -102,44 +106,43 @@ def integrate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
         Callable[
-            [Mapping[TSpherical, Array | NativeArray]],
-            Array | NativeArray,
+            [Mapping[TSpherical, Array]],
+            Array,
         ]
         | Array
-        | NativeArray
     ),
     does_f_support_separation_of_variables: Literal[False],
     n: int,
     *,
-    device: ivy.Device | ivy.NativeDevice | None = None,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+    device: Any | None = None,
+    dtype: Any | None = None,
 ) -> Array: ...
 
 def integrate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
         Callable[
-            [Mapping[TSpherical, Array | NativeArray]],
-            Mapping[TSpherical, Array | NativeArray] | Array | NativeArray,
+            [Mapping[TSpherical, Array]],
+            Mapping[TSpherical, Array] | Array,
         ]
-        | Mapping[TSpherical, Array | NativeArray]
+        | Mapping[TSpherical, Array]
         | Array
-        | NativeArray
+        
     ),
     does_f_support_separation_of_variables: bool,
     n: int,
     *,
-    device: ivy.Device | ivy.NativeDevice | None = None,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+    device: Any | None = None,
+    dtype: Any | None = None,
 ) -> Array | Mapping[TSpherical, Array]:
     """
     Integrate the function over the hypersphere.
 
     Parameters
     ----------
-    f : Callable[ [Mapping[TSpherical, Array  |  NativeArray]],
-        Mapping[TSpherical, Array  |  NativeArray]  |  Array  |  NativeArray, ]
-        |  Mapping[TSpherical, Array  |  NativeArray]  |  Array  |  NativeArray
+    f : Callable[ [Mapping[TSpherical, Array]],
+        Mapping[TSpherical, Array] | Array, ]
+        | Mapping[TSpherical, Array] | Array
             The function to integrate or the values of the function.
         In case of vectorized function, the function should add extra
         axis to the last dimension, not the first dimension.
@@ -148,9 +151,9 @@ def integrate(
         This could significantly reduce the computational cost.
     n : int
         The number of roots.
-    device : ivy.Device | ivy.NativeDevice, optional
+    device : Any, optional
         The device, by default None
-    dtype : ivy.Dtype | ivy.NativeDtype, optional
+    dtype : Any, optional
         The data type, by default None
 
     Returns
@@ -159,12 +162,6 @@ def integrate(
         The integrated value.
 
     """
-    xs, ws = c.roots(
-        n,
-        device=device,
-        dtype=dtype,
-        expand_dims_x=not does_f_support_separation_of_variables,
-    )
     if isinstance(f, Callable):  # type: ignore
         try:
             val = f(xs)  # type: ignore
@@ -172,6 +169,15 @@ def integrate(
             raise RuntimeError(f"Error occurred while evaluating {f=}") from e
     else:
         val = f
+    xp = array_namespace(*val.values()) if isinstance(val, Mapping) else array_namespace(val)
+    xs, ws = roots(
+        c,
+        n,
+        device=device,
+        dtype=dtype,
+        expand_dims_x=not does_f_support_separation_of_variables,
+        xp=xp,
+    )
 
     # in case f(theta1, ...) = f_1(theta1) * f_2(theta2) * ...
     if isinstance(val, Mapping):
@@ -182,15 +188,15 @@ def integrate(
             # axis=0 because in sph_harm
             # we add axis to the last dimension
             # theta(node),u1,...,uM
-            ivy.broadcast_shapes(ivy.shape(value)[:1], ivy.shape(ws[node]))
-            w = ws[node].reshape([-1] + [1] * (value.ndim - 1))
-            result[node] = ivy.sum(value * w, axis=0)
+            xpx.broadcast_shapes(value.shape[:1], ws[node].shape)
+            w = xp.reshape(ws[node], [-1] + [1] * (value.ndim - 1))
+            result[node] = xp.sum(value * w, axis=0)
         # we don't know how to einsum the result
         return result
     # theta1,...,thetaN,u1,...,uM\
     for node in c.s_nodes:
         w = ws[node]
-        ivy.broadcast_shapes(ivy.shape(val)[:1], ivy.shape(w))
-        # val = ivy.einsum("i...,i->...", val, w.astype(val.dtype))
-        val = ivy.sum(val * w[(slice(None),) + (None,) * (val.ndim - 1)], axis=0)
+        xpx.broadcast_shapes(val.shape[:1], w.shape)
+        # val = xp.einsum("i...,i->...", val, w.astype(val.dtype))
+        val = xp.sum(val * w[(slice(None),) + (None,) * (val.ndim - 1)], axis=0)
     return val

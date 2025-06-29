@@ -1,16 +1,27 @@
 
+from typing import Literal, Mapping, overload
+
+from array_api._2024_12 import Array
+from array_api_compat import array_namespace
+from shift_nth_row_n_steps._torch_like import create_slice
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
+from ultrasphere.harmonics.index import index_array_harmonics
+from ultrasphere.special import szv
+
+
 @overload
 def harmonics_regular_singular(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
-        Mapping[TSpherical | Literal["r"], Array | NativeArray]
-        | Mapping[Literal["r"], Array | NativeArray]
+        Mapping[TSpherical | Literal["r"], Array]
+        | Mapping[Literal["r"], Array]
     ),
     *,
-    k: Array | NativeArray,
+    k: Array,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = ...,
-    harmonics: Mapping[TSpherical, Array | NativeArray],
+    harmonics: Mapping[TSpherical, Array],
     multiply: bool = True,
 ) -> Mapping[TSpherical, Array]: ...
 
@@ -18,28 +29,28 @@ def harmonics_regular_singular(
 def harmonics_regular_singular(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
-        Mapping[TSpherical | Literal["r"], Array | NativeArray]
-        | Mapping[Literal["r"], Array | NativeArray]
+        Mapping[TSpherical | Literal["r"], Array]
+        | Mapping[Literal["r"], Array]
     ),
     *,
-    k: Array | NativeArray,
+    k: Array,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = ...,
-    harmonics: Array | NativeArray,
+    harmonics: Array,
     multiply: bool = True,
 ) -> Array: ...
 
 def harmonics_regular_singular(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
-        Mapping[TSpherical | Literal["r"], Array | NativeArray]
-        | Mapping[Literal["r"], Array | NativeArray]
+        Mapping[TSpherical | Literal["r"], Array]
+        | Mapping[Literal["r"], Array]
     ),
     *,
-    k: Array | NativeArray,
+    k: Array,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
-    harmonics: Array | NativeArray | Mapping[TSpherical, Array | NativeArray],
+    harmonics: Array | Mapping[TSpherical, Array],
     multiply: bool = True,
 ) -> Array | Mapping[TSpherical, Array]:
     """
@@ -48,10 +59,10 @@ def harmonics_regular_singular(
     Parameters
     ----------
     spherical : Mapping[TSpherical | Literal['r'],
-        Array | NativeArray] | Mapping[Literal['r'],
-        Array | NativeArray]
+        Array] | Mapping[Literal['r'],
+        Array]
         The spherical coordinates.
-    k : Array | NativeArray
+    k : Array
         The wavenumber. Must be positive.
     type : Literal['regular', 'singular', 'j', 'y', 'h1', 'h2']
         The type of the spherical Bessel/Hankel function.
@@ -76,13 +87,14 @@ def harmonics_regular_singular(
         If the wavenumber is not positive.
 
     """
+    xp = array_namespace(*(*spherical.values(), k, *(harmonics.values() if isinstance(harmonics, Mapping) else (harmonics,))))
     is_mapping = isinstance(harmonics, Mapping)
     if multiply and is_mapping:
         raise ValueError("multiply must be False if harmonics is Mapping.")
     n_end, include_negative_m = (
-        c.get_n_end_and_include_negative_m_from_expansion(harmonics)
+        get_n_end_and_include_negative_m_from_expansion(c, harmonics)
     )
-    n = c.index_array_harmonics(
+    n = index_array_harmonics(c, 
         c.root, n_end=n_end, include_negative_m=include_negative_m
     )[(None,) * spherical["r"].ndim + (slice(None),)]
     kr = k * spherical["r"]
@@ -93,7 +105,7 @@ def harmonics_regular_singular(
     elif type == "singular":
         type = "h1"
     val = szv(n, c.e_ndim, kr, type=type, derivative=derivative)
-    val = ivy.nan_to_num(val, nan=0)
+    val = xp.nan_to_num(val, nan=0)
     expand_dims = not (is_mapping and len({h.ndim for h in harmonics.values()}) > 1)
     if expand_dims:
         idx = c.s_nodes.index(c.root)

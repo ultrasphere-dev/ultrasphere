@@ -1,9 +1,18 @@
 
+from typing import Literal, Mapping, overload
+from array_api._2024_12 import Array, ArrayNamespace
+from shift_nth_row_n_steps._torch_like import create_slice
+from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere.harmonics.flatten import flatten_mask_harmonics
+from ultrasphere.symmetry import to_symmetric
+
+
 def index_array_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
     *,
     n_end: int,
+    xp: ArrayNamespace,
     expand_dims: bool = False,
     include_negative_m: bool = True,
 ) -> Array:
@@ -30,16 +39,16 @@ def index_array_harmonics(
     """
     branching_type = c.branching_types[node]
     if branching_type == BranchingType.A and include_negative_m:
-        result = to_symmetric(ivy.arange(0, n_end), asymmetric=True)
+        result = to_symmetric(xp.arange(0, n_end), asymmetric=True)
     elif (
         branching_type == BranchingType.B
         or branching_type == BranchingType.BP
         or (branching_type == BranchingType.A and not include_negative_m)
     ):
-        result = ivy.arange(0, n_end)
+        result = xp.arange(0, n_end)
     elif branching_type == BranchingType.C:
-        # result = ivy.arange(0, (n_end + 1) // 2)
-        result = ivy.arange(0, n_end)
+        # result = xp.arange(0, (n_end + 1) // 2)
+        result = xp.arange(0, n_end)
     if expand_dims:
         idx = c.s_nodes.index(node)
         result = result[
@@ -52,6 +61,7 @@ def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
+    xp: ArrayNamespace,
     include_negative_m: bool = ...,
     expand_dims: bool,
     as_array: Literal[False],
@@ -62,6 +72,7 @@ def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
+    xp: ArrayNamespace,
     include_negative_m: bool = ...,
     expand_dims: Literal[True],
     as_array: Literal[True],
@@ -72,6 +83,7 @@ def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
+    xp: ArrayNamespace,
     include_negative_m: bool = True,
     expand_dims: bool,
     as_array: bool,
@@ -101,9 +113,9 @@ def index_array_harmonics_all(
     Array | Mapping[TSpherical, Array]
         If as_array is True, the indices of shape
         [c.s_ndim,
-        len(c.index_array_harmonics(node1)),
+        len(index_array_harmonics(c, node1)),
         ...,
-        len(c.index_array_harmonics(node(c.s_ndim)))].
+        len(index_array_harmonics(c, node(c.s_ndim)))].
         If as_array is False, the dictionary of indices.
 
     Notes
@@ -124,8 +136,9 @@ def index_array_harmonics_all(
     if mask and not as_array:
         raise ValueError("mask must be False if as_array is False.")
     index_arrays = {
-        node: c.index_array_harmonics(
+        node: index_array_harmonics(c, 
             node,
+            xp=xp,
             n_end=n_end,
             expand_dims=expand_dims,
             include_negative_m=include_negative_m,
@@ -133,13 +146,13 @@ def index_array_harmonics_all(
         for node in c.s_nodes
     }
     if as_array:
-        result = ivy.stack(
-            ivy.broadcast_arrays(*[index_arrays[node] for node in c.s_nodes]),
+        result = xp.stack(
+            xp.broadcast_arrays(*[index_arrays[node] for node in c.s_nodes]),
             axis=0,
         )
         if mask:
-            result[:, ~c.flatten_mask_harmonics(n_end, include_negative_m)] = (
-                ivy.nan
+            result[:, ~flatten_mask_harmonics(c, n_end, include_negative_m)] = (
+                xp.nan
             )
         return result
     return index_arrays

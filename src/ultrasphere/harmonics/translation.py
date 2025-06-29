@@ -1,12 +1,21 @@
 
+from typing import Literal, Mapping
+
+from array_api._2024_12 import Array
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from array_api_compat import array_namespace
+
+from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
+from ultrasphere.harmonics.index import index_array_harmonics
+from .harmonics import harmonics as harmonics_
 def harmonics_translation_coef(
     c: SphericalCoordinates[TSpherical, TEuclidean],
-    euclidean: Mapping[TEuclidean, Array | NativeArray],
+    euclidean: Mapping[TEuclidean, Array],
     *,
     n_end: int,
     n_end_add: int,
     condon_shortley_phase: bool,
-    k: Array | NativeArray,
+    k: Array,
 ) -> Array:
     r"""
     Translation coefficients between same type of elementary solutions.
@@ -19,7 +28,7 @@ def harmonics_translation_coef(
 
     Parameters
     ----------
-    euclidean : Mapping[TEuclidean, Array | NativeArray]
+    euclidean : Mapping[TEuclidean, Array]
         The translation vector in euclidean coordinates.
     n_end : int
         The maximum degree of the harmonic.
@@ -27,7 +36,7 @@ def harmonics_translation_coef(
         The maximum degree of the harmonic to be summed over.
     condon_shortley_phase : bool
         Whether to apply the Condon-Shortley phase.
-    k : Array | NativeArray
+    k : Array
         The wavenumber.
 
     Returns
@@ -40,18 +49,20 @@ def harmonics_translation_coef(
         which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
 
     """
-    _, k = ivy.broadcast_arrays(euclidean[c.e_nodes[0]], k)
-    n = c.index_array_harmonics(c.root, n_end=n_end, expand_dims=True)[
+    xp = array_namespace(*euclidean.values())
+    _, k = xp.broadcast_arrays(euclidean[c.e_nodes[0]], k)
+    n = index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True)[
         (...,) + (None,) * c.s_ndim
     ]
-    ns = c.index_array_harmonics(c.root, n_end=n_end_add, expand_dims=True)[
+    ns = index_array_harmonics(c, c.root, n_end=n_end_add,  xp=xp, expand_dims=True)[
         (None,) * c.s_ndim + (...,)
     ]
 
-    def to_expand(spherical: Mapping[TSpherical, Array | NativeArray]) -> Array:
+    def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [spherical1,...,sphericalN,user1,...,userM,n1,...,nN]
         # [spherical1,...,sphericalN,n1,...,nN]
-        harmonics = c.harmonics(
+        harmonics = harmonics_(
+            c,
             spherical,
             n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -61,9 +72,9 @@ def harmonics_translation_coef(
         x = c.to_euclidean(spherical)
         ndim_user = euclidean[c.e_nodes[0]].ndim
         ndim_spherical = c.s_ndim
-        ip = ivy.sum(
-            ivy.stack(
-                ivy.broadcast_arrays(
+        ip = xp.sum(
+            xp.stack(
+                xp.broadcast_arrays(
                     *[
                         euclidean[i][
                             (None,) * ndim_spherical + (slice(None),) * ndim_user
@@ -79,7 +90,7 @@ def harmonics_translation_coef(
             axis=0,
         )
         # [spherical1,...,sphericalN,user1,...,userM]
-        e = ivy.exp(
+        e = xp.exp(
             1j * k[(None,) * ndim_spherical + (slice(None),) * ndim_user] * ip
         )
         result = (
@@ -96,7 +107,7 @@ def harmonics_translation_coef(
         return result
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
-    return (-1j) ** (n - ns) * c.expand(
+    return (-1j) ** (n - ns) * expand(c, 
         to_expand,
         does_f_support_separation_of_variables=False,
         n=n_end + n_end_add - 1,
@@ -160,9 +171,9 @@ def harmonics_twins_expansion(
 
     """
     if analytic:
-        n1 = c.index_array_harmonics(c.root, n_end=n_end_1, expand_dims=True)
-        n2 = c.index_array_harmonics(c.root, n_end=n_end_2, expand_dims=True)
-        n3 = c.index_array_harmonics(
+        n1 = index_array_harmonics(c, c.root, n_end=n_end_1, expand_dims=True)
+        n2 = index_array_harmonics(c, c.root, n_end=n_end_2, expand_dims=True)
+        n3 = index_array_harmonics(c, 
             c.root, n_end=n_end_1 + n_end_2 - 1, expand_dims=True
         )
         if c.e_ndim == 2:
@@ -174,7 +185,7 @@ def harmonics_twins_expansion(
             if conj_2:
                 n2 = -n2
             n3 = -n3
-            result = (n1 + n2 + n3 == 0) / ivy.sqrt(2 * ivy.pi)
+            result = (n1 + n2 + n3 == 0) / xp.sqrt(2 * xp.pi)
             if condon_shortley_phase:
                 result *= (-1) ** (n1 + n2 + n3)
             return result
@@ -182,13 +193,13 @@ def harmonics_twins_expansion(
             from py3nj import wigner3j
 
             another_node = (set(c.s_nodes) - {c.root}).pop()
-            m1 = c.index_array_harmonics(
+            m1 = index_array_harmonics(c, 
                 another_node, n_end=n_end_1, expand_dims=True
             )
-            m2 = c.index_array_harmonics(
+            m2 = index_array_harmonics(c, 
                 another_node, n_end=n_end_2, expand_dims=True
             )
-            m3 = c.index_array_harmonics(
+            m3 = index_array_harmonics(c, 
                 another_node, n_end=n_end_1 + n_end_2 - 1, expand_dims=True
             )
             n1 = n1[(...,) + (None,) * 4]
@@ -203,14 +214,14 @@ def harmonics_twins_expansion(
                 m2 = -m2
             m3 = -m3
             result = (
-                ivy.where(m1 <= 0, 1, (-1) ** ivy.abs(m1))
-                * ivy.where(m2 <= 0, 1, (-1) ** ivy.abs(m2))
-                * ivy.where(m3 <= 0, 1, (-1) ** ivy.abs(m3))
-                # * (n1 >= ivy.abs(m1))
-                # * (n2 >= ivy.abs(m2))
-                # * (n3 >= ivy.abs(m3))
-                * ivy.sqrt(
-                    (2 * n1 + 1) * (2 * n2 + 1) * (2 * n3 + 1) / (4 * ivy.pi)
+                xp.where(m1 <= 0, 1, (-1) ** xp.abs(m1))
+                * xp.where(m2 <= 0, 1, (-1) ** xp.abs(m2))
+                * xp.where(m3 <= 0, 1, (-1) ** xp.abs(m3))
+                # * (n1 >= xp.abs(m1))
+                # * (n2 >= xp.abs(m2))
+                # * (n3 >= xp.abs(m3))
+                * xp.sqrt(
+                    (2 * n1 + 1) * (2 * n2 + 1) * (2 * n3 + 1) / (4 * xp.pi)
                 )
                 * wigner3j(
                     2 * n1,
@@ -225,9 +236,9 @@ def harmonics_twins_expansion(
                     2 * n1,
                     2 * n2,
                     2 * n3,
-                    ivy.zeros_like(n1, dtype=int),
-                    ivy.zeros_like(n2, dtype=int),
-                    ivy.zeros_like(n3, dtype=int),
+                    xp.zeros_like(n1, dtype=int),
+                    xp.zeros_like(n2, dtype=int),
+                    xp.zeros_like(n3, dtype=int),
                     ignore_invalid=True,
                 )
             )
@@ -235,10 +246,10 @@ def harmonics_twins_expansion(
                 result *= (-1) ** (m1 + m2 + m3)
             return result
 
-    def to_expand(spherical: Mapping[TSpherical, Array | NativeArray]) -> Array:
+    def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [theta,n1,...,nN,nsummed1,...,nsummedN]
         # Y(n)Y*(nsummed)
-        Y1 = c.harmonics(
+        Y1 = harmonics(c, 
             spherical,
             n_end_1,
             condon_shortley_phase=condon_shortley_phase,
@@ -255,7 +266,7 @@ def harmonics_twins_expansion(
         }
         if conj_1:
             Y1 = {k: v.conj() for k, v in Y1.items()}
-        Y2 = c.harmonics(
+        Y2 = harmonics(c, 
             spherical,
             n_end_2,
             condon_shortley_phase=condon_shortley_phase,
@@ -275,9 +286,9 @@ def harmonics_twins_expansion(
         return {k: Y1[k] * Y2[k] for k in c.s_nodes}
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
-    return c.concat_harmonics(
-        c.expand_dims_harmonics(
-            c.expand(
+    return concat_harmonics(c, 
+        expand_dims_harmonics(c, 
+            expand(c, 
                 to_expand,
                 does_f_support_separation_of_variables=True,
                 n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
@@ -289,12 +300,12 @@ def harmonics_twins_expansion(
 
 def harmonics_translation_coef_using_triplet(
     c: SphericalCoordinates[TSpherical, TEuclidean],
-    spherical: Mapping[TSpherical | Literal["r"], Array | NativeArray],
+    spherical: Mapping[TSpherical | Literal["r"], Array],
     *,
     n_end: int,
     n_end_add: int,
     condon_shortley_phase: bool,
-    k: Array | NativeArray,
+    k: Array,
     is_type_same: bool,
 ) -> Array:
     r"""
@@ -310,7 +321,7 @@ def harmonics_translation_coef_using_triplet(
 
     Parameters
     ----------
-    spherical : Mapping[TSpherical, Array | NativeArray]
+    spherical : Mapping[TSpherical, Array]
         The translation vector in spherical coordinates.
     n_end : int
         The maximum degree of the harmonic.
@@ -318,7 +329,7 @@ def harmonics_translation_coef_using_triplet(
         The maximum degree of the harmonic to be summed over.
     condon_shortley_phase : bool
         Whether to apply the Condon-Shortley phase.
-    k : Array | NativeArray
+    k : Array
         The wavenumber.
     is_type_same : bool
         Whether the type of the elementary solutions is same.
@@ -334,32 +345,32 @@ def harmonics_translation_coef_using_triplet(
 
     """
     # [user1,...,userM,n1,...,nN,nsummed1,...,nsummedN,ntemp1,...,ntempN]
-    n = c.index_array_harmonics(c.root, n_end=n_end, expand_dims=True)[
+    n = index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True)[
         (...,) + (None,) * (2 * c.s_ndim)
     ]
-    ns = c.index_array_harmonics(c.root, n_end=n_end_add, expand_dims=True)[
+    ns = index_array_harmonics(c, c.root, n_end=n_end_add, expand_dims=True)[
         (None,) * c.s_ndim + (...,) + (None,) * c.s_ndim
     ]
-    ntemp = c.index_array_harmonics(
+    ntemp = index_array_harmonics(c, 
         c.root, n_end=n_end + n_end_add - 1, expand_dims=True
     )[(None,) * (2 * c.s_ndim) + (...,)]
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
-    coef = (2 * ivy.pi) ** (c.e_ndim / 2) * ivy.sqrt(2 / ivy.pi)
-    t_Y = c.harmonics(  # type: ignore
+    coef = (2 * xp.pi) ** (c.e_ndim / 2) * xp.sqrt(2 / xp.pi)
+    t_Y = harmonics(c,   # type: ignore
         spherical,
         n_end=n_end + n_end_add - 1,
         condon_shortley_phase=condon_shortley_phase,
         expand_dims=True,
         concat=True,
     )
-    t_RS = c.harmonics_regular_singular(
+    t_RS = harmonics_regular_singular(c,
         spherical,
         harmonics=t_Y,
         k=k,
         type="regular" if is_type_same else "singular",
     )
-    return coef * ivy.sum(
+    return coef * xp.sum(
         (-1j) ** (n - ns - ntemp)
         * t_RS[(...,) + (None,) * (2 * c.s_ndim) + (slice(None),) * c.s_ndim]
         * c.harmonics_twins_expansion(

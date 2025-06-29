@@ -3,9 +3,11 @@ import warnings
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any, Generic, Literal, TypeVar, overload
 
-import ivy
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
 import networkx as nx
-from ivy import Array, NativeArray
+
 from joblib.memory import Memory
 from shift_nth_row_n_steps import create_slice
 from strenum import StrEnum
@@ -114,7 +116,7 @@ def get_non_leaf_descendants(graph: nx.DiGraph) -> dict[Any, int]:
                 for successor in graph.successors(node)
             )
     for node in leaf_nodes:
-        non_leaf_descendants[node] = ivy.nan
+        non_leaf_descendants[node] = xp.nan
     return non_leaf_descendants
 
 
@@ -415,7 +417,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         """The number of Euclidean dimensions."""
         return len(self.e_nodes)
 
-    def __init__(c: SphericalCoordinates[TSpherical, TEuclidean], tree: nx.DiGraph, cache: bool | None = None) -> None:
+    def __init__(self, tree: nx.DiGraph, cache: bool | None = None) -> None:
         """
         Initialize the spherical coordinates.
 
@@ -485,8 +487,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         """
         return (
             2
-            * (ivy.pi ** (self.e_ndim / 2))
-            / ivy.exp(ivy.lgamma(self.e_ndim / 2.0))
+            * (xp.pi ** (self.e_ndim / 2))
+            / xp.exp(xp.lgamma(self.e_ndim / 2.0))
             * r**self.s_ndim
         )
 
@@ -506,18 +508,18 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
 
         """
         return (
-            (ivy.pi ** (self.e_ndim / 2))
-            / ivy.exp(ivy.lgamma(self.e_ndim / 2.0 + 1.0))
+            (xp.pi ** (self.e_ndim / 2))
+            / xp.exp(xp.lgamma(self.e_ndim / 2.0 + 1.0))
             * r**self.e_ndim
         )
 
-    def homogeneous_ndim(self, n: int | Array | NativeArray) -> int | Array:
+    def homogeneous_ndim(self, n: int | Array) -> int | Array:
         """
         The dimension of the homogeneous polynomials of degree n.
 
         Parameters
         ----------
-        n : int | Array | NativeArray
+        n : int | Array
             The degree.
 
         Returns
@@ -533,13 +535,13 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         """
         return homogeneous_ndim(n, e_ndim=self.e_ndim)
 
-    def harm_n_ndim(self, n: int | Array | NativeArray) -> int | Array:
+    def harm_n_ndim(self, n: int | Array) -> int | Array:
         """
         The dimension of the spherical harmonics of degree n.
 
         Parameters
         ----------
-        n : int | Array | NativeArray
+        n : int | Array
             The degree.
 
         Returns
@@ -556,14 +558,14 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         return harm_n_ndim(n, e_ndim=c.e_ndim)
 
     def from_euclidean(
-        self, euclidean: Mapping[TEuclidean, Array | NativeArray]
+        self, euclidean: Mapping[TEuclidean, Array]
     ) -> Mapping[TSpherical | Literal["r"], Array]:
         """
         Convert the Euclidean coordinates to the spherical coordinates.
 
         Parameters
         ----------
-        euclidean : Mapping[TEuclidean, Array | NativeArray]
+        euclidean : Mapping[TEuclidean, Array]
             The Euclidean coordinates.
 
         Returns
@@ -573,8 +575,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
 
         """
         r = (
-            ivy.vector_norm(
-                ivy.broadcast_arrays(*[euclidean[k] for k in self.e_nodes]), axis=0
+            xp.vector_norm(
+                xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes]), axis=0
             )
             if self.s_ndim > 0
             else euclidean[self.e_nodes[0]]
@@ -590,16 +592,16 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             sin_child = get_child(self.G, node, "sin")
             cos = tmp[cos_child]
             sin = tmp[sin_child]
-            result[node] = ivy.atan2(sin, cos)
-            tmp[node] = ivy.vector_norm(ivy.broadcast_arrays(sin, cos), axis=0)
+            result[node] = xp.atan2(sin, cos)
+            tmp[node] = xp.vector_norm(xp.broadcast_arrays(sin, cos), axis=0)
         return result
 
     @overload
     def to_euclidean(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array | NativeArray]
-            | Mapping[TSpherical, Array | NativeArray]
+            Mapping[TSpherical | Literal["r"], Array]
+            | Mapping[TSpherical, Array]
         ),
         as_array: Literal[False] = ...,
     ) -> Mapping[TEuclidean, Array]: ...
@@ -608,8 +610,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
     def to_euclidean(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array | NativeArray]
-            | Mapping[TSpherical, Array | NativeArray]
+            Mapping[TSpherical | Literal["r"], Array]
+            | Mapping[TSpherical, Array]
         ),
         as_array: Literal[True] = ...,
     ) -> Array: ...
@@ -617,8 +619,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
     def to_euclidean(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array | NativeArray]
-            | Mapping[TSpherical, Array | NativeArray]
+            Mapping[TSpherical | Literal["r"], Array]
+            | Mapping[TSpherical, Array]
         ),
         as_array: bool = False,
     ) -> Mapping[TEuclidean, Array] | Array:
@@ -627,7 +629,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
 
         Parameters
         ----------
-        spherical : Mapping[TSpherical, Array | NativeArray]
+        spherical : Mapping[TSpherical, Array]
             The spherical coordinates.
         as_array : bool, optional
             Whether to return as an array, by default False
@@ -647,14 +649,14 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
                 raise AssertionError()
             cos_child = get_child(self.G, node, "cos")
             sin_child = get_child(self.G, node, "sin")
-            cos = ivy.cos(spherical[node])
-            sin = ivy.sin(spherical[node])
+            cos = xp.cos(spherical[node])
+            sin = xp.sin(spherical[node])
             result[cos_child] = result[node] * cos
             result[sin_child] = result[node] * sin
         result = {k: result[k] for k in self.e_nodes}
         if as_array:
-            return ivy.stack(
-                ivy.broadcast_arrays(*[result[k] for k in self.e_nodes]),
+            return xp.stack(
+                xp.broadcast_arrays(*[result[k] for k in self.e_nodes]),
                 axis=0,
             )
 
@@ -673,8 +675,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
     def jacobian(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array | NativeArray]
-            | Mapping[TSpherical, Array | NativeArray]
+            Mapping[TSpherical | Literal["r"], Array]
+            | Mapping[TSpherical, Array]
         ),
     ) -> Array:
         """
@@ -682,7 +684,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
 
         Parameters
         ----------
-        spherical : Mapping[TSpherical, Array | NativeArray]
+        spherical : Mapping[TSpherical, Array]
             The spherical coordinates.
 
         Returns
@@ -691,10 +693,10 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The Jacobian of the spherical coordinates.
 
         """
-        jacobian = ivy.get(spherical, "r", 1)
+        jacobian = xp.get(spherical, "r", 1)
         for node in self.s_nodes:
-            cos = ivy.cos(spherical[node])
-            sin = ivy.sin(spherical[node])
+            cos = xp.cos(spherical[node])
+            sin = xp.sin(spherical[node])
             cos_child = get_child(self.G, node, "cos")
             sin_child = get_child(self.G, node, "sin")
             jacobian *= cos ** (self.S.get(cos_child, -1) + 1) * sin ** (

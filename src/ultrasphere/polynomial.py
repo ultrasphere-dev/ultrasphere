@@ -1,14 +1,16 @@
-import ivy
-from ivy import Array, NativeArray
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
+
 
 from .special import binom
 
 
 def jacobi(
-    x: Array | NativeArray,
+    x: Array,
     *,
-    alpha: Array | NativeArray,
-    beta: Array | NativeArray,
+    alpha: Array,
+    beta: Array,
     n_end: int,
 ) -> Array:
     """
@@ -19,11 +21,11 @@ def jacobi(
 
     Parameters
     ----------
-    x : Array | NativeArray
+    x : Array
         X
-    alpha : Array | NativeArray
+    alpha : Array
         Alpha
-    beta : Array | NativeArray
+    beta : Array
         Beta
     n_end : int
         The maximum order of the polynomials.
@@ -34,14 +36,14 @@ def jacobi(
         The values of the Jacobi polynomials at the points x of order {1,...,n_end-1}.
 
     """
-    x, alpha, beta = ivy.broadcast_arrays(x, alpha, beta)
+    x, alpha, beta = xp.broadcast_arrays(x, alpha, beta)
 
     ps = []
 
     # Compute the first two polynomials
     # https://en.wikipedia.org/wiki/Jacobi_polynomials#Special_cases
-    p = ivy.ones(
-        ivy.broadcast_shapes(x.shape, alpha.shape, beta.shape),
+    p = xp.ones(
+        xpx.broadcast_shapes(x.shape, alpha.shape, beta.shape),
         dtype=x.dtype,
         device=x.device,
     )
@@ -61,11 +63,11 @@ def jacobi(
         ) * (b - 1) * c * ps[-2]
         p = d / (2 * n * (c - n) * (c - 2))
         ps.append(p)
-    return ivy.stack(ps, axis=-1)
+    return xp.stack(ps, axis=-1)
 
 
 def log_jacobi_normalization_constant(
-    *, alpha: Array | NativeArray, beta: Array | NativeArray, n: Array | NativeArray
+    *, alpha: Array, beta: Array, n: Array
 ) -> Array:
     """
     Computes the log of normalization constant of
@@ -73,11 +75,11 @@ def log_jacobi_normalization_constant(
 
     Parameters
     ----------
-    alpha : Array | NativeArray
+    alpha : Array
         Alpha
-    beta : Array | NativeArray
+    beta : Array
         Beta
-    n : Array | NativeArray
+    n : Array
         The order of the Jacobi polynomial.
 
     Returns
@@ -87,20 +89,20 @@ def log_jacobi_normalization_constant(
 
     """
     logupper = (
-        ivy.log(2 * n + alpha + beta + 1)
-        + ivy.lgamma(n + alpha + beta + 1.0)
-        + ivy.lgamma(n + 1.0)
+        xp.log(2 * n + alpha + beta + 1)
+        + xp.lgamma(n + alpha + beta + 1.0)
+        + xp.lgamma(n + 1.0)
     )
     loglower = (
-        ivy.log(2) * (alpha + beta + 1)
-        + ivy.lgamma(n + alpha + 1.0)
-        + ivy.lgamma(n + beta + 1.0)
+        xp.log(2) * (alpha + beta + 1)
+        + xp.lgamma(n + alpha + 1.0)
+        + xp.lgamma(n + beta + 1.0)
     )
     return 0.5 * (logupper - loglower)
 
 
 def jacobi_normalization_constant(
-    *, alpha: Array | NativeArray, beta: Array | NativeArray, n: Array | NativeArray
+    *, alpha: Array, beta: Array, n: Array
 ) -> Array:
     """
     Computes the normalization constant of
@@ -108,11 +110,11 @@ def jacobi_normalization_constant(
 
     Parameters
     ----------
-    alpha : Array | NativeArray
+    alpha : Array
         Alpha
-    beta : Array | NativeArray
+    beta : Array
         Beta
-    n : Array | NativeArray
+    n : Array
         The order of the Jacobi polynomial.
 
     Returns
@@ -121,11 +123,11 @@ def jacobi_normalization_constant(
         The normalization constant.
 
     """
-    return ivy.exp(log_jacobi_normalization_constant(alpha=alpha, beta=beta, n=n))
+    return xp.exp(log_jacobi_normalization_constant(alpha=alpha, beta=beta, n=n))
 
 
 def gegenbauer(
-    x: Array | NativeArray, *, alpha: Array | NativeArray, n_end: int
+    x: Array, *, alpha: Array, n_end: int
 ) -> Array:
     """
     Computes the Gegenbauer polynomials of
@@ -136,9 +138,9 @@ def gegenbauer(
 
     Parameters
     ----------
-    x : Array | NativeArray
+    x : Array
         X
-    alpha : Array | NativeArray
+    alpha : Array
         Alpha
     n_end : int
         The maximum order of the polynomials.
@@ -150,20 +152,20 @@ def gegenbauer(
         at the points x of order {1,...,n_end-1}.
 
     """
-    x, alpha = ivy.broadcast_arrays(x, alpha)
-    n = ivy.arange(0, n_end, dtype=x.dtype, device=x.device)[
+    x, alpha = xp.broadcast_arrays(x, alpha)
+    n = xp.arange(0, n_end, dtype=x.dtype, device=x.device)[
         (None,) * x.ndim + (slice(None),)
     ]
-    alpha = ivy.array(alpha - 1 / 2, dtype=x.dtype, device=x.device)
+    alpha = xp.asarray(alpha - 1 / 2, dtype=x.dtype, device=x.device)
     log_coef = (
-        ivy.lgamma(2.0 * alpha[..., None] + 1.0 + n)
-        - ivy.lgamma(2.0 * alpha[..., None] + 1.0)
-        - (ivy.lgamma(alpha[..., None] + 1.0 + n) - ivy.lgamma(alpha[..., None] + 1.0))
+        xp.lgamma(2.0 * alpha[..., None] + 1.0 + n)
+        - xp.lgamma(2.0 * alpha[..., None] + 1.0)
+        - (xp.lgamma(alpha[..., None] + 1.0 + n) - xp.lgamma(alpha[..., None] + 1.0))
     ).astype(x.dtype)
-    return ivy.exp(log_coef) * jacobi(x, alpha=alpha, beta=alpha, n_end=n_end)
+    return xp.exp(log_coef) * jacobi(x, alpha=alpha, beta=alpha, n_end=n_end)
 
 
-def legendre(x: Array | NativeArray, *, ndim: Array | NativeArray, n_end: int) -> Array:
+def legendre(x: Array, *, ndim: Array, n_end: int) -> Array:
     """
     Computes the generalized Legendre polynomials of
     order {1,...,n_max} at the points x.
@@ -173,7 +175,7 @@ def legendre(x: Array | NativeArray, *, ndim: Array | NativeArray, n_end: int) -
 
     Parameters
     ----------
-    x : Array | NativeArray
+    x : Array
         X
     ndim : int
         The dimension of the space.
@@ -187,31 +189,31 @@ def legendre(x: Array | NativeArray, *, ndim: Array | NativeArray, n_end: int) -
         at the points x of order {1,...,n_end-1}.
 
     """
-    # return jacobi(x, alpha=ivy.array((ndim-3)/2),
-    # beta=ivy.array((ndim-3)/2), n_end=n_end)
-    x, ndim = ivy.broadcast_arrays(x, ndim)
-    n = ivy.arange(0, n_end, dtype=x.dtype, device=x.device)[
+    # return jacobi(x, alpha=xp.asarray((ndim-3)/2),
+    # beta=xp.asarray((ndim-3)/2), n_end=n_end)
+    x, ndim = xp.broadcast_arrays(x, ndim)
+    n = xp.arange(0, n_end, dtype=x.dtype, device=x.device)[
         (None,) * x.ndim + (slice(None),)
     ]
-    return ivy.where(
+    return xp.where(
         ndim[..., None] == 2,
         # Chebyshev polynomials of the first kind
-        ivy.cos(n * ivy.acos(x)[..., None]),
+        xp.cos(n * xp.acos(x)[..., None]),
         gegenbauer(x, alpha=(ndim - 2) / 2, n_end=n_end)
         / binom(n + ndim[..., None] - 3, ndim[..., None] - 3),
     )
 
 
 def jacobi_triplet_integral(
-    alpha1: Array | NativeArray,
-    alpha2: Array | NativeArray,
-    alpha3: Array | NativeArray | None,
-    beta1: Array | NativeArray,
-    beta2: Array | NativeArray,
-    beta3: Array | NativeArray | None,
-    n1: Array | NativeArray,
-    n2: Array | NativeArray,
-    n3: Array | NativeArray,
+    alpha1: Array,
+    alpha2: Array,
+    alpha3: Array | None,
+    beta1: Array,
+    beta2: Array,
+    beta3: Array | None,
+    n1: Array,
+    n2: Array,
+    n3: Array,
     *,
     normalized: bool,
 ) -> Array:
@@ -227,25 +229,25 @@ def jacobi_triplet_integral(
 
     Parameters
     ----------
-    alpha1 : Array | NativeArray
+    alpha1 : Array
         The alpha parameter of the first Jacobi polynomial.
-    alpha2 : Array | NativeArray
+    alpha2 : Array
         The alpha parameter of the second Jacobi polynomial.
-    alpha3 : Array | NativeArray | None
+    alpha3 : Array | None
         The alpha parameter of the third Jacobi polynomial.
         Must be alpha_1 + alpha_2.
-    beta1 : Array | NativeArray
+    beta1 : Array
         The beta parameter of the first Jacobi polynomial.
-    beta2 : Array | NativeArray
+    beta2 : Array
         The beta parameter of the second Jacobi polynomial.
-    beta3 : Array | NativeArray | None
+    beta3 : Array | None
         The beta parameter of the third Jacobi polynomial.
         Must be beta_1 + beta_2.
-    n1 : Array | NativeArray
+    n1 : Array
         The order of the first Jacobi polynomial.
-    n2 : Array | NativeArray
+    n2 : Array
         The order of the second Jacobi polynomial.
-    n3 : Array | NativeArray
+    n3 : Array
         The order of the third Jacobi polynomial.
     normalized : bool
         Whether all Jacobi polynomials are normalized.
@@ -268,16 +270,16 @@ def jacobi_triplet_integral(
 
     if alpha3 is None:
         alpha3 = alpha1 + alpha2
-    elif ivy.any(alpha3 != alpha1 + alpha2):
+    elif xp.any(alpha3 != alpha1 + alpha2):
         raise ValueError(f"{alpha3=} should be {(alpha1 + alpha2)=}")
     if beta3 is None:
         beta3 = beta1 + beta2
-    elif ivy.any(beta3 != beta1 + beta2):
+    elif xp.any(beta3 != beta1 + beta2):
         raise ValueError(f"{beta3=} should be {(beta1 + beta2)=}")
 
-    alphas = ivy.stack(ivy.broadcast_arrays(alpha1, alpha2, alpha3), axis=0)
-    betas = ivy.stack(ivy.broadcast_arrays(beta1, beta2, beta3), axis=0)
-    ns = ivy.stack(ivy.broadcast_arrays(n1, n2, n3), axis=0)
+    alphas = xp.stack(xp.broadcast_arrays(alpha1, alpha2, alpha3), axis=0)
+    betas = xp.stack(xp.broadcast_arrays(beta1, beta2, beta3), axis=0)
+    ns = xp.stack(xp.broadcast_arrays(n1, n2, n3), axis=0)
     del alpha1, alpha2, alpha3, beta1, beta2, beta3, n1, n2, n3
 
     # wigner arguments
@@ -286,15 +288,15 @@ def jacobi_triplet_integral(
     Ns2 = betas - alphas
     # check if Ls2, Ms2, Ns2 are integers
     if (
-        (Ls2 != ivy.round(Ls2)).any()
-        or (Ms2 != ivy.round(Ms2)).any()
-        or (Ns2 != ivy.round(Ns2)).any()
+        (Ls2 != xp.round(Ls2)).any()
+        or (Ms2 != xp.round(Ms2)).any()
+        or (Ns2 != xp.round(Ns2)).any()
     ):
         raise ValueError(
             f"The sum of the orders should be an integer. {Ls2=}, {Ms2=}, {Ns2=}"
         )
     # round and cast to int
-    Ls2, Ms2, Ns2 = ivy.round(Ls2), ivy.round(Ms2), ivy.round(Ns2)
+    Ls2, Ms2, Ns2 = xp.round(Ls2), xp.round(Ms2), xp.round(Ns2)
     Ls2, Ms2, Ns2 = Ls2.astype(int), Ms2.astype(int), Ns2.astype(int)
 
     # coefficients
@@ -307,11 +309,11 @@ def jacobi_triplet_integral(
                 alpha=alphas[i, ...], beta=betas[i, ...], n=ns[i, ...]
             )
         )
-        + 0.5 * ivy.log(2 * ns[i, ...] + alphas[i, ...] + betas[i, ...] + 1)
+        + 0.5 * xp.log(2 * ns[i, ...] + alphas[i, ...] + betas[i, ...] + 1)
         for i in range(3)
     ]
     phase = (-1) ** (-Ls2[0] + Ls2[1] - betas[2, ...])
-    coef = phase / ivy.sqrt(2) * ivy.exp(ivy.sum(logcoefs, axis=0))
+    coef = phase / xp.sqrt(2) * xp.exp(xp.sum(logcoefs, axis=0))
     return (
         coef
         * wigner3j(

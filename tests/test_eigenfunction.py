@@ -1,4 +1,6 @@
-import ivy
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
 import pytest
 
 from ultrasphere.harmonics.eigenfunction import type_b, type_bdash, type_c
@@ -25,7 +27,7 @@ def type_b_scalar(theta: float, s_beta: float, l_beta: int, l: int) -> float:
         The value of the eigenfunction.
 
     """
-    array = type_b(ivy.array(theta), n_end=l + l_beta + 1, s_beta=ivy.array(s_beta))
+    array = type_b(xp.asarray(theta), n_end=l + l_beta + 1, s_beta=xp.asarray(s_beta))
     return array[l_beta, l].item()
 
 
@@ -51,7 +53,7 @@ def type_bdash_scalar(theta: float, s_alpha: float, l_alpha: int, l: int) -> flo
 
     """
     array = type_bdash(
-        ivy.array(theta), n_end=l + l_alpha + 1, s_alpha=ivy.array(s_alpha)
+        xp.asarray(theta), n_end=l + l_alpha + 1, s_alpha=xp.asarray(s_alpha)
     )
     return array[l_alpha, l].item()
 
@@ -97,18 +99,18 @@ def type_c_scalar(
 
     if index_with_surrogate_quantum_number:
         array = type_c(
-            ivy.array(theta),
+            xp.asarray(theta),
             n_end=2 * (l + l_alpha + l_beta) + 1,
-            s_alpha=ivy.array(s_alpha),
-            s_beta=ivy.array(s_beta),
+            s_alpha=xp.asarray(s_alpha),
+            s_beta=xp.asarray(s_beta),
             index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
         )
         return array[l_alpha, l_beta, even // 2].item()
     array = type_c(
-        ivy.array(theta),
+        xp.asarray(theta),
         n_end=2 * (l + l_alpha + l_beta) + 1,
-        s_alpha=ivy.array(s_alpha),
-        s_beta=ivy.array(s_beta),
+        s_alpha=xp.asarray(s_alpha),
+        s_beta=xp.asarray(s_beta),
         index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
     )
     return array[l_alpha, l_beta, l].item()
@@ -116,23 +118,23 @@ def type_c_scalar(
 
 @pytest.fixture(autouse=True, scope="module", params=["numpy", "torch"])
 def setup(request: pytest.FixtureRequest) -> None:
-    ivy.set_backend(request.param)
-    ivy.set_default_float_dtype(ivy.float64)
+    xp.set_backend(request.param)
+    xp.set_default_float_dtype(xp.float64)
 
 
 def test_type_b() -> None:
-    for theta in ivy.random.random_uniform(low=0, high=ivy.pi, shape=(3)):
+    for theta in xp.random.random_uniform(low=0, high=xp.pi, shape=(3)):
         # we refer to 3d spherical harmonics table where s_beta = 0
         # https://en.wikipedia.org/wiki/Table_of_spherical_harmonics
         s_beta = 0
         # l = 0
-        assert type_b_scalar(theta, s_beta, 0, 0) == pytest.approx(ivy.sqrt(1 / 2))
+        assert type_b_scalar(theta, s_beta, 0, 0) == pytest.approx(xp.sqrt(1 / 2))
         # l = 1
         assert type_b_scalar(theta, s_beta, 1, 1) == pytest.approx(
-            ivy.sqrt(3) / 2 * ivy.sin(theta)
+            xp.sqrt(3) / 2 * xp.sin(theta)
         )
         assert type_b_scalar(theta, s_beta, 0, 1) == pytest.approx(
-            ivy.sqrt(3 / 2) * ivy.cos(theta)
+            xp.sqrt(3 / 2) * xp.cos(theta)
         )
 
 
@@ -140,20 +142,20 @@ def test_type_b() -> None:
 # def test_type_b(shape: tuple[int, ...]) -> None:
 #     # we refer to 3d spherical harmonics table where s_beta = 0
 #     # https://en.wikipedia.org/wiki/Table_of_spherical_harmonics
-#     theta = ivy.random.random_uniform(low=0, high=ivy.pi, shape=shape)
+#     theta = xp.random.random_uniform(low=0, high=xp.pi, shape=shape)
 #     expected = {
-#         (0, 0, 0): ivy.sqrt(1 / 2),
-#         (0, 1, 1): ivy.sqrt(3) / 2 * ivy.sin(theta),
-#         (1, 0, 1): ivy.sqrt(3 / 2) * ivy.cos(theta),
+#         (0, 0, 0): xp.sqrt(1 / 2),
+#         (0, 1, 1): xp.sqrt(3) / 2 * xp.sin(theta),
+#         (1, 0, 1): xp.sqrt(3 / 2) * xp.cos(theta),
 #     }
-#     s_beta, l_beta, l = ivy.array(list(expected.keys())).T
+#     s_beta, l_beta, l = xp.asarray(list(expected.keys())).T
 #     s_beta_ = s_beta.reshape(s_beta.shape + (1,) * theta.ndim)
 #     l_beta_ = l_beta.reshape(l_beta.shape + (1,) * theta.ndim)
 #     l_ = l.reshape(l.shape + (1,) * theta.ndim)
 #     theta_ = theta.reshape((1,) * s_beta.ndim + theta.shape)
 #     actual = type_b(theta=theta, s_beta=s_beta_, l_beta_, l_)
-#     expected = ivy.array(list(expected.values()), dtype=theta.dtype)
-#     assert ivy.allclose(
+#     expected = xp.asarray(list(expected.values()), dtype=theta.dtype)
+#     assert xp.allclose(
 #         actual,
 #         expected,
 #         rtol=1e-3,
@@ -167,7 +169,7 @@ def test_type_c(
 ) -> None:
     # we consider O(2) \otimes O(2) 4d spherical harmonics where s_beta = 1
     # http://kuiperbelt.la.coocan.jp/sf/egan/Diaspora/atomic-orbital/laplacian/4D-2.html
-    for theta in ivy.random.random_uniform(low=0, high=ivy.pi / 2, shape=(3)):
+    for theta in xp.random.random_uniform(low=0, high=xp.pi / 2, shape=(3)):
         for l, l_alpha, l_beta in [
             (0, 0, 0),
             (1, 1, 0),
@@ -188,12 +190,12 @@ def test_type_c(
                 index_with_surrogate_quantum_number,
             )
             if (l, l_alpha, l_beta) == (0, 0, 0):
-                assert res == pytest.approx(ivy.sqrt(2))
+                assert res == pytest.approx(xp.sqrt(2))
             elif (l, l_alpha, l_beta) == (1, 1, 0):
-                assert res == pytest.approx(ivy.cos(theta) * 2)
+                assert res == pytest.approx(xp.cos(theta) * 2)
             elif (l, l_alpha, l_beta) == (1, 0, 1):
-                assert res == pytest.approx(ivy.sin(theta) * 2)
+                assert res == pytest.approx(xp.sin(theta) * 2)
             elif (l, l_alpha, l_beta) == (2, 0, 0):
                 # alpha = beta = 0, n = 1, phi = 2 * N_1^00 * P_1^00 (cos 2 theta)
                 # P_1^00(x) = x, N_1^00 = sqrt(3/2)
-                assert res == pytest.approx((ivy.cos(2 * theta)) * ivy.sqrt(3 / 2) * 2)
+                assert res == pytest.approx((xp.cos(2 * theta)) * xp.sqrt(3 / 2) * 2)

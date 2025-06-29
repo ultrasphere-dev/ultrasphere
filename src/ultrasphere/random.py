@@ -49,8 +49,8 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    device: ivy.Device | ivy.NativeDevice | None = ...,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = ...,
+    device: Any | None = ...,
+    dtype: Any | None = ...,
     type: Literal["uniform"] = ...,
     rng: np.random.Generator | None = ...,
     surface: bool = ...,
@@ -60,8 +60,8 @@ def random_points(  # type: ignore
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    device: ivy.Device | ivy.NativeDevice | None = ...,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = ...,
+    device: Any | None = ...,
+    dtype: Any | None = ...,
     type: Literal["spherical"] = ...,
     rng: np.random.Generator | None = ...,
     surface: Literal[False] = ...,
@@ -71,8 +71,8 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    device: ivy.Device | ivy.NativeDevice | None = ...,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = ...,
+    device: Any | None = ...,
+    dtype: Any | None = ...,
     type: Literal["spherical"] = ...,
     rng: np.random.Generator | None = ...,
     surface: Literal[True] = ...,
@@ -81,8 +81,8 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    device: ivy.Device | ivy.NativeDevice | None = None,
-    dtype: ivy.Dtype | ivy.NativeDtype | None = None,
+    device: Any | None = None,
+    dtype: Any | None = None,
     type: Literal["uniform", "spherical"] = "uniform",
     rng: np.random.Generator | None = None,
     surface: bool = False,
@@ -94,9 +94,9 @@ def random_points(
     ----------
     shape : Sequence[int]
         The shape of the random points.
-    device : ivy.Device | ivy.NativeDevice | None, optional
+    device : Any | None, optional
         The device, by default None
-    dtype : ivy.Dtype | ivy.NativeDtype | None, optional
+    dtype : Any | None, optional
         The dtype, by default None
     type : Literal["uniform", "spherical"], optional
         The type of the random points, by default "uniform"
@@ -122,26 +122,26 @@ def random_points(
 
     """
     if type == "uniform":
-        return ivy.asarray(
+        return xp.asarray(
             random_sphere(shape, dim=c.e_ndim, surface=surface, rng=rng),
             device=device,
             dtype=dtype,
         )
     elif type == "spherical":
         d = {
-            BranchingType.A: (0, 2 * ivy.pi),
-            BranchingType.B: (0, ivy.pi),
-            BranchingType.BP: (-ivy.pi / 2, ivy.pi / 2),
-            BranchingType.C: (0, ivy.pi / 2),
+            BranchingType.A: (0, 2 * xp.pi),
+            BranchingType.B: (0, xp.pi),
+            BranchingType.BP: (-xp.pi / 2, xp.pi / 2),
+            BranchingType.C: (0, xp.pi / 2),
         }
         result: dict[TSpherical | Literal["r"], Array] = {}
         for node in c.s_nodes:
             low, high = d[c.branching_types[node]]
-            result[node] = ivy.random_uniform(
+            result[node] = xp.random_uniform(
                 low=low, high=high, shape=shape, device=device, dtype=dtype
             )
         if not surface:
-            result["r"] = ivy.random_uniform(
+            result["r"] = xp.random_uniform(
                 low=0, high=1, shape=shape, device=device, dtype=dtype
             )
         return result

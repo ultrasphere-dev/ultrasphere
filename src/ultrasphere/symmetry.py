@@ -1,10 +1,12 @@
-import ivy
-from ivy import Array, NativeArray
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
+
 from shift_nth_row_n_steps import narrow
 
 
 def to_symmetric(
-    input: Array | NativeArray,
+    input: Array,
     *,
     axis: int = -1,
     asymmetric: bool = False,
@@ -16,7 +18,7 @@ def to_symmetric(
 
     Parameters
     ----------
-    input : Array | NativeArray
+    input : Array
         The input tensor.
     axis : int, optional
         The axis to extend, by default -1
@@ -37,28 +39,29 @@ def to_symmetric(
         forall a < input.shape[axis] result[-a-1] = result[a]
 
     """
+    xp = array_namespace(input)
     input_to_symmetric = input
     if asymmetric:
         input_to_symmetric = -input_to_symmetric
     if conjugate:
-        input_to_symmetric = ivy.conj(input_to_symmetric)
+        input_to_symmetric = xp.conj(input_to_symmetric)
     if not include_zero_twice:
         input_to_symmetric = narrow(
-            input_to_symmetric, 1, ivy.shape(input_to_symmetric)[axis] - 1, axis=axis
+            input_to_symmetric, 1, input_to_symmetric.shape[axis] - 1, axis=axis
         )
-    input_to_symmetric = ivy.flip(input_to_symmetric, axis=axis)
-    return ivy.concat([input, input_to_symmetric], axis=axis)
+    input_to_symmetric = xp.flip(input_to_symmetric, axis=axis)
+    return xp.concat([input, input_to_symmetric], axis=axis)
 
 
 def flip_symmetric_tensor(
-    input: Array | NativeArray, *, axis: int = -1, include_zero_twice: bool = False
+    input: Array, *, axis: int = -1, include_zero_twice: bool = False
 ) -> Array:
     """
     Flip a symmetric tensor.
 
     Parameters
     ----------
-    input : Array | NativeArray
+    input : Array
         The input tensor.
     axis : int, optional
         The axis to flip, by default -1
@@ -75,8 +78,9 @@ def flip_symmetric_tensor(
         forall a < input.shape[axis] result[-a-1] = result[a] = input[a] = input[-a-1]
 
     """
+    xp = array_namespace(input)
     if include_zero_twice:
-        return ivy.flip(input, axis=axis)
+        return xp.flip(input, axis=axis)
     zero = narrow(input, 0, 1, axis=axis)
-    nonzero = narrow(input, 1, ivy.shape(input)[axis] - 1, axis=axis)
-    return ivy.concat([zero, ivy.flip(nonzero, axis=axis)], axis=axis)
+    nonzero = narrow(input, 1, input.shape[axis] - 1, axis=axis)
+    return xp.concat([zero, xp.flip(nonzero, axis=axis)], axis=axis)

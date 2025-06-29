@@ -1,8 +1,12 @@
-from ultrasphere.coordinates import SphericalCoordinates
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
 
 import networkx as nx
 from networkx.drawing.nx_pydot import graphviz_layout
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Circle
+from networkx.algorithms.dag import dag_longest_path
 
 
 import warnings
@@ -23,10 +27,6 @@ def draw(c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = Tr
         The recommended width and height of the figure (in inches).
 
     """
-    import matplotlib.pyplot as plt
-    from matplotlib.lines import Line2D
-    from matplotlib.patches import Circle
-    from networkx.algorithms.dag import dag_longest_path
 
     ASCII_TO_GREEK = {
         "alpha": "α",  # noqa
@@ -97,7 +97,7 @@ def draw(c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = Tr
         c.G,
         pos,
         labels={
-            n: f"{ascii_to_greek(str(n))}\n"
+            n: f"{ascii_to_greek(str(n))}"
             f"{c.branching_types[n].value}/{c.S[n]}"
             for n in c.s_nodes
         },

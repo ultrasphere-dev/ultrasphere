@@ -1,12 +1,14 @@
 from logging import DEBUG, INFO, basicConfig, getLogger
 from typing import Annotated, Literal
 
-import ivy
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import typer
-from ivy import Array, NativeArray
+
 from joblib.parallel import Parallel, delayed
 
 # import tracemalloc
@@ -43,19 +45,19 @@ def plot_harm(n_end: Annotated[int, typer.Argument(help="Log the values")] = 5) 
     """Plot the real part of the spherical harmonics."""
     n_div = 32
     fig, axes = plt.subplots(n_end, n_end * 2 - 1, subplot_kw={"projection": "3d"})
-    theta = ivy.linspace(0, np.pi, n_div)
-    phi = ivy.linspace(0, 2 * np.pi, 2 * n_div)
-    theta, phi = ivy.meshgrid(theta, phi)
+    theta = xp.linspace(0, np.pi, n_div)
+    phi = xp.linspace(0, 2 * np.pi, 2 * n_div)
+    theta, phi = xp.meshgrid(theta, phi)
     Y = sph_harm(
         phi=phi, theta=theta, n_end=n_end, condon_shortley_phase=True, concat=True
     )
     for n in range(n_end):
         for m in range(-n, n + 1):
-            r = ivy.abs(Y[..., m, n].real)
-            # r = ivy.abs(Y[..., m, n])
-            x = r * ivy.sin(theta) * ivy.cos(phi)
-            y = r * ivy.sin(theta) * ivy.sin(phi)
-            z = r * ivy.cos(theta)
+            r = xp.abs(Y[..., m, n].real)
+            # r = xp.abs(Y[..., m, n])
+            x = r * xp.sin(theta) * xp.cos(phi)
+            y = r * xp.sin(theta) * xp.sin(phi)
+            z = r * xp.cos(theta)
             ax = axes[n, m + n_end - 1]
             ax.plot_surface(
                 x.numpy(), y.numpy(), z.numpy(), rstride=1, cstride=1, cmap="viridis"
@@ -70,9 +72,9 @@ def plot_harm(n_end: Annotated[int, typer.Argument(help="Log the values")] = 5) 
 
 def _task(
     branching_types: str,
-    k: Array | NativeArray,
-    x: Array | NativeArray,
-    t_angle: Array | NativeArray,
+    k: Array,
+    x: Array,
+    t_angle: Array,
     n_end: int,
     n_end_add_max: int,
     condon_shortley_phase: bool,
@@ -82,7 +84,7 @@ def _task(
     to_: Literal["regular", "singular"],
     use_triplet: bool,
 ) -> DataFrame:
-    ivy.set_backend("numpy")
+    xp.set_backend("numpy")
     c = SphericalCoordinates.from_branching_types(branching_types)
     dfs = []
     t = t_angle * ratio
@@ -90,10 +92,10 @@ def _task(
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
     t_spherical = c.from_euclidean(t)
-    y_RS = c.harmonics_regular_singular(
+    y_RS = harmonics_regular_singular(c,
         y_spherical,
         k=k,
-        harmonics=c.harmonics(
+        harmonics=harmonics(c, 
             y_spherical,
             n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -102,10 +104,10 @@ def _task(
         ),
         type=to_,
     )
-    x_RS = c.harmonics_regular_singular(
+    x_RS = harmonics_regular_singular(c,
         x_spherical,
         k=k,
-        harmonics=c.harmonics(
+        harmonics=harmonics(c, 
             x_spherical,
             n_end=n_end_add_max,
             condon_shortley_phase=condon_shortley_phase,
@@ -136,13 +138,13 @@ def _task(
     for n_end_add in range(n_end_add_max, 0, -1):
         x_RS_add = c.expand_cut(x_RS_add, n_end_add)
         coef = c.expand_cut(coef, n_end_add)
-        y_RS_approx = ivy.sum(
+        y_RS_approx = xp.sum(
             x_RS_add * coef,
             axis=tuple(range(-c.s_ndim, 0)),
         )
-        ae = ivy.abs(y_RS - y_RS_approx)
-        rel = ivy.abs(1 - y_RS_approx / (y_RS + 1e-8))
-        index = c.index_array_harmonics_all(
+        ae = xp.abs(y_RS - y_RS_approx)
+        rel = xp.abs(1 - y_RS_approx / (y_RS + 1e-8))
+        index = index_array_harmonics_all(c, 
             n_end=n_end,
             include_negative_m=True,
             expand_dims=True,
@@ -178,9 +180,9 @@ def plot_translation_error(
     Plot the error of the translation of
     elementary solutions.
     """
-    ivy.set_backend("numpy")
+    xp.set_backend("numpy")
     condon_shortley_phase = False
-    k = ivy.array(complex(k)).to_numpy()
+    k = xp.asarray(complex(k)).to_numpy()
     n_end_add_max = n_end
     c = SphericalCoordinates.from_branching_types(branching_types)
     rng = np.random.default_rng(0)
@@ -260,7 +262,8 @@ def plot_translation_error(
             f"Branching Types: {branching_types}, "
             f"|x| = 1 ({size} random points), k = {complex(k):g}"
         )
-        g.set_titles("{col_var}={col_name}\n{row_name}")
+        g.set_titles("{col_var}={col_name}
+{row_name}")
         g.tight_layout()
         plt.savefig(f"{branching_types}-{n_end}-{k}-{error}.svg")
         plt.savefig(f"{branching_types}-{n_end}-{k}-{error}.png")
@@ -274,7 +277,9 @@ def benchmark_sph_harm(
     device: str = typer.Option("cpu", "--device", "-d"),
 ) -> None:
     """Benchmark the spherical harmonics."""
-    import ivy
+    from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
     from cm_time import timer
     from scipy.special import sph_harm as sp_sph_harm
 
@@ -282,37 +287,37 @@ def benchmark_sph_harm(
 
     if device in ["gpu", "tpu"]:
         device = f"{device}:0"
-    ivy.set_backend(backend)
-    ivy.default_device(device)
+    xp.set_backend(backend)
+    xp.default_device(device)
 
-    # ivy
-    phi = ivy.random.random_uniform(
-        low=0, high=2 * ivy.pi, shape=[int(i) for i in shape.split(",")]
+    # xp
+    phi = xp.random.random_uniform(
+        low=0, high=2 * xp.pi, shape=[int(i) for i in shape.split(",")]
     )
-    theta = ivy.random.random_uniform(
-        low=0, high=ivy.pi, shape=[int(i) for i in shape.split(",")]
+    theta = xp.random.random_uniform(
+        low=0, high=xp.pi, shape=[int(i) for i in shape.split(",")]
     )
     for _ in range(3):
         with timer() as t1:
             sph_harm(phi=phi, theta=theta, n_end=n_end, condon_shortley_phase=True)
-        print(f"ivy: {t1.elapsed}")
+        print(f"xp: {t1.elapsed}")
 
     # scipy
-    m = ivy.arange(-n_end, n_end + 1).reshape([1] * theta.ndim + [-1, 1])
-    n = ivy.arange(n_end + 1).reshape([1] * theta.ndim + [1, -1])
+    m = xp.arange(-n_end, n_end + 1).reshape([1] * theta.ndim + [-1, 1])
+    n = xp.arange(n_end + 1).reshape([1] * theta.ndim + [1, -1])
     theta = theta[..., None, None]
     phi = phi[..., None, None]
     m, n, phi, theta = (
-        ivy.to_numpy(m),
-        ivy.to_numpy(n),
-        ivy.to_numpy(phi),
-        ivy.to_numpy(theta),
+        xp.to_numpy(m),
+        xp.to_numpy(n),
+        xp.to_numpy(phi),
+        xp.to_numpy(theta),
     )
     for _ in range(3):
         with timer() as t2:
             sp_sph_harm(m, n, phi, theta)
         print(f"scipy: {t2.elapsed}")
-    print(f"ivy: {t1.elapsed}, scipy: {t2.elapsed}")
+    print(f"xp: {t1.elapsed}, scipy: {t2.elapsed}")
 
 
 @app.command()
@@ -343,37 +348,37 @@ def benchmark_c2s(
     from functools import partial
 
     from cm_time import timer
-    from ivy import Array
+    from xp import Array
 
     def forward(r: Array, theta: Array, phi: Array) -> tuple[Array, Array, Array]:
-        rsin = r * ivy.sin(theta)
-        x = rsin * ivy.cos(phi)
-        y = rsin * ivy.sin(phi)
-        z = r * ivy.cos(theta)
+        rsin = r * xp.sin(theta)
+        x = rsin * xp.cos(phi)
+        y = rsin * xp.sin(phi)
+        z = r * xp.cos(theta)
         return x, y, z
 
     def backward_copilot(x: Array, y: Array, z: Array) -> tuple[Array, Array, Array]:
-        r = ivy.linalg.vector_norm([x, y, z], axis=0)
-        theta = ivy.acos(z / r)
-        phi = ivy.atan2(y, x)
+        r = xp.linalg.vector_norm([x, y, z], axis=0)
+        theta = xp.acos(z / r)
+        phi = xp.atan2(y, x)
         return r, theta, phi
 
     def backward_atan2_vector_norm(
         x: Array, y: Array, z: Array, vector_norm: bool, r_independent: bool
     ) -> tuple[Array, Array, Array]:
-        phi = ivy.atan2(y, x)
-        rsin = ivy.linalg.vector_norm([x, y], axis=0)
-        theta = ivy.atan2(rsin, z)
+        phi = xp.atan2(y, x)
+        rsin = xp.linalg.vector_norm([x, y], axis=0)
+        theta = xp.atan2(rsin, z)
 
         if vector_norm:
-            r = ivy.linalg.vector_norm(
+            r = xp.linalg.vector_norm(
                 [x, y, z] if r_independent else [rsin, z], axis=0
             )
         else:
             r = (
-                ivy.sqrt(x**2 + y**2 + z**2)
+                xp.sqrt(x**2 + y**2 + z**2)
                 if r_independent
-                else ivy.sqrt(rsin**2 + z**2)
+                else xp.sqrt(rsin**2 + z**2)
             )
         return r, theta, phi
 
@@ -395,16 +400,16 @@ def benchmark_c2s(
         ),
     }
 
-    ivy.set_backend(backend)
-    ivy.default_device(device)
-    ivy.set_default_dtype(dtype)
+    xp.set_backend(backend)
+    xp.default_device(device)
+    xp.set_default_dtype(dtype)
     shape_ = [int(i) for i in shape.split(",")]
     ts = defaultdict(list)
     errors = defaultdict(list)
     for i in trange(20):
-        x = ivy.random.random_uniform(low=-1, high=1, shape=shape_)
-        y = ivy.random.random_uniform(low=-1, high=1, shape=shape_)
-        z = ivy.random.random_uniform(low=-1, high=1, shape=shape_)
+        x = xp.random.random_uniform(low=-1, high=1, shape=shape_)
+        y = xp.random.random_uniform(low=-1, high=1, shape=shape_)
+        z = xp.random.random_uniform(low=-1, high=1, shape=shape_)
         for name, func in functions.items():
             with timer() as t:
                 r, theta, phi = func(x, y, z)
@@ -413,16 +418,16 @@ def benchmark_c2s(
                 continue
             ts[name].append(t.elapsed)
             x_, y_, z_ = forward(r, theta, phi)
-            diff = ivy.vector_norm([x - x_, y - y_, z - z_], axis=0)
-            errors[name].append(ivy.mean(diff))
+            diff = xp.vector_norm([x - x_, y - y_, z - z_], axis=0)
+            errors[name].append(xp.mean(diff))
     print(
         "Time: ",
-        {k: f"{float(ivy.mean(v)):.2e}±{float(ivy.std(v)):.2e}" for k, v in ts.items()},
+        {k: f"{float(xp.mean(v)):.2e}±{float(xp.std(v)):.2e}" for k, v in ts.items()},
     )
     print(
         "Error: ",
         {
-            k: f"{float(ivy.mean(v)):.2e}±{float(ivy.std(v)):.2e}"
+            k: f"{float(xp.mean(v)):.2e}±{float(xp.std(v)):.2e}"
             for k, v in errors.items()
         },
     )

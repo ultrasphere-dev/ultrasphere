@@ -1,6 +1,8 @@
 from typing import Literal
 
-import ivy
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
 import pytest
 from scipy.special import eval_gegenbauer, eval_jacobi, roots_jacobi
 
@@ -15,7 +17,7 @@ from ultrasphere.special import binom
 
 @pytest.fixture(autouse=True, scope="session", params=["numpy"])
 def setup(request: pytest.FixtureRequest) -> None:
-    ivy.set_backend(request.param)
+    xp.set_backend(request.param)
 
 
 @pytest.mark.parametrize(
@@ -28,10 +30,10 @@ def setup(request: pytest.FixtureRequest) -> None:
 )
 @pytest.mark.parametrize("n_end", [8])
 def test_jacobi(shape: tuple[int, ...], n_end: int) -> None:
-    alpha = ivy.random.random_uniform(low=0, high=5, shape=shape)
-    beta = ivy.random.random_uniform(low=0, high=5, shape=shape)
-    x = ivy.random.random_uniform(low=0, high=1, shape=shape)
-    n = ivy.arange(n_end)[
+    alpha = xp.random.random_uniform(low=0, high=5, shape=shape)
+    beta = xp.random.random_uniform(low=0, high=5, shape=shape)
+    x = xp.random.random_uniform(low=0, high=1, shape=shape)
+    n = xp.arange(n_end)[
         (None,) * len(shape)
         + (
             slice(
@@ -41,7 +43,7 @@ def test_jacobi(shape: tuple[int, ...], n_end: int) -> None:
     ]
     expected = eval_jacobi(n, alpha[..., None], beta[..., None], x[..., None])
     actual = jacobi(x, alpha=alpha, beta=beta, n_end=n_end)
-    assert ivy.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
 
 
 @pytest.mark.parametrize(
@@ -54,9 +56,9 @@ def test_jacobi(shape: tuple[int, ...], n_end: int) -> None:
 )
 @pytest.mark.parametrize("n_end", [8])
 def test_gegenbauer(shape: tuple[int, ...], n_end: int) -> None:
-    alpha = ivy.random.random_uniform(low=0, high=5, shape=shape)
-    x = ivy.random.random_uniform(low=0, high=1, shape=shape)
-    n = ivy.arange(n_end)[
+    alpha = xp.random.random_uniform(low=0, high=5, shape=shape)
+    x = xp.random.random_uniform(low=0, high=1, shape=shape)
+    n = xp.arange(n_end)[
         (None,) * len(shape)
         + (
             slice(
@@ -66,7 +68,7 @@ def test_gegenbauer(shape: tuple[int, ...], n_end: int) -> None:
     ]
     expected = eval_gegenbauer(n, alpha[..., None], x[..., None])
     actual = gegenbauer(x, alpha=alpha, n_end=n_end)
-    assert ivy.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
 
 
 @pytest.mark.parametrize(
@@ -82,10 +84,10 @@ def test_gegenbauer(shape: tuple[int, ...], n_end: int) -> None:
 def test_legendre(
     shape: tuple[int, ...], n_end: int, type: Literal["gegenbauer", "jacobi"]
 ) -> None:
-    d = ivy.random.randint(3, 8, shape=shape)
+    d = xp.random.randint(3, 8, shape=shape)
     alpha = (d - 3) / 2
-    x = ivy.random.random_uniform(low=0, high=1, shape=shape)
-    n = ivy.arange(n_end)[
+    x = xp.random.random_uniform(low=0, high=1, shape=shape)
+    n = xp.arange(n_end)[
         (None,) * len(shape)
         + (
             slice(
@@ -105,21 +107,21 @@ def test_legendre(
         )
     else:
         raise ValueError(f"Invalid type {type}")
-    actual = legendre(x, ndim=ivy.asarray(d), n_end=n_end)
-    assert ivy.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    actual = legendre(x, ndim=xp.asarray(d), n_end=n_end)
+    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
 
 
 @pytest.mark.parametrize("alpha_eq_beta", [True, False])
 def test_jacobi_triplet_integral(alpha_eq_beta: bool) -> None:
     n_samples = 20
-    alphas = ivy.random.randint(0, 5, shape=(3, n_samples))
+    alphas = xp.random.randint(0, 5, shape=(3, n_samples))
     alphas[2, ...] = alphas[0, ...] + alphas[1, ...]
-    betas = ivy.random.randint(0, 5, shape=(3, n_samples))
+    betas = xp.random.randint(0, 5, shape=(3, n_samples))
     betas[2, ...] = betas[0, ...] + betas[1, ...]
     if alpha_eq_beta:
         betas = alphas
 
-    ns = ivy.random.randint(0, 5, shape=(3, n_samples))
+    ns = xp.random.randint(0, 5, shape=(3, n_samples))
 
     expected = []
     for sample in range(n_samples):
@@ -127,11 +129,11 @@ def test_jacobi_triplet_integral(alpha_eq_beta: bool) -> None:
 
         # expected
         x, w = roots_jacobi(
-            24, ivy.sum(alpha).to_numpy() / 2, ivy.sum(beta).to_numpy() / 2
+            24, xp.sum(alpha).to_numpy() / 2, xp.sum(beta).to_numpy() / 2
         )
         js = [eval_jacobi(n[i], alpha[i], beta[i], x) for i in range(3)]
-        expected.append(ivy.sum(js[0] * js[1] * js[2] * w, axis=-1))
-    expected = ivy.stack(expected, axis=-1)
+        expected.append(xp.sum(js[0] * js[1] * js[2] * w, axis=-1))
+    expected = xp.stack(expected, axis=-1)
 
     # actual
     actual = jacobi_triplet_integral(
@@ -146,4 +148,4 @@ def test_jacobi_triplet_integral(alpha_eq_beta: bool) -> None:
         n3=ns[2, ...],
         normalized=False,
     )
-    assert ivy.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)

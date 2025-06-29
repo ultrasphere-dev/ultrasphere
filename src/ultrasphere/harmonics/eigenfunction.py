@@ -18,8 +18,9 @@ Reference
 DOI:10.3842/SIGMA.2013.042 p.17-18
 """
 
-import ivy
-from ivy import Array, NativeArray
+from array_api_compat import array_namespace
+import array_api_extra as xpx
+from array_api._2024_12 import Array
 from shift_nth_row_n_steps import shift_nth_row_n_steps
 
 from ..polynomial import jacobi, jacobi_normalization_constant
@@ -27,7 +28,7 @@ from ..symmetry import to_symmetric
 
 
 def type_a(
-    theta: Array | NativeArray,
+    theta: Array,
     n_end: int,
     *,
     condon_shortley_phase: bool,
@@ -63,34 +64,35 @@ def type_a(
         The result of the eigenfunction.
 
     """
-    m = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    xp = array_namespace(theta)
+    m = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [-1]
     )
     if include_negative_m:
         m = to_symmetric(m, axis=-1, asymmetric=True, conjugate=False)
-    res = ivy.exp(
-        ivy.array(
+    res = xp.exp(
+        xp.asarray(
             1j,
             dtype=(
-                ivy.complex64
-                if theta.dtype in [ivy.complex64, ivy.float32]
-                else ivy.complex128
+                xp.complex64
+                if theta.dtype in [xp.complex64, xp.float32]
+                else xp.complex128
             ),
             device=theta.device,
         )
         * m
         * theta[..., None]
-    ) / ivy.sqrt(2 * ivy.pi)
+    ) / xp.sqrt(2 * xp.pi)
     if condon_shortley_phase:
-        res *= (-1) ** ((m + ivy.abs(m)) // 2)
+        res *= (-1) ** ((m + xp.abs(m)) // 2)
     return res
 
 
 def type_b(
-    theta: Array | NativeArray,
+    theta: Array,
     *,
     n_end: int,
-    s_beta: Array | NativeArray | int,
+    s_beta: Array | int,
     index_with_surrogate_quantum_number: bool = False,
     is_beta_type_a_and_include_negative_m: bool = False,
     fill_value: float = 0,
@@ -100,11 +102,11 @@ def type_b(
 
     Parameters
     ----------
-    theta : Array | NativeArray
+    theta : Array
         [0, π]
     n_end : int
         Positive integer, l - l_beta, where l is the quantum number of this node.
-    s_beta : Array | NativeArray
+    s_beta : Array
         The number of non-leaf child nodes of the node beta.
     index_with_surrogate_quantum_number : bool, optional
         Whether to index with surrogate quantum number, by default False
@@ -122,13 +124,14 @@ def type_b(
         [..., l_beta, l] of size (..., n_end, n_end), if l < l_beta value is 0.
 
     """
+    xp = array_namespace(theta)
     if isinstance(s_beta, int):
-        s_beta = ivy.array(s_beta)
+        s_beta = xp.asarray(s_beta)
     # using broadcasting may cause problems, we have to be very careful here
-    l_beta = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    l_beta = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [-1]
     )
-    n = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    n = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [1, -1]
     )
     alpha = l_beta + s_beta[..., None] / 2
@@ -136,8 +139,8 @@ def type_b(
         jacobi_normalization_constant(
             alpha=alpha[..., None], beta=alpha[..., None], n=n
         )
-        * (ivy.sin(theta[..., None, None]) ** l_beta[..., None])
-        * jacobi(n_end=n_end, alpha=alpha, beta=alpha, x=ivy.cos(theta[..., None]))
+        * (xp.sin(theta[..., None, None]) ** l_beta[..., None])
+        * jacobi(n_end=n_end, alpha=alpha, beta=alpha, x=xp.cos(theta[..., None]))
     )
     if not index_with_surrogate_quantum_number:
         # [l_beta, n] -> [l_beta, l = n + l_beta]
@@ -146,7 +149,7 @@ def type_b(
             axis_row=-2,
             axis_shift=-1,
             cut_padding=True,
-            padding_constant_values=fill_value,
+            fill_values=fill_value,
         )
     if is_beta_type_a_and_include_negative_m:
         res = to_symmetric(res, axis=-2, asymmetric=False, conjugate=False)
@@ -154,10 +157,10 @@ def type_b(
 
 
 def type_bdash(
-    theta: Array | NativeArray,
+    theta: Array,
     *,
     n_end: int,
-    s_alpha: Array | NativeArray | int,
+    s_alpha: Array | int,
     index_with_surrogate_quantum_number: bool = False,
     is_alpha_type_a_and_include_negative_m: bool = False,
     fill_value: float = 0,
@@ -167,11 +170,11 @@ def type_bdash(
 
     Parameters
     ----------
-    theta : Array | NativeArray
+    theta : Array
         [-π/2, π/2]
     n_end : int
         Positive integer, l - l_alpha, where l is the quantum number of this node.
-    s_alpha : Array | NativeArray
+    s_alpha : Array
         The number of non-leaf child nodes of the node alpha.
     index_with_surrogate_quantum_number : bool, optional
         Whether to index with surrogate quantum number, by default False
@@ -189,19 +192,20 @@ def type_bdash(
         [..., l_alpha, l] of size (..., n_end, n_end), if l < l_alpha value is 0.
 
     """
+    xp = array_namespace(theta)
     if isinstance(s_alpha, int):
-        s_alpha = ivy.array(s_alpha)
-    l_alpha = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+        s_alpha = xp.asarray(s_alpha)
+    l_alpha = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [-1]
     )
-    n = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    n = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [1, -1]
     )
     beta = l_alpha + s_alpha[..., None] / 2
     res = (
         jacobi_normalization_constant(alpha=beta[..., None], beta=beta[..., None], n=n)
-        * (ivy.cos(theta[..., None, None]) ** l_alpha[..., None])
-        * jacobi(n_end=n_end, alpha=beta, beta=beta, x=ivy.sin(theta[..., None]))
+        * (xp.cos(theta[..., None, None]) ** l_alpha[..., None])
+        * jacobi(n_end=n_end, alpha=beta, beta=beta, x=xp.sin(theta[..., None]))
     )
     if not index_with_surrogate_quantum_number:
         res = shift_nth_row_n_steps(
@@ -209,7 +213,7 @@ def type_bdash(
             axis_row=-2,
             axis_shift=-1,
             cut_padding=True,
-            padding_constant_values=fill_value,
+            fill_values=fill_value,
         )
     # [l_alpha, n] -> [l_alpha, l = n + l_alpha]
     if is_alpha_type_a_and_include_negative_m:
@@ -218,11 +222,11 @@ def type_bdash(
 
 
 def type_c(
-    theta: Array | NativeArray,
+    theta: Array,
     *,
     n_end: int,
-    s_alpha: Array | NativeArray | int,
-    s_beta: Array | NativeArray | int,
+    s_alpha: Array | int,
+    s_beta: Array | int,
     index_with_surrogate_quantum_number: bool = False,
     is_alpha_type_a_and_include_negative_m: bool = False,
     is_beta_type_a_and_include_negative_m: bool = False,
@@ -233,14 +237,14 @@ def type_c(
 
     Parameters
     ----------
-    theta : Array | NativeArray
+    theta : Array
         [0, π/2]
     n_end : int
         Positive integer, (l - l_alpha - l_beta) / 2,
         where l is the quantum number of this node.
-    s_alpha : Array | NativeArray
+    s_alpha : Array
         The number of non-leaf child nodes of the node alpha.
-    s_beta : Array | NativeArray
+    s_beta : Array
         The number of non-leaf child nodes of the node beta.
     index_with_surrogate_quantum_number : bool, optional
         Whether to index with surrogate quantum number, by default False
@@ -258,17 +262,18 @@ def type_c(
         if l < l_alpha + l_beta value is 0.
 
     """
+    xp = array_namespace(theta)
     if isinstance(s_alpha, int):
-        s_alpha = ivy.array(s_alpha)
+        s_alpha = xp.asarray(s_alpha)
     if isinstance(s_beta, int):
-        s_beta = ivy.array(s_beta)
-    l_alpha = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+        s_beta = xp.asarray(s_beta)
+    l_alpha = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [-1, 1]
     )  # 2d
-    l_beta = ivy.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
+    l_beta = xp.arange(0, n_end, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [1, -1]
     )  # 2d
-    n = ivy.arange(0, (n_end + 1) // 2, dtype=theta.dtype, device=theta.device).reshape(
+    n = xp.arange(0, (n_end + 1) // 2, dtype=theta.dtype, device=theta.device).reshape(
         [1] * (theta.ndim) + [1, 1, -1]
     )  # 3d
     alpha = l_alpha + s_alpha[..., None, None] / 2  # 2d
@@ -278,13 +283,13 @@ def type_c(
         * jacobi_normalization_constant(
             alpha=alpha[..., None], beta=beta[..., None], n=n
         )
-        * (ivy.sin(theta[..., None, None, None]) ** l_beta[..., None])
-        * (ivy.cos(theta[..., None, None, None]) ** l_alpha[..., None])
+        * (xp.sin(theta[..., None, None, None]) ** l_beta[..., None])
+        * (xp.cos(theta[..., None, None, None]) ** l_alpha[..., None])
         * jacobi(
             n_end=(n_end + 1) // 2,
             alpha=beta,
             beta=alpha,  # this is weird but correct
-            x=ivy.cos(2 * theta[..., None, None]),
+            x=xp.cos(2 * theta[..., None, None]),
         )
     )
     # n_end = 3 -> max l = 2 -> max jacobi order = 1 -> jacobi n_end = 2
@@ -296,7 +301,7 @@ def type_c(
         # [l_alpha, l_beta, n] -> [l_alpha, l_beta, l = 2n + l_alpha + l_beta]
         # 1. [l_alpha, l_beta, n] -> [l_alpha, l_beta, 2n]
         # add zeros to the left for each row, i.e. [1, 2, 3] -> [1, 0, 2, 0, 3, 0]
-        res_expaneded = ivy.zeros(res.shape[:-1] + (n_end,))
+        res_expaneded = xp.zeros(res.shape[:-1] + (n_end,))
         res_expaneded[..., ::2] = res
         # 2. [l_alpha, l_beta, 2n] -> [l_alpha, l_beta, 2n + l_alpha]
         res_expaneded = shift_nth_row_n_steps(
@@ -304,7 +309,7 @@ def type_c(
             axis_row=-3,
             axis_shift=-1,
             cut_padding=True,
-            padding_constant_values=fill_value,
+            fill_values=fill_value,
         )
         # 3. [l_alpha, l_beta, 2n + l_alpha] ->
         # [l_alpha, l_beta, 2n + l_alpha + l_beta]
@@ -313,7 +318,7 @@ def type_c(
             axis_row=-2,
             axis_shift=-1,
             cut_padding=True,
-            padding_constant_values=fill_value,
+            fill_values=fill_value,
         )
     if is_alpha_type_a_and_include_negative_m:
         res = to_symmetric(res, axis=-3, asymmetric=False, conjugate=False)
