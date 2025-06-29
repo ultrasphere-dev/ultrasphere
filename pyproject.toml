@@ -4,7 +4,7 @@ requires = [ "setuptools" ]
 
 [project]
 name = "ultrasphere"
-version = "0.0.0"
+version = "1.0.0-rc.1"
 description = "hyperspherical coordinates and spherical harmonics"
 readme = "README.md"
 license = { text = "MIT" }
