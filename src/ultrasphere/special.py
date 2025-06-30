@@ -41,8 +41,8 @@ def sjv(
     Boundary Integral Equations. p.279
 
     """
-    ivy = array_namespace(v, d, z)
-    if ivy.any((d > 2) & (v < 0)):
+    xp = array_namespace(v, d, z)
+    if xp.any((d > 2) & (v < 0)):
         raise ValueError(
             "The hyperspherical Bessel function of "
             "the first kind is not defined for negative degrees."
@@ -51,8 +51,8 @@ def sjv(
         return v / z * sjv(v, d, z) - sjv(v + 1, d, z)
     d_half_minus_1 = d / 2 - 1
     return (
-        ivy.sqrt(ivy.pi / 2)
-        * ivy.asarray((jvp if derivative else jv)((v + d_half_minus_1), (z)))
+        xp.sqrt(xp.pi / 2)
+        * xp.asarray((jvp if derivative else jv)((v + d_half_minus_1), (z)))
         / (z**d_half_minus_1)
     )
 
@@ -89,8 +89,8 @@ def syv(
     Boundary Integral Equations. p.279
 
     """
-    ivy = array_namespace(v, d, z)
-    if ivy.any((d > 2) & (v < 0)):
+    xp = array_namespace(v, d, z)
+    if xp.any((d > 2) & (v < 0)):
         raise ValueError(
             "The hyperspherical Bessel function of "
             "the second kind is not defined for negative degrees."
@@ -99,8 +99,8 @@ def syv(
         return v / z * syv(v, d, z) - syv(v + 1, d, z)
     d_half_minus_1 = d / 2 - 1
     return (
-        ivy.sqrt(ivy.pi / 2)
-        * ivy.asarray((yvp if derivative else yv)((v + d_half_minus_1), (z)))
+        xp.sqrt(xp.pi / 2)
+        * xp.asarray((yvp if derivative else yv)((v + d_half_minus_1), (z)))
         / (z**d_half_minus_1)
     )
 
@@ -307,7 +307,7 @@ def potential_coef[TArray: Array](
     Boundary Integral Equations. p.285
 
     """
-    ivy = array_namespace(n, d, k, x_abs, y_abs)
+    xp = array_namespace(n, d, k, x_abs, y_abs)
     if x_abs_derivative is None and y_abs_derivative is None:
         x_abs_derivative = derivative in ["D*", "N"]
         y_abs_derivative = derivative in ["D", "N"]
@@ -318,7 +318,7 @@ def potential_coef[TArray: Array](
             f"Both {x_abs_derivative=} and {y_abs_derivative=} must be None or not None."
         )
     # p.285
-    inner = ivy.where(
+    inner = xp.where(
         x_abs < y_abs,
         shn1(n, d, k * y_abs, derivative=y_abs_derivative)
         * (sjv(n, d, k * x_abs, derivative=x_abs_derivative) if for_func == "harmonics" else 1),
@@ -346,7 +346,7 @@ def potential_coef[TArray: Array](
                 # inner D
                 addition = 1 / 2
         elif limit == "warn":
-            if ivy.isclose(x_abs, y_abs, rtol=1e-4, atol=0).any():
+            if xp.isclose(x_abs, y_abs, rtol=1e-4, atol=0).any():
                 warnings.warn(
                     "As x_abs is close to y_abs "
                     "and requested to calculate D or D*, "

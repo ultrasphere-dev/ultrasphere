@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.cut import expand_cut
-from ultrasphere.harmonics.expansion import expand_evaluate
+from ultrasphere.harmonics.expansion import expand, expand_evaluate
 from ultrasphere.harmonics.flatten import flatten_harmonics, flatten_mask_harmonics, unflatten_harmonics
 from ultrasphere.harmonics.harmonics import harmonics
 from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
@@ -72,12 +72,12 @@ def test_harmonics_orthogonal(
 
     # assert non-zero values are all 1
     expansion_nonzero_values = result[(result.abs() > 1e-3).nonzero()]
-    assert xp.allclose(
+    assert xp.all(xpx.isclose(
         expansion_nonzero_values,
         xp.ones_like(expansion_nonzero_values),
         rtol=1e-3,
         atol=1e-3,
-    )
+    ))
 
 
 @pytest.mark.parametrize(
@@ -135,12 +135,12 @@ def test_orthogonal_expand(
 
         # assert non-zero values are all 1
         expansion_nonzero_values = actual[(actual.abs() > 1e-3).nonzero()]
-        assert xp.allclose(
+        assert xp.all(xpx.isclose(
             expansion_nonzero_values,
             xp.ones_like(expansion_nonzero_values),
             rtol=1e-3,
             atol=1e-3,
-        )
+        ))
 
 
 @pytest.mark.parametrize(
@@ -169,7 +169,7 @@ def test_approximate(
         x = c.to_euclidean(s, as_array=True)
         return xp.exp(1j * xp.einsum("v,v...->...", k.astype(x.dtype), x))
 
-    spherical, _ = roots(c,n=n_end, expand_dims_x=True)
+    spherical, _ = roots(c,n=n_end, expand_dims_x=True, xp=xp)
     expected = f(spherical)
     error = {}
     expansion = expand(c, 
@@ -686,12 +686,12 @@ def test_harmonics_translation_coef_using_triplet(
                 type="regular" if from_ == to_ else "singular",
             )[..., idx]
         )
-        assert xp.allclose(
+        assert xp.all(xpx.isclose(
             coef,
             expected2,
             rtol=1e-5,
             atol=1e-5,
-        )
+        ))
     actual = xp.sum(
         x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
         axis=tuple(range(-c.s_ndim, 0)),

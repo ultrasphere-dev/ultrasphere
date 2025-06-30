@@ -155,7 +155,7 @@ def test_type_b() -> None:
 #     theta_ = xp.reshape(theta,(1,) * s_beta.ndim + theta.shape)
 #     actual = type_b(theta=theta, s_beta=s_beta_, l_beta_, l_)
 #     expected = xp.asarray(list(expected.values()), dtype=theta.dtype)
-#     assert xp.allclose(
+#     assert xp.all(xpx.isclose(
 #         actual,
 #         expected,
 #         rtol=1e-3,

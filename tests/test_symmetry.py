@@ -1,25 +1,22 @@
 from array_api_compat import array_namespace
 import array_api_extra as xpx
-from array_api._2024_12 import Array
+from array_api._2024_12 import Array, ArrayNamespace
 import pytest
-from xp import NativeArray
+
 from shift_nth_row_n_steps import select
 
 from ultrasphere.symmetry import flip_symmetric_tensor, to_symmetric
 
 
-@pytest.fixture(autouse=True, scope="session", params=["numpy"])
-def setup(request: pytest.FixtureRequest) -> None:
-    xp.set_backend(request.param)
 
 
-@pytest.mark.parametrize("array", [xp.arange(1, 10).reshape((3, 3))])
 @pytest.mark.parametrize("axis", [0, 1, -1])
 @pytest.mark.parametrize("asymmetric", [True, False])
 @pytest.mark.parametrize("conjugate", [True, False])
 def test_to_symmetric(
-    array: xp.asarray, axis: int, asymmetric: bool, conjugate: bool
+    axis: int, asymmetric: bool, conjugate: bool, xp: ArrayNamespace
 ) -> None:
+    array = xp.arange(1, 10).reshape((3, 3))
     result = to_symmetric(array, axis=axis, asymmetric=asymmetric, conjugate=conjugate)
     result_ = result
     axis = axis % len(array.shape)
@@ -31,27 +28,27 @@ def test_to_symmetric(
             + (slice(None),) * (len(array.shape) - axis - 1)
         ] = -select(result_, 0, axis=axis)
     if conjugate:
-        result_ = result_.conj()
+        result_ = xp.conj(result_)
         result_[
             (slice(None),) * axis
             + (0,)
             + (slice(None),) * (len(array.shape) - axis - 1)
-        ] = select(result_, 0, axis=axis).conj()
+        ] = xp.conj(select(result_, 0, axis=axis))
 
     # test if flipped result is equal to result if index 0 is removed
     assert xp.all(xpx.isclose(result, flip_symmetric_tensor(result_, axis=axis)))
 
     # test manually
     random_index = xp.randint(1, array.shape[axis], shape=(1,))
-    assert xp.allclose(
+    assert xp.all(xpx.isclose(
         select(result, random_index, axis=axis),
         select(result_, -random_index, axis=axis),
-    )
+    ))
 
 
 @pytest.mark.parametrize("asymmetric", [True, False])
 @pytest.mark.parametrize("conjugate", [True, False])
-def test_to_symmetric_manual(asymmetric: bool, conjugate: bool) -> None:
+def test_to_symmetric_manual(asymmetric: bool, conjugate: bool, xp: ArrayNamespace) -> None:
     array = [0, 1 + 1j]
     result = to_symmetric(xp.asarray(array), asymmetric=asymmetric, conjugate=conjugate)
     if asymmetric and conjugate:
