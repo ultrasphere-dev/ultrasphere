@@ -4,7 +4,7 @@ from array_api._2024_12 import ArrayNamespaceFull
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import c_spherical, hopf, random
-from ultrasphere.harmonics.index import index_array_harmonics_all
+from ultrasphere.harmonics.flatten import index_array_harmonics_all
 
 
 @pytest.mark.parametrize(

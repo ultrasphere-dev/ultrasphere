@@ -8,9 +8,9 @@ from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.expansion import (
     expand,
 )
+from ultrasphere.harmonics.flatten import index_array_harmonics
 from ultrasphere.harmonics.harmonics import concat_harmonics, expand_dims_harmonics
 from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
-from ultrasphere.harmonics.index import index_array_harmonics
 
 from .harmonics import harmonics as harmonics_
 

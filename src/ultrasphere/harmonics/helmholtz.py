@@ -7,7 +7,7 @@ from shift_nth_row_n_steps._torch_like import create_slice
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
-from ultrasphere.harmonics.index import index_array_harmonics
+from ultrasphere.harmonics.flatten import index_array_harmonics
 from ultrasphere.special import szv
 
 
