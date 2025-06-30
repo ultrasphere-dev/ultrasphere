@@ -1,7 +1,6 @@
-from array_api_compat import array_namespace
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
-
+from array_api_compat import array_namespace
 
 from .special import binom, lgamma
 
@@ -67,9 +66,7 @@ def jacobi(
     return xp.stack(ps, axis=-1)
 
 
-def log_jacobi_normalization_constant(
-    *, alpha: Array, beta: Array, n: Array
-) -> Array:
+def log_jacobi_normalization_constant(*, alpha: Array, beta: Array, n: Array) -> Array:
     """
     Computes the log of normalization constant of
     the Jacobi polynomials of order n with parameters alpha and beta.
@@ -128,9 +125,7 @@ def jacobi_normalization_constant(
     return xp.exp(log_jacobi_normalization_constant(alpha=alpha, beta=beta, n=n))
 
 
-def gegenbauer(
-    x: Array, *, alpha: Array, n_end: int
-) -> Array:
+def gegenbauer(x: Array, *, alpha: Array, n_end: int) -> Array:
     """
     Computes the Gegenbauer polynomials of
     order {1,...,n_max} at the points x.
@@ -163,8 +158,9 @@ def gegenbauer(
     log_coef = xp.astype(
         lgamma(2.0 * alpha[..., None] + 1.0 + n)
         - lgamma(2.0 * alpha[..., None] + 1.0)
-        - (lgamma(alpha[..., None] + 1.0 + n) - lgamma(alpha[..., None] + 1.0))
-    , x.dtype)
+        - (lgamma(alpha[..., None] + 1.0 + n) - lgamma(alpha[..., None] + 1.0)),
+        x.dtype,
+    )
     return xp.exp(log_coef) * jacobi(x, alpha=alpha, beta=alpha, n_end=n_end)
 
 
@@ -270,9 +266,7 @@ def jacobi_triplet_integral(
         If beta3 is not None and beta3 is not beta1 + beta2.
 
     """
-    xp = array_namespace(
-        alpha1, alpha2, alpha3, beta1, beta2, beta3, n1, n2, n3
-    )
+    xp = array_namespace(alpha1, alpha2, alpha3, beta1, beta2, beta3, n1, n2, n3)
     from py3nj import wigner3j
 
     if alpha3 is None:

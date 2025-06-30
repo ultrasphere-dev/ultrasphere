@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from array_api_compat import array_namespace
 import array_api_extra as xpx
 from array_api._2024_12 import Array
-
 
 
 def is_same_shape(*shapes: tuple[int, ...]) -> bool:

@@ -1,25 +1,18 @@
-
 import sys
 import warnings
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any, Generic, Literal, TypeVar, overload
 
-from array_api_compat import array_namespace
-import array_api_extra as xpx
-from array_api._2024_12 import Array
 import networkx as nx
 import numpy as np
-
+from array_api._2024_12 import Array
+from array_api_compat import array_namespace
 from joblib.memory import Memory
-from shift_nth_row_n_steps import create_slice
 from strenum import StrEnum
-from .creation import s_node_name
-from .random import random_sphere
 
-from .special import szv
-from .symmetry import to_symmetric
+from .special import lgamma
 from .wave_expansion import harm_n_ndim, homogeneous_ndim
-from .special import lgamma, binom
+
 
 class BranchingType(StrEnum):
     """
@@ -214,94 +207,6 @@ def get_branching_types(graph: nx.DiGraph) -> dict[Any, BranchingType]:
         else:
             branching_types[node] = BranchingType.C
     return branching_types
-
-
-def get_digraph_from_branching_type(
-    branching_types: str | Sequence[BranchingType],
-) -> nx.DiGraph:
-    """
-    Get a rooted tree from the branching types.
-
-    Parameters
-    ----------
-    branching_types : str | Sequence[BranchingType]
-        The branching types. e.g. "ba" for standard spherical coordinates.
-
-    Returns
-    -------
-    nx.DiGraph
-        The rooted tree representing the coordinates.
-
-    Raises
-    ------
-    ValueError
-        If the branching types are invalid.
-
-    """
-    if isinstance(branching_types, str):
-        branching_types_str = branching_types.replace("bp", "b'")
-        branching_types_: list[BranchingType] = []
-        while branching_types_str:
-            if branching_types_str.startswith("b'"):
-                branching_types_.append(BranchingType.BP)
-                branching_types_str = branching_types_str[2:]
-            elif branching_types_str[0] in ["a", "b", "c"]:
-                branching_types_.append(BranchingType(branching_types_str[0]))
-                branching_types_str = branching_types_str[1:]
-            else:
-                raise ValueError(f"Invalid branching type: {branching_types_str}")
-    else:
-        branching_types_ = list(branching_types)
-
-    G = nx.DiGraph()
-    type_c_stack: list[Any] = []
-    next_e_idx = 0
-    next_s_idx = 0
-    current_node = s_node_name(next_s_idx)
-    G.add_node(current_node)
-    next_s_idx += 1
-    for i, branching_type in enumerate(branching_types_):
-        if branching_type == BranchingType.A:
-            G.add_node(next_e_idx)
-            G.add_edge(current_node, next_e_idx, type="cos")
-            next_e_idx += 1
-            G.add_node(next_e_idx)
-            G.add_edge(current_node, next_e_idx, type="sin")
-            next_e_idx += 1
-            if i == len(branching_types_) - 1:
-                break
-            else:
-                try:
-                    next_node = type_c_stack.pop()
-                except IndexError as e:
-                    raise ValueError("Invalid branching types.") from e
-        elif branching_type == BranchingType.B:
-            G.add_node(next_e_idx)
-            G.add_edge(current_node, next_e_idx, type="cos")
-            next_e_idx += 1
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="sin")
-            next_node = s_node_name(next_s_idx)
-            next_s_idx += 1
-        elif branching_type == BranchingType.BP:
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="cos")
-            next_node = s_node_name(next_s_idx)
-            next_s_idx += 1
-            G.add_node(next_e_idx)
-            G.add_edge(current_node, next_e_idx, type="sin")
-            next_e_idx += 1
-        elif branching_type == BranchingType.C:
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="cos")
-            next_node = s_node_name(next_s_idx)
-            next_s_idx += 1
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="sin")
-            type_c_stack.append(s_node_name(next_s_idx))
-            next_s_idx += 1
-        current_node = next_node
-    return G
 
 
 def get_branching_type_from_digraph(G: nx.DiGraph) -> Iterable[BranchingType]:
@@ -579,7 +484,8 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         xp = array_namespace(*euclidean.values())
         r = (
             xp.linalg.vector_norm(
-                xp.stack(xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes])), axis=0
+                xp.stack(xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes])),
+                axis=0,
             )
             if self.s_ndim > 0
             else euclidean[self.e_nodes[0]]
@@ -596,15 +502,16 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             cos = tmp[cos_child]
             sin = tmp[sin_child]
             result[node] = xp.atan2(sin, cos)
-            tmp[node] = xp.linalg.vector_norm(xp.stack(xp.broadcast_arrays(sin, cos)), axis=0)
+            tmp[node] = xp.linalg.vector_norm(
+                xp.stack(xp.broadcast_arrays(sin, cos)), axis=0
+            )
         return result
 
     @overload
     def to_euclidean(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array]
-            | Mapping[TSpherical, Array]
+            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
         as_array: Literal[False] = ...,
     ) -> Mapping[TEuclidean, Array]: ...
@@ -613,8 +520,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
     def to_euclidean(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array]
-            | Mapping[TSpherical, Array]
+            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
         as_array: Literal[True] = ...,
     ) -> Array: ...
@@ -622,8 +528,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
     def to_euclidean(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array]
-            | Mapping[TSpherical, Array]
+            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
         as_array: bool = False,
     ) -> Mapping[TEuclidean, Array] | Array:
@@ -679,8 +584,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
     def jacobian(
         self,
         spherical: (
-            Mapping[TSpherical | Literal["r"], Array]
-            | Mapping[TSpherical, Array]
+            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
     ) -> Array:
         """
@@ -711,4 +615,3 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
                 self.S.get(sin_child, -1) + 1
             )
         return jacobian
-

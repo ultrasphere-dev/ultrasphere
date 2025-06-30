@@ -2,21 +2,34 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
-from ultrasphere.harmonics.harmonics import harmonics
-from array_api_compat import array_namespace
-from array_api._2024_12 import Array, ArrayNamespaceFull
-import pytest
-from ultrasphere.creation import from_branching_types, hopf, random, spherical, standard
 import array_api_extra as xpx
+import pytest
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from matplotlib import pyplot as plt
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere.creation import (
+    c_spherical,
+    from_branching_types,
+    hopf,
+    random,
+    standard,
+)
 from ultrasphere.harmonics.cut import expand_cut
 from ultrasphere.harmonics.expansion import expand, expand_evaluate, ndim_harmonics
-from ultrasphere.harmonics.flatten import flatten_harmonics, flatten_mask_harmonics, unflatten_harmonics
+from ultrasphere.harmonics.flatten import (
+    flatten_harmonics,
+    flatten_mask_harmonics,
+    unflatten_harmonics,
+)
+from ultrasphere.harmonics.harmonics import harmonics
 from ultrasphere.harmonics.harmonics import harmonics as harmonics_
 from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
-from ultrasphere.harmonics.translation import harmonics_translation_coef, harmonics_twins_expansion
+from ultrasphere.harmonics.translation import (
+    harmonics_translation_coef,
+    harmonics_translation_coef_using_triplet,
+    harmonics_twins_expansion,
+)
 from ultrasphere.integral import roots
 from ultrasphere.polynomial import gegenbauer, legendre
 from ultrasphere.random import random_points
@@ -26,10 +39,11 @@ from ultrasphere.symmetry import to_symmetric
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)
 
+
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
         (hopf(2)),
     ],
@@ -42,8 +56,9 @@ def test_harmonics_orthogonal(
     condon_shortley_phase: bool,
     xp: ArrayNamespaceFull,
 ) -> None:
-    s, ws = roots(c,n=n, expand_dims_x=True, xp=xp)
-    Y = harmonics(c, 
+    s, ws = roots(c, n=n, expand_dims_x=True, xp=xp)
+    Y = harmonics(
+        c,
         s,
         n_end=n,
         condon_shortley_phase=condon_shortley_phase,
@@ -68,22 +83,24 @@ def test_harmonics_orthogonal(
     # assert quantum numbers are the same for non-zero values
     expansion_nonzero = (result.abs() > 1e-3).nonzero(as_tuple=False)
     l, r = expansion_nonzero[:, : c.s_ndim], expansion_nonzero[:, c.s_ndim :]
-    assert xp.all(l== r), expansion_nonzero
+    assert xp.all(l == r), expansion_nonzero
 
     # assert non-zero values are all 1
     expansion_nonzero_values = result[(result.abs() > 1e-3).nonzero()]
-    assert xp.all(xpx.isclose(
-        expansion_nonzero_values,
-        xp.ones_like(expansion_nonzero_values),
-        rtol=1e-3,
-        atol=1e-3,
-    ))
+    assert xp.all(
+        xpx.isclose(
+            expansion_nonzero_values,
+            xp.ones_like(expansion_nonzero_values),
+            rtol=1e-3,
+            atol=1e-3,
+        )
+    )
 
 
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
         (standard(4)),
         (hopf(2)),
@@ -97,10 +114,11 @@ def test_orthogonal_expand(
     n: int,
     condon_shortley_phase: bool,
     concat: bool,
-    xp: ArrayNamespaceFull
+    xp: ArrayNamespaceFull,
 ) -> None:
     def f(s: Mapping[TSpherical, Array]) -> Array:
-        return harmonics(c,   # type: ignore
+        return harmonics(
+            c,  # type: ignore
             s,
             n_end=n,
             condon_shortley_phase=condon_shortley_phase,
@@ -108,7 +126,8 @@ def test_orthogonal_expand(
             expand_dims=concat,
         )
 
-    actual = expand(c,   # type: ignore
+    actual = expand(
+        c,  # type: ignore
         f,
         n=n,
         n_end=n,
@@ -131,22 +150,24 @@ def test_orthogonal_expand(
         # assert quantum numbers are the same for non-zero values
         expansion_nonzero = (xp.abs(actual) > 1e-3).nonzero(as_tuple=False)
         l, r = expansion_nonzero[:, : c.s_ndim], expansion_nonzero[:, c.s_ndim :]
-        assert xp.all(l== r), expansion_nonzero
+        assert xp.all(l == r), expansion_nonzero
 
         # assert non-zero values are all 1
         expansion_nonzero_values = actual[(xp.abs(actual) > 1e-3).nonzero()]
-        assert xp.all(xpx.isclose(
-            expansion_nonzero_values,
-            xp.ones_like(expansion_nonzero_values),
-            rtol=1e-3,
-            atol=1e-3,
-        ))
+        assert xp.all(
+            xpx.isclose(
+                expansion_nonzero_values,
+                xp.ones_like(expansion_nonzero_values),
+                rtol=1e-3,
+                atol=1e-3,
+            )
+        )
 
 
 @pytest.mark.parametrize(
     "name, c, n_end",
     [
-        ("spherical", spherical(), 25),
+        ("spherical", c_spherical(), 25),
         ("standard-3'", from_branching_types("bpa"), 10),
         ("standard-4", standard(3), 7),
         ("hoph-2", hopf(2), 6),
@@ -161,7 +182,7 @@ def test_approximate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     condon_shortley_phase: bool,
-    xp: ArrayNamespaceFull
+    xp: ArrayNamespaceFull,
 ) -> None:
     k = xp.random.random_uniform(low=0, high=1, shape=(c.e_ndim,))
 
@@ -169,10 +190,11 @@ def test_approximate(
         x = c.to_euclidean(s, as_array=True)
         return xp.exp(1j * xp.einsum("v,v...->...", k.astype(x.dtype), x))
 
-    spherical, _ = roots(c,n=n_end, expand_dims_x=True, xp=xp)
+    spherical, _ = roots(c, n=n_end, expand_dims_x=True, xp=xp)
     expected = f(spherical)
     error = {}
-    expansion = expand(c, 
+    expansion = expand(
+        c,
         f,
         n=n_end,
         n_end=n_end,
@@ -203,7 +225,7 @@ def test_approximate(
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
         (hopf(2)),
     ],
@@ -219,7 +241,7 @@ def test_harmonics_regular_singular_j_expansion(
     concat: bool,
     expand_dims: bool,
     type: Literal["j", "y", "h1", "h2"],
-    xp: ArrayNamespaceFull
+    xp: ArrayNamespaceFull,
 ) -> None:
     shape = (5,)
     x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
@@ -230,34 +252,38 @@ def test_harmonics_regular_singular_j_expansion(
     y_spherical = c.from_euclidean(y)
 
     expected = szv(0, c.e_ndim, k * xp.linalg.vector_norm(x - y, axis=0), type=type)
-    x_Y = harmonics(c,   # type: ignore
+    x_Y = harmonics(
+        c,  # type: ignore
         x_spherical,
         n_end=n,
         condon_shortley_phase=False,
         concat=concat,
         expand_dims=expand_dims,
     )
-    x_Z = harmonics_regular_singular(c,
-        x_spherical, k=k, harmonics=x_Y, type=type, multiply=concat
+    x_Z = harmonics_regular_singular(
+        c, x_spherical, k=k, harmonics=x_Y, type=type, multiply=concat
     )
-    x_R = harmonics_regular_singular(c,
+    x_R = harmonics_regular_singular(
+        c,
         x_spherical,
         k=k,
         harmonics=x_Y,
         type="regular",
         multiply=concat,
     )
-    y_Y = harmonics(c,   # type: ignore
+    y_Y = harmonics(
+        c,  # type: ignore
         y_spherical,
         n_end=n,
         condon_shortley_phase=False,
         concat=concat,
         expand_dims=expand_dims,
     )
-    y_Z = harmonics_regular_singular(c,
-        y_spherical, k=k, harmonics=y_Y, type=type, multiply=concat
+    y_Z = harmonics_regular_singular(
+        c, y_spherical, k=k, harmonics=y_Y, type=type, multiply=concat
     )
-    y_R = harmonics_regular_singular(c,
+    y_R = harmonics_regular_singular(
+        c,
         y_spherical,
         k=k,
         harmonics=y_Y,
@@ -278,15 +304,13 @@ def test_harmonics_regular_singular_j_expansion(
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
     ],
 )
 @pytest.mark.parametrize("n_end", [5])
 def test_addition_theorem_same_x(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    n_end: int,
-    xp: ArrayNamespaceFull
+    c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
 ) -> None:
     """
     Test the addition theorem for spherical harmonics.
@@ -304,7 +328,8 @@ def test_addition_theorem_same_x(
     expected = (
         c.harm_n_ndim(n) / c.surface_area() * xp.ones_like(x_spherical["r"])[:, None]
     )
-    x_Y = harmonics(c,   # type: ignore
+    x_Y = harmonics(
+        c,  # type: ignore
         x_spherical,
         n_end=n_end,
         condon_shortley_phase=False,
@@ -312,8 +337,8 @@ def test_addition_theorem_same_x(
         expand_dims=True,
     )
     axis = set(range(0, c.s_ndim)) - {c.s_nodes.index(c.root)}
-    actual = xp.sum(xp.real(
-        x_Y * x_Y.conj()), axis=tuple(a + x_spherical["r"].ndim for a in axis)
+    actual = xp.sum(
+        xp.real(x_Y * x_Y.conj()), axis=tuple(a + x_spherical["r"].ndim for a in axis)
     )
     assert xp.all(xpx.isclose(actual, expected))
 
@@ -321,7 +346,7 @@ def test_addition_theorem_same_x(
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
     ],
 )
@@ -331,7 +356,7 @@ def test_addition_theorem(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     type: Literal["legendre", "gegenbauer", "gegenbauer-cohl"],
-    xp: ArrayNamespaceFull
+    xp: ArrayNamespaceFull,
 ) -> None:
     """
     Test the addition theorem for spherical harmonics.
@@ -384,14 +409,16 @@ def test_addition_theorem(
     else:
         raise ValueError("type must be 'legendre' or 'gegenbauer")
 
-    x_Y = harmonics(c,   # type: ignore
+    x_Y = harmonics(
+        c,  # type: ignore
         x_spherical,
         n_end=n_end,
         condon_shortley_phase=False,
         concat=True,
         expand_dims=True,
     )
-    y_Y = harmonics(c,   # type: ignore
+    y_Y = harmonics(
+        c,  # type: ignore
         y_spherical,
         n_end=n_end,
         condon_shortley_phase=False,
@@ -400,8 +427,8 @@ def test_addition_theorem(
     )
     # [..., n]
     axis = set(range(0, c.s_ndim)) - {c.s_nodes.index(c.root)}
-    actual = xp.sum(xp.real(
-        x_Y * y_Y.conj()), axis=tuple(a + x_spherical["r"].ndim for a in axis)
+    actual = xp.sum(
+        xp.real(x_Y * y_Y.conj()), axis=tuple(a + x_spherical["r"].ndim for a in axis)
     )
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-4, atol=1e-4))
 
@@ -409,7 +436,7 @@ def test_addition_theorem(
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (from_branching_types("a")),
     ],
 )
@@ -422,7 +449,7 @@ def test_harmonics_translation_coef(
     n_end_add: int,
     condon_shortley_phase: bool,
     type: Literal["regular", "singular"],
-    xp: ArrayNamespaceFull
+    xp: ArrayNamespaceFull,
 ) -> None:
     shape = (20,)
     # get x, t, y := x + t
@@ -432,16 +459,20 @@ def test_harmonics_translation_coef(
     if type == "singular":
         # |t| < |x|
         t *= xp.random.random_uniform(low=0.05, high=0.1, shape=shape)
-        assert (xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)).all()
+        assert (
+            xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)
+        ).all()
     # t = xp.zeros_like(t)
     y = x + t
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    y_RS = harmonics_regular_singular(c,
+    y_RS = harmonics_regular_singular(
+        c,
         y_spherical,
         k=k,
-        harmonics=harmonics(c,   # type: ignore
+        harmonics=harmonics(
+            c,  # type: ignore
             y_spherical,
             n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -450,10 +481,12 @@ def test_harmonics_translation_coef(
         ),
         type=type,
     )
-    x_RS = harmonics_regular_singular(c,
+    x_RS = harmonics_regular_singular(
+        c,
         x_spherical,
         k=k,
-        harmonics=harmonics(c,   # type: ignore
+        harmonics=harmonics(
+            c,  # type: ignore
             x_spherical,
             n_end=n_end_add,
             condon_shortley_phase=condon_shortley_phase,
@@ -466,7 +499,8 @@ def test_harmonics_translation_coef(
     expected = y_RS
 
     # actual
-    coef = harmonics_translation_coef(c,
+    coef = harmonics_translation_coef(
+        c,
         t,
         n_end=n_end,
         n_end_add=n_end_add,
@@ -483,15 +517,14 @@ def test_harmonics_translation_coef(
         pytest.skip("singular case does not converge in real world computation")
 
 
-def test_harmonics_translation_coef_gumerov_table(
-    xp: ArrayNamespaceFull) -> None:
+def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> None:
     if "torch" in xp.__name__:
         pytest.skip("round_cpu not implemented in torch")
     # Gumerov, N.A., & Duraiswami, R. (2001). Fast, Exact,
     # and Stable Computation of Multipole Translation and
     # Rotation Coefficients for the 3-D Helmholtz Equation.
     # got completely same results as the table in 12.3 Example
-    c = spherical()
+    c = c_spherical()
     x = xp.asarray([-1.0, 1.0, 0.0])
     t = xp.asarray([2.0, -7.0, 1.0])
     y = xp.add(x, t)
@@ -502,10 +535,12 @@ def test_harmonics_translation_coef_gumerov_table(
 
     n_end = 6
     for n_end_add in [1, 3, 5, 7, 9]:
-        y_RS = harmonics_regular_singular(c,
+        y_RS = harmonics_regular_singular(
+            c,
             y_spherical,
             k=k,
-            harmonics=harmonics(c,   # type: ignore
+            harmonics=harmonics(
+                c,  # type: ignore
                 y_spherical,
                 n_end=n_end,
                 condon_shortley_phase=False,
@@ -514,10 +549,12 @@ def test_harmonics_translation_coef_gumerov_table(
             ),
             type="singular",
         )
-        x_RS = harmonics_regular_singular(c,
+        x_RS = harmonics_regular_singular(
+            c,
             x_spherical,
             k=k,
-            harmonics=harmonics(c,   # type: ignore
+            harmonics=harmonics(
+                c,  # type: ignore
                 x_spherical,
                 n_end=n_end_add,
                 condon_shortley_phase=False,
@@ -530,7 +567,8 @@ def test_harmonics_translation_coef_gumerov_table(
         expected = y_RS
 
         # actual
-        coef = harmonics_translation_coef_using_triplet(c,
+        coef = harmonics_translation_coef_using_triplet(
+            c,
             t_spherical,
             n_end=n_end,
             n_end_add=n_end_add,
@@ -542,16 +580,14 @@ def test_harmonics_translation_coef_gumerov_table(
             x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
             axis=tuple(range(-c.s_ndim, 0)),
         )
-        print(
-            xp.round(expected[5, 2], decimals=6), xp.round(actual[5, 2], decimals=6)
-        )
+        print(xp.round(expected[5, 2], decimals=6), xp.round(actual[5, 2], decimals=6))
 
 
 @pytest.mark.parametrize(
     "c",
     [
         (from_branching_types("a")),
-        (spherical()),
+        (c_spherical()),
     ],
 )
 @pytest.mark.parametrize("n_end", [6])
@@ -564,25 +600,27 @@ def test_harmonics_twins_expansion(
     n_end: int,
     conj_1: bool,
     conj_2: bool,
-    xp: ArrayNamespaceFull
+    xp: ArrayNamespaceFull,
 ) -> None:
-    actual = harmonics_twins_expansion(c, 
+    actual = harmonics_twins_expansion(
+        c,
         n_end_1=n_end,
         n_end_2=n_end,
         condon_shortley_phase=condon_shortley_phase,
         conj_1=conj_1,
         conj_2=conj_2,
         analytic=False,
-        xp=xp
+        xp=xp,
     )
-    expected = harmonics_twins_expansion(c, 
+    expected = harmonics_twins_expansion(
+        c,
         n_end_1=n_end,
         n_end_2=n_end,
         condon_shortley_phase=condon_shortley_phase,
         conj_1=conj_1,
         conj_2=conj_2,
         analytic=True,
-        xp=xp
+        xp=xp,
     )
     # unmatched = ~xp.isclose(actual, expected, atol=1e-5, rtol=1e-5)
     # print(unmatched.nonzero(as_tuple=False), actual[unmatched], expected[unmatched])
@@ -593,7 +631,7 @@ def test_harmonics_twins_expansion(
     "c",
     [
         (from_branching_types("a")),
-        (spherical()),
+        (c_spherical()),
     ],
 )
 @pytest.mark.parametrize("n_end, n_end_add", [(4, 4)])
@@ -619,11 +657,15 @@ def test_harmonics_translation_coef_using_triplet(
     if (from_, to_) == ("singular", "singular"):
         # |t| < |x| (if too close, the result would be inaccurate)
         t = t * xp.random.random_uniform(low=0.05, high=0.1, shape=shape)
-        assert (xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)).all()
+        assert (
+            xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)
+        ).all()
     elif (from_, to_) == ("regular", "singular"):
         # |t| > |x| (if too close, the result would be inaccurate)
         t = t * xp.random.random_uniform(low=10, high=20, shape=shape)
-        assert (xp.linalg.vector_norm(t, axis=0) > xp.linalg.vector_norm(x, axis=0)).all()
+        assert (
+            xp.linalg.vector_norm(t, axis=0) > xp.linalg.vector_norm(x, axis=0)
+        ).all()
 
     # t = xp.zeros_like(t)
     y = x + t
@@ -631,10 +673,12 @@ def test_harmonics_translation_coef_using_triplet(
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    y_RS = harmonics_regular_singular(c,
+    y_RS = harmonics_regular_singular(
+        c,
         y_spherical,
         k=k,
-        harmonics=harmonics(c,   # type: ignore
+        harmonics=harmonics(
+            c,  # type: ignore
             y_spherical,
             n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -643,10 +687,12 @@ def test_harmonics_translation_coef_using_triplet(
         ),
         type=to_,
     )
-    x_RS = harmonics_regular_singular(c,
+    x_RS = harmonics_regular_singular(
+        c,
         x_spherical,
         k=k,
-        harmonics=harmonics(c,   # type: ignore
+        harmonics=harmonics(
+            c,  # type: ignore
             x_spherical,
             n_end=n_end_add,
             condon_shortley_phase=condon_shortley_phase,
@@ -659,7 +705,8 @@ def test_harmonics_translation_coef_using_triplet(
     expected = y_RS
 
     # actual
-    coef = harmonics_translation_coef_using_triplet(c,
+    coef = harmonics_translation_coef_using_triplet(
+        c,
         t_spherical,
         n_end=n_end,
         n_end_add=n_end_add,
@@ -673,10 +720,12 @@ def test_harmonics_translation_coef_using_triplet(
         idx = n[:, None] - n_add[None, :]
         expected2 = (
             2
-            * harmonics_regular_singular(c,
+            * harmonics_regular_singular(
+                c,
                 t_spherical,
                 k=k,
-                harmonics=harmonics(c,   # type: ignore
+                harmonics=harmonics(
+                    c,  # type: ignore
                     t_spherical,
                     n_end=n_end + n_end_add - 1,
                     condon_shortley_phase=condon_shortley_phase,
@@ -686,12 +735,14 @@ def test_harmonics_translation_coef_using_triplet(
                 type="regular" if from_ == to_ else "singular",
             )[..., idx]
         )
-        assert xp.all(xpx.isclose(
-            coef,
-            expected2,
-            rtol=1e-5,
-            atol=1e-5,
-        ))
+        assert xp.all(
+            xpx.isclose(
+                coef,
+                expected2,
+                rtol=1e-5,
+                atol=1e-5,
+            )
+        )
     actual = xp.sum(
         x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
         axis=tuple(range(-c.s_ndim, 0)),
@@ -709,18 +760,17 @@ def test_harmonics_translation_coef_using_triplet(
     [
         random(1),
         random(2),
-        spherical(),
+        c_spherical(),
         hopf(2),
     ],
 )
 @pytest.mark.parametrize("n_end", [4, 7])
 def test_flatten_mask_harmonics(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    n_end: int,
-    xp: ArrayNamespaceFull
+    c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
 ) -> None:
-    points = roots(c,n=n_end, expand_dims_x=True, xp=xp)[0]
-    harmonics = harmonics(c, 
+    points = roots(c, n=n_end, expand_dims_x=True, xp=xp)[0]
+    harmonics = harmonics(
+        c,
         # random_points(c, shape=shape, type="spherical"),
         points,
         n_end=n_end,
@@ -731,10 +781,10 @@ def test_flatten_mask_harmonics(
     expected = (harmonics.abs() > 1e-3).any(
         axis=tuple(range(harmonics.ndim - c.s_ndim)), keepdims=False
     )
-    actual = flatten_mask_harmonics(c, n_end)
+    actual = flatten_mask_harmonics(c, n_end, xp=xp)
     assert actual.shape == expected.shape
     try:
-        assert xp.all(actual== expected)
+        assert xp.all(actual == expected)
     except AssertionError:
         wrong_index = actual != expected
         print(
@@ -744,29 +794,28 @@ def test_flatten_mask_harmonics(
         )
         raise
 
+
 @pytest.mark.parametrize(
     "c",
     [
         random(1),
         random(2),
-        spherical(),
+        c_spherical(),
         hopf(2),
     ],
 )
 def test_flatten_unflatten_harmonics(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    xp: ArrayNamespaceFull
+    c: SphericalCoordinates[TSpherical, TEuclidean], xp: ArrayNamespaceFull
 ) -> None:
     n_end = 4
-    harmonics = harmonics_(c, 
-        roots(c,n=n_end, expand_dims_x=True, xp=xp)[0],
+    harmonics = harmonics_(
+        c,
+        roots(c, n=n_end, expand_dims_x=True, xp=xp)[0],
         n_end=n_end,
         condon_shortley_phase=False,
         concat=True,
         expand_dims=True,
     )
-    flattened = flatten_harmonics(c,harmonics)
-    unflattened = unflatten_harmonics(c,flattened, n_end=n_end)
-    assert xp.all(harmonics== unflattened)
-
-
+    flattened = flatten_harmonics(c, harmonics)
+    unflattened = unflatten_harmonics(c, flattened, n_end=n_end)
+    assert xp.all(harmonics == unflattened)

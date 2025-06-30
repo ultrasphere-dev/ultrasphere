@@ -1,23 +1,18 @@
-from array_api_compat import array_namespace
 import array_api_extra as xpx
-from array_api._2024_12 import Array
 import pytest
+from array_api._2024_12 import ArrayNamespaceFull
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere.creation import c_spherical, standard
 from ultrasphere.polynomial import gegenbauer
 from ultrasphere.special import sjv
 from ultrasphere.wave_expansion import plane_wave_expansion_coef
 
 
-@pytest.fixture(autouse=True, scope="session", params=["numpy", "torch"])
-def setup(request: pytest.FixtureRequest) -> None:
-    xp.set_backend(request.param)
-
-
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
     ],
 )
@@ -25,6 +20,7 @@ def setup(request: pytest.FixtureRequest) -> None:
 def test_plane_wave_decomposition(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
+    xp: ArrayNamespaceFull,
 ) -> None:
     shape = (5,)
     r = xp.random.random_uniform(low=0, high=2, shape=shape)
@@ -41,9 +37,7 @@ def test_plane_wave_decomposition(
             k[..., None] * r[..., None],
         )
         # * legendre(xp.cos(gamma), ndim=c.e_ndim, n_end=n_end)
-        * gegenbauer(
-            xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end
-        ),
+        * gegenbauer(xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end),
         axis=-1,
     )
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))

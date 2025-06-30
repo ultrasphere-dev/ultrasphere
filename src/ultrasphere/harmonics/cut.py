@@ -1,9 +1,12 @@
-from ..coordinates import BranchingType, SphericalCoordinates, TSpherical, TEuclidean
-from typing import Mapping, TypeVar, overload
-from array_api_compat import array_namespace
-import array_api_extra as xpx
+from collections.abc import Mapping
+from typing import overload
+
 from array_api._2024_12 import Array
+from array_api_compat import array_namespace
+
+from ..coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
 from .assume import get_n_end_and_include_negative_m_from_expansion
+
 
 @overload
 def expand_cut(
@@ -12,12 +15,14 @@ def expand_cut(
     n_end: int,
 ) -> Mapping[TSpherical, Array]: ...
 
+
 @overload
 def expand_cut(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Array,
     n_end: int,
 ) -> Array: ...
+
 
 def expand_cut(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -41,12 +46,16 @@ def expand_cut(
         The cut expansion coefficients.
 
     """
-    xp = array_namespace(*expansion.values()) if isinstance(expansion, Mapping) else array_namespace(expansion)
+    xp = (
+        array_namespace(*expansion.values())
+        if isinstance(expansion, Mapping)
+        else array_namespace(expansion)
+    )
     from shift_nth_row_n_steps import take_slice
 
     is_mapping = isinstance(expansion, Mapping)
-    n_end_prev, include_negative_m = (
-        get_n_end_and_include_negative_m_from_expansion(c, expansion)
+    n_end_prev, include_negative_m = get_n_end_and_include_negative_m_from_expansion(
+        c, expansion
     )
     if n_end > n_end_prev:
         raise ValueError(f"n_end={n_end} > n_end_prev={n_end_prev}.")

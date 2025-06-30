@@ -1,11 +1,23 @@
+from collections.abc import Callable, Mapping
+from typing import Any, Literal, overload
 
-from typing import Any, Callable, Literal, Mapping, overload
+import array_api_extra as xpx
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical, get_child
+
+from ultrasphere.coordinates import (
+    BranchingType,
+    SphericalCoordinates,
+    TEuclidean,
+    TSpherical,
+    get_child,
+)
 from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
-import array_api_extra as xpx
-from .eigenfunction import type_a, type_b, type_bdash, type_c
+from ultrasphere.integral import integrate
+
+from .expansion import ndim_harmonics as ndim_harmonics_
+from .harmonics import harmonics as harmonics_
+
 
 @overload
 def expand_evaluate(
@@ -16,6 +28,7 @@ def expand_evaluate(
     condon_shortley_phase: bool,
 ) -> Mapping[TSpherical, Array]: ...
 
+
 @overload
 def expand_evaluate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -24,6 +37,7 @@ def expand_evaluate(
     *,
     condon_shortley_phase: bool,
 ) -> Array: ...
+
 
 def expand_evaluate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -64,9 +78,14 @@ def expand_evaluate(
 
     """
     is_mapping = isinstance(expansion, Mapping)
-    xp = array_namespace(*expansion.values()) if is_mapping else array_namespace(expansion)
+    xp = (
+        array_namespace(*expansion.values())
+        if is_mapping
+        else array_namespace(expansion)
+    )
     n_end, _ = get_n_end_and_include_negative_m_from_expansion(c, expansion)
-    harmonics = harmonics(c,   # type: ignore
+    harmonics = harmonics_(
+        c,  # type: ignore
         spherical,
         n_end,
         condon_shortley_phase=condon_shortley_phase,
@@ -81,7 +100,7 @@ def expand_evaluate(
             # expansion: f1,...,fL,harm1,...,harmN
             # harmonics: u1,...,uM,harm1,...,harmN
             # result: u1,...,uM,f1,...,fL
-            ndim_harmonics = ndim_harmonics(c, node)
+            ndim_harmonics = ndim_harmonics_(c, node)
             ndim_expansion = expansion_.ndim - ndim_harmonics
             ndim_extra_harmonics = harmonics_.ndim - ndim_harmonics
             expansion_ = harmonics_[
@@ -120,6 +139,7 @@ def expand_evaluate(
         result = xp.sum(result, axis=-1)
     return result
 
+
 @overload
 def expand(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -130,7 +150,6 @@ def expand(
         ]
         | Mapping[TSpherical, Array]
         | Array
-        
     ),
     does_f_support_separation_of_variables: Literal[True],
     n_end: int,
@@ -141,6 +160,7 @@ def expand(
     dtype: Any | None = None,
 ) -> Mapping[TSpherical, Array]: ...
 
+
 @overload
 def expand(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -151,7 +171,6 @@ def expand(
         ]
         | Mapping[TSpherical, Array]
         | Array
-        
     ),
     does_f_support_separation_of_variables: Literal[False],
     n_end: int,
@@ -162,6 +181,7 @@ def expand(
     dtype: Any | None = None,
 ) -> Array: ...
 
+
 def expand(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
@@ -171,7 +191,6 @@ def expand(
         ]
         | Mapping[TSpherical, Array]
         | Array
-        
     ),
     does_f_support_separation_of_variables: bool,
     n_end: int,
@@ -271,7 +290,8 @@ def expand(
             val = f
 
         # calculate harmonics
-        harmonics = harmonics(c,   # type: ignore
+        harmonics = harmonics_(
+            c,  # type: ignore
             xs,
             n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -294,9 +314,7 @@ def expand(
                 # val: theta(node),u1,...,uM
                 # harmonics: theta(node),harm1,...,harmN
                 # result: theta(node),u1,...,uM,harm1,...,harmN
-                xpx.broadcast_shapes(
-                    value.shape[:1], harmonics[node].shape[:1]
-                )
+                xpx.broadcast_shapes(value.shape[:1], harmonics[node].shape[:1])
                 ndim_val = value.ndim - 1
                 ndim_harm = ndim_harmonics(c, node)
                 value = value[(...,) + (None,) * (ndim_harm)]
@@ -314,13 +332,9 @@ def expand(
             # val: theta1,...,thetaN,u1,...,uM
             # harmonics: theta1,...,thetaN,harm1,...,harmN
             # res: theta1,...,thetaN,u1,...,uM,harm1,...,harmN
-            xpx.broadcast_shapes(
-                val.shape[: c.s_ndim], harmonics.shape[: c.s_ndim]
-            )
+            xpx.broadcast_shapes(val.shape[: c.s_ndim], harmonics.shape[: c.s_ndim])
             ndim_val = val.ndim - c.s_ndim
-            val = val[
-                (slice(None),) * (c.s_ndim + ndim_val) + (None,) * c.s_ndim
-            ]
+            val = val[(slice(None),) * (c.s_ndim + ndim_val) + (None,) * c.s_ndim]
             harmonics = harmonics[
                 (slice(None),) * c.s_ndim
                 + (None,) * ndim_val
@@ -330,9 +344,15 @@ def expand(
 
         return result
 
-    return integrate(c,  # type: ignore
-        inner, does_f_support_separation_of_variables, n, device=device, dtype=dtype
+    return integrate(
+        c,  # type: ignore
+        inner,
+        does_f_support_separation_of_variables,
+        n,
+        device=device,
+        dtype=dtype,
     )
+
 
 def expand_dim_harmoncis(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -398,6 +418,7 @@ def expand_dim_harmoncis(
     harmonics = harmonics[(...,) + (None,) * adding_ndim]
     return xp.moveaxis(harmonics, list(moveaxis.keys()), list(moveaxis.values()))
 
+
 def expand_dims_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Mapping[TSpherical, Array],
@@ -434,6 +455,7 @@ def expand_dims_harmonics(
         result[node] = expand_dim_harmoncis(c, node, harmonics[node])
     return result
 
+
 def concat_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Mapping[TSpherical, Array],
@@ -463,6 +485,7 @@ def concat_harmonics(
         shapes = {k: v.shape for k, v in harmonics.items()}
         raise RuntimeError(f"Error occurred while concatenating {shapes=}") from e
 
+
 def ndim_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
@@ -488,4 +511,3 @@ def ndim_harmonics(
         BranchingType.BP: 2,
         BranchingType.C: 3,
     }[c.branching_types[node]]
-

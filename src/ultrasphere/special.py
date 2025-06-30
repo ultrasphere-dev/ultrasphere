@@ -1,11 +1,16 @@
 import warnings
 from typing import Literal, TypeVar
 
-from array_api._2024_12 import Array
-from array_api_compat import array_namespace
 import array_api_extra as xpx
+from array_api._2024_12 import Array
+from array_api_compat import (
+    array_namespace,
+    is_jax_array,
+    is_numpy_array,
+    is_torch_array,
+)
 from scipy.special import jv, jvp, yv, yvp
-from array_api_compat import is_jax_array, is_numpy_array, is_torch_array
+
 TArray = TypeVar("TArray", bound=Array)
 
 
@@ -234,7 +239,9 @@ def fundamental_solution(
     """
     xp = array_namespace(d, z)
     coef = k ** (d - 2) * 1j / (2 * (2 * xp.pi) ** ((d - 1) / 2))
-    return coef * shn1(xp.asarray(0), d, k * xp.linalg.vector_norm(z, axis=-1), derivative)
+    return coef * shn1(
+        xp.asarray(0), d, k * xp.linalg.vector_norm(z, axis=-1), derivative
+    )
 
 
 def potential_coef[TArray: Array](
@@ -321,9 +328,17 @@ def potential_coef[TArray: Array](
     inner = xp.where(
         x_abs < y_abs,
         shn1(n, d, k * y_abs, derivative=y_abs_derivative)
-        * (sjv(n, d, k * x_abs, derivative=x_abs_derivative) if for_func == "harmonics" else 1),
+        * (
+            sjv(n, d, k * x_abs, derivative=x_abs_derivative)
+            if for_func == "harmonics"
+            else 1
+        ),
         sjv(n, d, k * y_abs, derivative=y_abs_derivative)
-        * (shn1(n, d, k * x_abs, derivative=x_abs_derivative) if for_func == "harmonics" else 1),
+        * (
+            shn1(n, d, k * x_abs, derivative=x_abs_derivative)
+            if for_func == "harmonics"
+            else 1
+        ),
     )
     derivative_count = int(x_abs_derivative) + int(y_abs_derivative)
     result = (k) ** derivative_count * 1j * (k ** (d - 2)) * (y_abs ** (d - 1)) * inner
@@ -367,7 +382,11 @@ def potential_coef[TArray: Array](
         if addition is not None:
             result += addition
     return result
+
+
 from numbers import Number
+
+
 def lgamma(x: Array) -> Array:
     """
     Compute the logarithm of the absolute value of the gamma function.
@@ -384,17 +403,21 @@ def lgamma(x: Array) -> Array:
 
     """
     if isinstance(x, Number):
-        from math import lgamma as lgamma_
-        return lgamma_(x)
+        from math import lgamma as lgamma_math
+
+        return lgamma_math(x)
     elif is_jax_array(x):
-        from jax.lax import lgamma as lgamma_
-        return lgamma_(x)
+        from jax.lax import lgamma as lgamma_jax
+
+        return lgamma_jax(x)
     elif is_numpy_array(x):
-        from scipy.special import gammaln as lgamma_
-        return lgamma_(x)
+        from scipy.special import gammaln as lgamma_scipy
+
+        return lgamma_scipy(x)
     elif is_torch_array(x):
-        from torch import lgamma as lgamma_
-        return lgamma_(x)
+        from torch import lgamma as lgamma_torch
+
+        return lgamma_torch(x)
     else:
         xp = array_namespace(x)
         if hasattr(xp, "lgamma"):
@@ -406,7 +429,7 @@ def lgamma(x: Array) -> Array:
                 "The input array must be a JAX, NumPy, or PyTorch array, "
                 "or an array with a lgamma or gammaln method."
             )
-        
+
 
 def binom(x: Array, y: Array) -> Array:
     """

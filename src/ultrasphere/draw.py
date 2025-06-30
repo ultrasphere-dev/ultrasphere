@@ -1,18 +1,19 @@
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+import warnings
 
-
-import networkx as nx
-from networkx.drawing.nx_pydot import graphviz_layout
 import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle
 from networkx.algorithms.dag import dag_longest_path
-import numpy as np
+from networkx.drawing.nx_pydot import graphviz_layout
 
-import warnings
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
 
-def draw(c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = True) -> tuple[float, float]:
+def draw(
+    c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = True
+) -> tuple[float, float]:
     """
     Nicely draw the rooted tree representing the coordinates.
 
@@ -27,7 +28,6 @@ def draw(c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = Tr
         The recommended width and height of the figure (in inches).
 
     """
-
     ASCII_TO_GREEK = {
         "alpha": "α",  # noqa
         "beta": "β",
@@ -97,8 +97,7 @@ def draw(c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = Tr
         c.G,
         pos,
         labels={
-            n: f"{ascii_to_greek(str(n))}"
-            f"{c.branching_types[n].value}/{c.S[n]}"
+            n: f"{ascii_to_greek(str(n))}{c.branching_types[n].value}/{c.S[n]}"
             for n in c.s_nodes
         },
     )

@@ -1,13 +1,20 @@
+from collections.abc import Mapping
+from typing import Literal, overload
 
-from typing import Any, Callable, Literal, Mapping, overload
 from array_api._2024_12 import Array
-from array_api_compat import array_namespace
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical, get_child
-from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
-import array_api_extra as xpx
 
+from ultrasphere.coordinates import (
+    BranchingType,
+    SphericalCoordinates,
+    TEuclidean,
+    TSpherical,
+    get_child,
+)
 from ultrasphere.harmonics.expansion import concat_harmonics
+
 from .eigenfunction import type_a, type_b, type_bdash, type_c
+
+
 @overload
 def harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -21,6 +28,7 @@ def harmonics(
     concat: Literal[True] = ...,
 ) -> Array: ...
 
+
 @overload
 def harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -33,6 +41,7 @@ def harmonics(
     expand_dims: bool = True,
     concat: Literal[False] = ...,
 ) -> Mapping[TSpherical, Array]: ...
+
 
 def harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -118,8 +127,7 @@ def harmonics(
                 s_beta=c.S[get_child(c.G, node, "sin")],
                 index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
                 is_beta_type_a_and_include_negative_m=include_negative_m
-                and c.branching_types[get_child(c.G, node, "sin")]
-                == BranchingType.A,
+                and c.branching_types[get_child(c.G, node, "sin")] == BranchingType.A,
             )
         elif c.branching_types[node] == BranchingType.BP:
             result[node] = type_bdash(
@@ -128,8 +136,7 @@ def harmonics(
                 s_alpha=c.S[get_child(c.G, node, "cos")],
                 index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
                 is_alpha_type_a_and_include_negative_m=include_negative_m
-                and c.branching_types[get_child(c.G, node, "cos")]
-                == BranchingType.A,
+                and c.branching_types[get_child(c.G, node, "cos")] == BranchingType.A,
             )
         elif c.branching_types[node] == BranchingType.C:
             result[node] = type_c(
@@ -139,16 +146,12 @@ def harmonics(
                 s_beta=c.S[get_child(c.G, node, "sin")],
                 index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
                 is_alpha_type_a_and_include_negative_m=include_negative_m
-                and c.branching_types[get_child(c.G, node, "cos")]
-                == BranchingType.A,
+                and c.branching_types[get_child(c.G, node, "cos")] == BranchingType.A,
                 is_beta_type_a_and_include_negative_m=include_negative_m
-                and c.branching_types[get_child(c.G, node, "sin")]
-                == BranchingType.A,
+                and c.branching_types[get_child(c.G, node, "sin")] == BranchingType.A,
             )
         else:
-            raise ValueError(
-                f"Invalid branching type {c.branching_types[node]}."
-            )
+            raise ValueError(f"Invalid branching type {c.branching_types[node]}.")
     if expand_dims:
         result = expand_dims_harmonics(c, result)  # type: ignore
     if concat:

@@ -1,14 +1,11 @@
 from logging import DEBUG, INFO, basicConfig, getLogger
 from typing import Annotated, Literal
 
-from array_api_compat import array_namespace
-import array_api_extra as xpx
-from array_api._2024_12 import Array
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import typer
-
+from array_api._2024_12 import Array
 from joblib.parallel import Parallel, delayed
 
 # import tracemalloc
@@ -17,9 +14,6 @@ from rich import print
 from rich.logging import RichHandler
 from tqdm import trange
 from tqdm_joblib import tqdm_joblib
-
-from ultrasphere.coordinates import SphericalCoordinates
-from ultrasphere.harmonics import sph_harm
 
 app = typer.Typer()
 
@@ -92,10 +86,12 @@ def _task(
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
     t_spherical = c.from_euclidean(t)
-    y_RS = harmonics_regular_singular(c,
+    y_RS = harmonics_regular_singular(
+        c,
         y_spherical,
         k=k,
-        harmonics=harmonics(c, 
+        harmonics=harmonics(
+            c,
             y_spherical,
             n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -104,10 +100,12 @@ def _task(
         ),
         type=to_,
     )
-    x_RS = harmonics_regular_singular(c,
+    x_RS = harmonics_regular_singular(
+        c,
         x_spherical,
         k=k,
-        harmonics=harmonics(c, 
+        harmonics=harmonics(
+            c,
             x_spherical,
             n_end=n_end_add_max,
             condon_shortley_phase=condon_shortley_phase,
@@ -117,7 +115,8 @@ def _task(
         type=from_,
     )
     if use_triplet:
-        coef = harmonics_translation_coef_using_triplet(c,
+        coef = harmonics_translation_coef_using_triplet(
+            c,
             t_spherical,
             n_end=n_end,
             n_end_add=n_end_add_max,
@@ -126,7 +125,8 @@ def _task(
             is_type_same=from_ == to_,
         )
     else:
-        coef = harmonics_translation_coef(c,
+        coef = harmonics_translation_coef(
+            c,
             t,
             n_end=n_end,
             n_end_add=n_end_add_max,
@@ -144,15 +144,16 @@ def _task(
         )
         ae = xp.abs(y_RS - y_RS_approx)
         rel = xp.abs(1 - y_RS_approx / (y_RS + 1e-8))
-        index = index_array_harmonics_all(c, 
+        index = index_array_harmonics_all(
+            c,
             n_end=n_end,
             include_negative_m=True,
             expand_dims=True,
             as_array=True,
         )[c.root_index, ...][None, ...].repeat(size, axis=0)
-        ae_flatten = flatten_harmonics(c,ae).flatten()
-        rel_flatten = flatten_harmonics(c,rel).flatten()
-        index_flatten = flatten_harmonics(c,index).flatten()
+        ae_flatten = flatten_harmonics(c, ae).flatten()
+        rel_flatten = flatten_harmonics(c, rel).flatten()
+        index_flatten = flatten_harmonics(c, index).flatten()
         df = DataFrame(
             {
                 "absolute_error": ae_flatten,
@@ -262,8 +263,7 @@ def plot_translation_error(
             f"Branching Types: {branching_types}, "
             f"|x| = 1 ({size} random points), k = {complex(k):g}"
         )
-        g.set_titles("{col_var}={col_name}
-{row_name}")
+        g.set_titles("{col_var}={col_name}{row_name}")
         g.tight_layout()
         plt.savefig(f"{branching_types}-{n_end}-{k}-{error}.svg")
         plt.savefig(f"{branching_types}-{n_end}-{k}-{error}.png")
@@ -277,9 +277,6 @@ def benchmark_sph_harm(
     device: str = typer.Option("cpu", "--device", "-d"),
 ) -> None:
     """Benchmark the spherical harmonics."""
-    from array_api_compat import array_namespace
-import array_api_extra as xpx
-from array_api._2024_12 import Array
     from cm_time import timer
     from scipy.special import sph_harm as sp_sph_harm
 
@@ -303,8 +300,8 @@ from array_api._2024_12 import Array
         print(f"xp: {t1.elapsed}")
 
     # scipy
-    m = xp.reshape(xp.arange(-n_end, n_end + 1),[1] * theta.ndim + [-1, 1])
-    n = xp.reshape(xp.arange(n_end + 1),[1] * theta.ndim + [1, -1])
+    m = xp.reshape(xp.arange(-n_end, n_end + 1), [1] * theta.ndim + [-1, 1])
+    n = xp.reshape(xp.arange(n_end + 1), [1] * theta.ndim + [1, -1])
     theta = theta[..., None, None]
     phi = phi[..., None, None]
     m, n, phi, theta = (
@@ -371,9 +368,7 @@ def benchmark_c2s(
         theta = xp.atan2(rsin, z)
 
         if vector_norm:
-            r = xp.linalg.vector_norm(
-                [x, y, z] if r_independent else [rsin, z], axis=0
-            )
+            r = xp.linalg.vector_norm([x, y, z] if r_independent else [rsin, z], axis=0)
         else:
             r = (
                 xp.sqrt(x**2 + y**2 + z**2)

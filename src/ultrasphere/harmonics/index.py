@@ -1,8 +1,15 @@
+from collections.abc import Mapping
+from typing import Literal, overload
 
-from typing import Literal, Mapping, overload
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from shift_nth_row_n_steps._torch_like import create_slice
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
+
+from ultrasphere.coordinates import (
+    BranchingType,
+    SphericalCoordinates,
+    TEuclidean,
+    TSpherical,
+)
 from ultrasphere.harmonics.flatten import flatten_mask_harmonics
 from ultrasphere.symmetry import to_symmetric
 
@@ -51,10 +58,9 @@ def index_array_harmonics(
         result = xp.arange(0, n_end)
     if expand_dims:
         idx = c.s_nodes.index(node)
-        result = result[
-            create_slice(c.s_ndim, [(idx, slice(None))], default=None)
-        ]
+        result = result[create_slice(c.s_ndim, [(idx, slice(None))], default=None)]
     return result
+
 
 @overload
 def index_array_harmonics_all(
@@ -78,6 +84,7 @@ def index_array_harmonics_all(
     as_array: Literal[True],
     mask: bool = ...,
 ) -> Array: ...
+
 
 def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -136,7 +143,8 @@ def index_array_harmonics_all(
     if mask and not as_array:
         raise ValueError("mask must be False if as_array is False.")
     index_arrays = {
-        node: index_array_harmonics(c, 
+        node: index_array_harmonics(
+            c,
             node,
             xp=xp,
             n_end=n_end,
@@ -151,8 +159,11 @@ def index_array_harmonics_all(
             axis=0,
         )
         if mask:
-            result[:, ~flatten_mask_harmonics(c, n_end, xp=xp, include_negative_m=include_negative_m)] = (
-                xp.nan
-            )
+            result[
+                :,
+                ~flatten_mask_harmonics(
+                    c, n_end, xp=xp, include_negative_m=include_negative_m
+                ),
+            ] = xp.nan
         return result
     return index_arrays

@@ -1,16 +1,14 @@
 from collections import defaultdict
-from tests import xp
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.creation import hopf, random, spherical, standard
+from collections.abc import Callable, Mapping
+from typing import Any, Literal
 
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 
-
-from collections.abc import Callable, Mapping
-from typing import Any, Literal
-
+from tests import xp
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere.creation import c_spherical, hopf, random, standard
 from ultrasphere.integral import integrate
 
 
@@ -21,9 +19,9 @@ def test_sphere_surface_integrate(
     n: int,
     expected: float,
 ) -> None:
-    c = spherical()
-    assert integrate(c,
-        f, does_f_support_separation_of_variables=False, n=n
+    c = c_spherical()
+    assert integrate(
+        c, f, does_f_support_separation_of_variables=False, n=n
     ).item() == pytest.approx(expected, rel=1e-2)
 
 
@@ -32,14 +30,18 @@ def test_sphere_surface_integrate(
 @pytest.mark.parametrize(
     "c",
     [
-        (spherical()),
+        (c_spherical()),
         (standard(3)),
         (hopf(2)),
     ],
 )
 @pytest.mark.parametrize("concat", [True, False])
 def test_integrate(
-    c: SphericalCoordinates[TSpherical, TEuclidean], n: int, concat: bool, r: float, xp: ArrayNamespaceFull
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    n: int,
+    concat: bool,
+    r: float,
+    xp: ArrayNamespaceFull,
 ) -> None:
     # surface integral (area) of the sphere
     def f(s: Mapping[TSpherical, Array]) -> Array:
@@ -48,7 +50,7 @@ def test_integrate(
         else:
             return defaultdict(lambda: xp.asarray(r))
 
-    actual = integrate(c,f, does_f_support_separation_of_variables=not concat, n=n)  # type: ignore
+    actual = integrate(c, f, does_f_support_separation_of_variables=not concat, n=n)  # type: ignore
     if not concat:
         actual = xp.prod(list(actual.values()))
     expected = c.surface_area(r)
@@ -57,9 +59,7 @@ def test_integrate(
 
 @pytest.mark.parametrize("n", [3, 4, 5])
 def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
-    cs: list[SphericalCoordinates[Any, Any]] = [
-        random(n - 1) for _ in range(4)
-    ]
+    cs: list[SphericalCoordinates[Any, Any]] = [random(n - 1) for _ in range(4)]
     k = xp.random.random_uniform(low=0, high=1, shape=(n,))
 
     def create_f(
@@ -72,7 +72,7 @@ def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
         return f
 
     actual = [
-        integrate(c,create_f(c), does_f_support_separation_of_variables=False, n=8)
+        integrate(c, create_f(c), does_f_support_separation_of_variables=False, n=8)
         for c in cs
     ]
     assert xp.all(xpx.isclose(xp.asarray(actual), actual[0], rtol=1e-3, atol=1e-3))

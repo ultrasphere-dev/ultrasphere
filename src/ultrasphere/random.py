@@ -1,10 +1,17 @@
-from collections.abc import Sequence
-from typing import Any, Literal, Mapping, overload
-from array_api._2024_12 import Array, ArrayNamespaceFull
+from collections.abc import Mapping, Sequence
+from typing import Any, Literal, overload
+
 import numpy as np
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from numpy._typing import NDArray
 
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere.coordinates import (
+    BranchingType,
+    SphericalCoordinates,
+    TEuclidean,
+    TSpherical,
+)
+
 
 def random_sphere(
     shape: Sequence[int],
@@ -48,6 +55,7 @@ def random_sphere(
         z = rng.exponential(scale=1, size=shape)[None, ...]
         result = g / np.sqrt(np.sum(g**2, axis=0, keepdims=True) + z)
     return np.nan_to_num(result, nan=0.0)  # not sure if nan_to_num is necessary
+
 
 @overload
 def random_points(
@@ -147,13 +155,13 @@ def random_points(
         result: dict[TSpherical | Literal["r"], Array] = {}
         for node in c.s_nodes:
             low, high = d[c.branching_types[node]]
-            result[node] = xp.asarray(rng.uniform(
-                low=low, high=high, size=shape
-            ), device=device, dtype=dtype)
+            result[node] = xp.asarray(
+                rng.uniform(low=low, high=high, size=shape), device=device, dtype=dtype
+            )
         if not surface:
-            result["r"] = xp.asarray(rng.uniform(
-                low=0, high=1, size=shape
-            ), device=device, dtype=dtype)
+            result["r"] = xp.asarray(
+                rng.uniform(low=0, high=1, size=shape), device=device, dtype=dtype
+            )
         return result
     else:
         raise ValueError(f"Invalid type {type}.")

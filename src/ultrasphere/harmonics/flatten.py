@@ -1,9 +1,17 @@
-from array_api_compat import array_namespace
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical, get_child
-from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
-from ultrasphere.harmonics.index import index_array_harmonics_all
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_compat import array_namespace
+
+from ultrasphere.coordinates import (
+    BranchingType,
+    SphericalCoordinates,
+    TEuclidean,
+    TSpherical,
+    get_child,
+)
+from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
+from ultrasphere.harmonics.index import index_array_harmonics_all
+
 
 def flatten_mask_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -29,12 +37,13 @@ def flatten_mask_harmonics(
         The mask.
 
     """
-    index_arrays = index_array_harmonics_all(c, 
+    index_arrays = index_array_harmonics_all(
+        c,
         n_end=n_end,
         include_negative_m=include_negative_m,
         as_array=False,
         expand_dims=True,
-        xp=xp
+        xp=xp,
     )
     shape = xpx.broadcast_shapes(
         *[index_array.shape for index_array in index_arrays.values()]
@@ -43,13 +52,11 @@ def flatten_mask_harmonics(
     for node, branching_type in c.branching_types.items():
         if branching_type == BranchingType.B:
             mask = mask & (
-                xp.abs(index_arrays[get_child(c.G, node, "sin")])
-                <= index_arrays[node]
+                xp.abs(index_arrays[get_child(c.G, node, "sin")]) <= index_arrays[node]
             )
         if branching_type == BranchingType.BP:
             mask = mask & (
-                xp.abs(index_arrays[get_child(c.G, node, "cos")])
-                <= index_arrays[node]
+                xp.abs(index_arrays[get_child(c.G, node, "cos")]) <= index_arrays[node]
             )
         if branching_type == BranchingType.C:
             value = (
@@ -80,8 +87,8 @@ def flatten_harmonics(
 
     """
     xp = array_namespace(harmonics)
-    n_end, include_negative_m = (
-        get_n_end_and_include_negative_m_from_expansion(c, harmonics)
+    n_end, include_negative_m = get_n_end_and_include_negative_m_from_expansion(
+        c, harmonics
     )
     mask = flatten_mask_harmonics(c, n_end, xp, include_negative_m)
     return harmonics[..., mask]

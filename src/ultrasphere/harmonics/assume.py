@@ -1,8 +1,10 @@
-from ..coordinates import SphericalCoordinates, TSpherical, TEuclidean
-from typing import Mapping, TypeVar
-from array_api_compat import array_namespace
-import array_api_extra as xpx
+from collections.abc import Mapping
+
 from array_api._2024_12 import Array
+from array_api_compat import array_namespace
+
+from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
+
 
 def get_n_end_and_include_negative_m_from_expansion(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -23,7 +25,11 @@ def get_n_end_and_include_negative_m_from_expansion(
         n_end, include_negative_m
 
     """
-    xp = array_namespace(*expansion.values()) if isinstance(expansion, Mapping) else array_namespace(expansion)
+    xp = (
+        array_namespace(*expansion.values())
+        if isinstance(expansion, Mapping)
+        else array_namespace(expansion)
+    )
     if c.s_ndim == 0:
         return 0, False
     is_mapping = isinstance(expansion, Mapping)

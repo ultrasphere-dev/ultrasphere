@@ -1,9 +1,8 @@
 from typing import Literal
 
-from array_api_compat import array_namespace
 import array_api_extra as xpx
-from array_api._2024_12 import Array
 import pytest
+from array_api._2024_12 import ArrayNamespaceFull
 from scipy.special import eval_gegenbauer, eval_jacobi, roots_jacobi
 
 from ultrasphere.polynomial import (
@@ -15,11 +14,6 @@ from ultrasphere.polynomial import (
 from ultrasphere.special import binom
 
 
-@pytest.fixture(autouse=True, scope="session", params=["numpy"])
-def setup(request: pytest.FixtureRequest) -> None:
-    xp.set_backend(request.param)
-
-
 @pytest.mark.parametrize(
     "shape",
     [
@@ -29,7 +23,7 @@ def setup(request: pytest.FixtureRequest) -> None:
     ],
 )
 @pytest.mark.parametrize("n_end", [8])
-def test_jacobi(shape: tuple[int, ...], n_end: int) -> None:
+def test_jacobi(shape: tuple[int, ...], n_end: int, xp: ArrayNamespaceFull) -> None:
     alpha = xp.random.random_uniform(low=0, high=5, shape=shape)
     beta = xp.random.random_uniform(low=0, high=5, shape=shape)
     x = xp.random.random_uniform(low=0, high=1, shape=shape)
@@ -55,7 +49,7 @@ def test_jacobi(shape: tuple[int, ...], n_end: int) -> None:
     ],
 )
 @pytest.mark.parametrize("n_end", [8])
-def test_gegenbauer(shape: tuple[int, ...], n_end: int) -> None:
+def test_gegenbauer(shape: tuple[int, ...], n_end: int, xp: ArrayNamespaceFull) -> None:
     alpha = xp.random.random_uniform(low=0, high=5, shape=shape)
     x = xp.random.random_uniform(low=0, high=1, shape=shape)
     n = xp.arange(n_end)[

@@ -1,12 +1,100 @@
 from collections.abc import Sequence
 from functools import lru_cache
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates, get_digraph_from_branching_type
-import numpy as np
-from ultrasphere.coordinates import SphericalCoordinates as cls
-import networkx as nx
-
-
 from typing import Any, Literal
+
+import networkx as nx
+import numpy as np
+
+from ultrasphere.coordinates import BranchingType, SphericalCoordinates
+from ultrasphere.coordinates import SphericalCoordinates as cls
+
+
+def get_digraph_from_branching_type(
+    branching_types: str | Sequence[BranchingType],
+) -> nx.DiGraph:
+    """
+    Get a rooted tree from the branching types.
+
+    Parameters
+    ----------
+    branching_types : str | Sequence[BranchingType]
+        The branching types. e.g. "ba" for standard spherical coordinates.
+
+    Returns
+    -------
+    nx.DiGraph
+        The rooted tree representing the coordinates.
+
+    Raises
+    ------
+    ValueError
+        If the branching types are invalid.
+
+    """
+    if isinstance(branching_types, str):
+        branching_types_str = branching_types.replace("bp", "b'")
+        branching_types_: list[BranchingType] = []
+        while branching_types_str:
+            if branching_types_str.startswith("b'"):
+                branching_types_.append(BranchingType.BP)
+                branching_types_str = branching_types_str[2:]
+            elif branching_types_str[0] in ["a", "b", "c"]:
+                branching_types_.append(BranchingType(branching_types_str[0]))
+                branching_types_str = branching_types_str[1:]
+            else:
+                raise ValueError(f"Invalid branching type: {branching_types_str}")
+    else:
+        branching_types_ = list(branching_types)
+
+    G = nx.DiGraph()
+    type_c_stack: list[Any] = []
+    next_e_idx = 0
+    next_s_idx = 0
+    current_node = s_node_name(next_s_idx)
+    G.add_node(current_node)
+    next_s_idx += 1
+    for i, branching_type in enumerate(branching_types_):
+        if branching_type == BranchingType.A:
+            G.add_node(next_e_idx)
+            G.add_edge(current_node, next_e_idx, type="cos")
+            next_e_idx += 1
+            G.add_node(next_e_idx)
+            G.add_edge(current_node, next_e_idx, type="sin")
+            next_e_idx += 1
+            if i == len(branching_types_) - 1:
+                break
+            else:
+                try:
+                    next_node = type_c_stack.pop()
+                except IndexError as e:
+                    raise ValueError("Invalid branching types.") from e
+        elif branching_type == BranchingType.B:
+            G.add_node(next_e_idx)
+            G.add_edge(current_node, next_e_idx, type="cos")
+            next_e_idx += 1
+            G.add_node(s_node_name(next_s_idx))
+            G.add_edge(current_node, s_node_name(next_s_idx), type="sin")
+            next_node = s_node_name(next_s_idx)
+            next_s_idx += 1
+        elif branching_type == BranchingType.BP:
+            G.add_node(s_node_name(next_s_idx))
+            G.add_edge(current_node, s_node_name(next_s_idx), type="cos")
+            next_node = s_node_name(next_s_idx)
+            next_s_idx += 1
+            G.add_node(next_e_idx)
+            G.add_edge(current_node, next_e_idx, type="sin")
+            next_e_idx += 1
+        elif branching_type == BranchingType.C:
+            G.add_node(s_node_name(next_s_idx))
+            G.add_edge(current_node, s_node_name(next_s_idx), type="cos")
+            next_node = s_node_name(next_s_idx)
+            next_s_idx += 1
+            G.add_node(s_node_name(next_s_idx))
+            G.add_edge(current_node, s_node_name(next_s_idx), type="sin")
+            type_c_stack.append(s_node_name(next_s_idx))
+            next_s_idx += 1
+        current_node = next_node
+    return G
 
 
 def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
@@ -24,8 +112,7 @@ def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
     return cls(G)  # type: ignore
 
 
-def spherical(
-) -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]':
+def c_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]':
     """
     Spherical coordinates.
 
@@ -111,7 +198,7 @@ def hopf(q: int) -> "SphericalCoordinates[Any, Any]":
 
 
 def from_branching_types(
-    branching_types: str | Sequence[BranchingType]
+    branching_types: str | Sequence[BranchingType],
 ) -> "SphericalCoordinates[Any, Any]":
     """
     Spherical coordinates from branching types.

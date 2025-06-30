@@ -1,15 +1,13 @@
-from ultrasphere.coordinates import SphericalCoordinates
-from ultrasphere.creation import hopf, random
-
-
 import pytest
+
+from ultrasphere.creation import hopf, random, standard, standard_prime
 
 
 @pytest.mark.parametrize("s_ndim", [0, 1, 2, 3, 6, 103])
 def test_generate(s_ndim: int) -> None:
     assert random(s_ndim).s_ndim == s_ndim
-    assert SphericalCoordinates.standard(s_ndim).s_ndim == s_ndim
-    assert SphericalCoordinates.standard_prime(s_ndim).s_ndim == s_ndim
+    assert standard(s_ndim).s_ndim == s_ndim
+    assert standard_prime(s_ndim).s_ndim == s_ndim
 
 
 @pytest.mark.parametrize("q", [0, 1, 2, 5])

@@ -1,6 +1,4 @@
-from array_api_compat import array_namespace
-import array_api_extra as xpx
-from array_api._2024_12 import Array
+import numpy as xp
 import pytest
 
 from ultrasphere.harmonics.eigenfunction import type_b, type_bdash, type_c
@@ -114,12 +112,6 @@ def type_c_scalar(
         index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
     )
     return array[l_alpha, l_beta, l].item()
-
-
-@pytest.fixture(autouse=True, scope="module", params=["numpy", "torch"])
-def setup(request: pytest.FixtureRequest) -> None:
-    xp.set_backend(request.param)
-    xp.set_default_float_dtype(xp.float64)
 
 
 def test_type_b() -> None:

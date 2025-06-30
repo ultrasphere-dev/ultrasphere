@@ -1,13 +1,9 @@
-from array_api_compat import array_namespace
 import array_api_extra as xpx
-from array_api._2024_12 import Array, ArrayNamespaceFull
 import pytest
-
+from array_api._2024_12 import ArrayNamespaceFull
 from shift_nth_row_n_steps import select
 
 from ultrasphere.symmetry import flip_symmetric_tensor, to_symmetric
-
-
 
 
 @pytest.mark.parametrize("axis", [0, 1, -1])
@@ -40,15 +36,19 @@ def test_to_symmetric(
 
     # test manually
     random_index = xp.randint(1, array.shape[axis], shape=(1,))
-    assert xp.all(xpx.isclose(
-        select(result, random_index, axis=axis),
-        select(result_, -random_index, axis=axis),
-    ))
+    assert xp.all(
+        xpx.isclose(
+            select(result, random_index, axis=axis),
+            select(result_, -random_index, axis=axis),
+        )
+    )
 
 
 @pytest.mark.parametrize("asymmetric", [True, False])
 @pytest.mark.parametrize("conjugate", [True, False])
-def test_to_symmetric_manual(asymmetric: bool, conjugate: bool, xp: ArrayNamespaceFull) -> None:
+def test_to_symmetric_manual(
+    asymmetric: bool, conjugate: bool, xp: ArrayNamespaceFull
+) -> None:
     array = [0, 1 + 1j]
     result = to_symmetric(xp.asarray(array), asymmetric=asymmetric, conjugate=conjugate)
     if asymmetric and conjugate:

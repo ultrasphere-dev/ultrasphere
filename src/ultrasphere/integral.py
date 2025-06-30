@@ -1,11 +1,18 @@
-from typing import Any, Callable, Literal, overload
-from .coordinates import BranchingType, SphericalCoordinates, TSpherical, get_child, TEuclidean
+from collections.abc import Callable, Mapping
+from typing import Any, Literal, overload
+
+import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
-import array_api_extra as xpx
-
-from collections.abc import Mapping
 from scipy.special import roots_jacobi
+
+from .coordinates import (
+    BranchingType,
+    SphericalCoordinates,
+    TEuclidean,
+    TSpherical,
+    get_child,
+)
 
 
 def roots(
@@ -45,7 +52,6 @@ def roots(
         If the branching type is invalid.
 
     """
-
     xs = {}
     ws = {}
     for i, node in enumerate(c.s_nodes):
@@ -101,6 +107,7 @@ def integrate(
     dtype: Any | None = None,
 ) -> Mapping[TSpherical, Array]: ...
 
+
 @overload
 def integrate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -118,6 +125,7 @@ def integrate(
     dtype: Any | None = None,
 ) -> Array: ...
 
+
 def integrate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
@@ -127,7 +135,6 @@ def integrate(
         ]
         | Mapping[TSpherical, Array]
         | Array
-        
     ),
     does_f_support_separation_of_variables: bool,
     n: int,
@@ -169,7 +176,11 @@ def integrate(
             raise RuntimeError(f"Error occurred while evaluating {f=}") from e
     else:
         val = f
-    xp = array_namespace(*val.values()) if isinstance(val, Mapping) else array_namespace(val)
+    xp = (
+        array_namespace(*val.values())
+        if isinstance(val, Mapping)
+        else array_namespace(val)
+    )
     xs, ws = roots(
         c,
         n,

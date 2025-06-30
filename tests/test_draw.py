@@ -1,17 +1,16 @@
-from tests.test_cooridnates import PATH
-from ultrasphere.coordinates import SphericalCoordinates
-from ultrasphere.creation import hopf, random, spherical
-from ultrasphere.draw import draw
-
-
 import pytest
 from matplotlib import pyplot as plt
+
+from tests.test_cooridnates import PATH
+from ultrasphere.coordinates import SphericalCoordinates
+from ultrasphere.creation import c_spherical, hopf, random
+from ultrasphere.draw import draw
 
 
 @pytest.mark.parametrize(
     "name, c",
     [
-        ("spherical", spherical()),
+        ("spherical", c_spherical()),
         ("hoph", hopf(3)),
         ("random-1", random(1)),
         ("random-10", random(10)),

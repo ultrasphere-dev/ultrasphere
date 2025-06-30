@@ -1,14 +1,10 @@
-from array_api_compat import array_namespace
-import array_api_extra as xpx
 from array_api._2024_12 import Array
-
+from array_api_compat import array_namespace
 
 from .special import binom, lgamma
 
 
-def homogeneous_ndim(
-    n: int | Array, *, e_ndim: int | Array
-) -> int | Array:
+def homogeneous_ndim(n: int | Array, *, e_ndim: int | Array) -> int | Array:
     """
     The dimension of the homogeneous polynomials of degree n.
 
@@ -34,9 +30,7 @@ def homogeneous_ndim(
     return binom(n + s_ndim, s_ndim)
 
 
-def harm_n_ndim(
-    n: int | Array, *, e_ndim: int | Array
-) -> int | Array:
+def harm_n_ndim(n: int | Array, *, e_ndim: int | Array) -> int | Array:
     """
     The dimension of the spherical harmonics of degree n.
 
@@ -67,9 +61,7 @@ def harm_n_ndim(
         return (2 * n + e_ndim - 2) / (e_ndim - 2) * binom(n + e_ndim - 3, e_ndim - 3)
 
 
-def plane_wave_expansion_coef(
-    n: int | Array, *, e_ndim: int | Array
-) -> Array:
+def plane_wave_expansion_coef(n: int | Array, *, e_ndim: int | Array) -> Array:
     """
     The coefficients of the plane wave expansion.
 

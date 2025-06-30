@@ -31,10 +31,13 @@ dependencies = [
   "joblib>=1.5.1",
   "matplotlib>=3.10.3",
   "networkx>=3.4.2",
+  "pandas>=2.3.0",
   "rich>=10",
   "scipy>=1.15.3",
+  "seaborn>=0.13.2",
   "shift-nth-row-n-steps>=0.3.0",
   "strenum>=0.4.15",
+  "tqdm>=4.67.1",
   "typer>=0.15,<1",
   "types-array-api>=1.1.4",
 ]
