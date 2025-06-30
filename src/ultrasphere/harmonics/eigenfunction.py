@@ -281,7 +281,7 @@ def type_c(
     res = (
         2 ** ((alpha + beta) / 2 + 1)[..., None]
         * jacobi_normalization_constant(
-            alpha=alpha[..., None], beta=beta[..., None], n=n
+            alpha=alpha[..., None], beta=beta[..., None], n=n, xp=xp
         )
         * (xp.sin(theta[..., None, None, None]) ** l_beta[..., None])
         * (xp.cos(theta[..., None, None, None]) ** l_alpha[..., None])

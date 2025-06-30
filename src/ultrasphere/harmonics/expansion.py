@@ -431,7 +431,7 @@ def expand_dims_harmonics(
     """
     result: dict[TSpherical, Array] = {}
     for node in c.s_nodes:
-        result[node] = c.expand_dim_harmoncis(node, harmonics[node])
+        result[node] = expand_dim_harmoncis(c, node, harmonics[node])
     return result
 
 def concat_harmonics(

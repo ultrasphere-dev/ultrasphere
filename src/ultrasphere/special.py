@@ -5,7 +5,7 @@ from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 import array_api_extra as xpx
 from scipy.special import jv, jvp, yv, yvp
-
+from array_api_compat import is_jax_array, is_numpy_array, is_torch_array
 TArray = TypeVar("TArray", bound=Array)
 
 
@@ -367,3 +367,63 @@ def potential_coef[TArray: Array](
         if addition is not None:
             result += addition
     return result
+from numbers import Number
+def lgamma(x: Array) -> Array:
+    """
+    Compute the logarithm of the absolute value of the gamma function.
+
+    Parameters
+    ----------
+    x : Array
+        The input array.
+
+    Returns
+    -------
+    Array
+        The logarithm of the absolute value of the gamma function.
+
+    """
+    if isinstance(x, Number):
+        from math import lgamma
+        return lgamma(x)
+    elif is_jax_array(x):
+        from jax.lax import lgamma
+        return lgamma(x)
+    elif is_numpy_array(x):
+        from scipy.special import gammaln
+        return gammaln(x)
+    elif is_torch_array(x):
+        from torch import lgamma
+        return lgamma(x)
+    else:
+        xp = array_namespace(x)
+        if hasattr(xp, "lgamma"):
+            return lgamma(x)
+        elif hasattr(xp, "gammaln"):
+            return xp.gammaln(x)
+        else:
+            raise ValueError(
+                "The input array must be a JAX, NumPy, or PyTorch array, "
+                "or an array with a lgamma or gammaln method."
+            )
+        
+
+def binom(x: Array, y: Array) -> Array:
+    """
+    Compute the binomial coefficient.
+
+    Parameters
+    ----------
+    x : Array
+        The first argument.
+    y : Array
+        The second argument.
+
+    Returns
+    -------
+    Array
+        The binomial coefficient.
+
+    """
+    xp = array_namespace(x, y)
+    return xp.exp(lgamma(x + 1.0) - lgamma(y + 1.0) - lgamma(x - y + 1.0))

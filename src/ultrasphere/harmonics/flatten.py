@@ -34,6 +34,7 @@ def flatten_mask_harmonics(
         include_negative_m=include_negative_m,
         as_array=False,
         expand_dims=True,
+        xp=xp
     )
     shape = xpx.broadcast_shapes(
         *[index_array.shape for index_array in index_arrays.values()]

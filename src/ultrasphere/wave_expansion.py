@@ -3,7 +3,7 @@ import array_api_extra as xpx
 from array_api._2024_12 import Array
 
 
-from .special import binom
+from .special import binom, lgamma
 
 
 def homogeneous_ndim(
@@ -92,6 +92,6 @@ def plane_wave_expansion_coef(
         1j**n
         * (2 * n + e_ndim - 2)
         / (e_ndim - 2)
-        * xp.exp(xp.lgamma(e_ndim / 2.0) + xp.log(2) * ((e_ndim - 1) / 2))
+        * xp.exp(lgamma(e_ndim / 2.0) + xp.log(2) * ((e_ndim - 1) / 2))
         / xp.sqrt(xp.pi)
     )

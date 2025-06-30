@@ -151,7 +151,7 @@ def index_array_harmonics_all(
             axis=0,
         )
         if mask:
-            result[:, ~flatten_mask_harmonics(c, n_end, include_negative_m)] = (
+            result[:, ~flatten_mask_harmonics(c, n_end, xp=xp, include_negative_m=include_negative_m)] = (
                 xp.nan
             )
         return result

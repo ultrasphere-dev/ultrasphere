@@ -3,7 +3,7 @@ import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespace
 
 
-from .special import binom
+from .special import binom, lgamma
 
 
 def jacobi(
@@ -92,13 +92,13 @@ def log_jacobi_normalization_constant(
     xp = array_namespace(alpha, beta, n)
     logupper = (
         xp.log(2 * n + alpha + beta + 1)
-        + xp.lgamma(n + alpha + beta + 1.0)
-        + xp.lgamma(n + 1.0)
+        + lgamma(n + alpha + beta + 1.0)
+        + lgamma(n + 1.0)
     )
     loglower = (
         xp.log(2) * (alpha + beta + 1)
-        + xp.lgamma(n + alpha + 1.0)
-        + xp.lgamma(n + beta + 1.0)
+        + lgamma(n + alpha + 1.0)
+        + lgamma(n + beta + 1.0)
     )
     return 0.5 * (logupper - loglower)
 
@@ -160,11 +160,11 @@ def gegenbauer(
         (None,) * x.ndim + (slice(None),)
     ]
     alpha = xp.asarray(alpha - 1 / 2, dtype=x.dtype, device=x.device)
-    log_coef = (
-        xp.lgamma(2.0 * alpha[..., None] + 1.0 + n)
-        - xp.lgamma(2.0 * alpha[..., None] + 1.0)
-        - (xp.lgamma(alpha[..., None] + 1.0 + n) - xp.lgamma(alpha[..., None] + 1.0))
-    ).astype(x.dtype)
+    log_coef = xp.astype(
+        lgamma(2.0 * alpha[..., None] + 1.0 + n)
+        - lgamma(2.0 * alpha[..., None] + 1.0)
+        - (lgamma(alpha[..., None] + 1.0 + n) - lgamma(alpha[..., None] + 1.0))
+    , x.dtype)
     return xp.exp(log_coef) * jacobi(x, alpha=alpha, beta=alpha, n_end=n_end)
 
 
@@ -295,9 +295,9 @@ def jacobi_triplet_integral(
     Ns2 = betas - alphas
     # check if Ls2, Ms2, Ns2 are integers
     if (
-        (Ls2 != xp.round(Ls2)).any()
-        or (Ms2 != xp.round(Ms2)).any()
-        or (Ns2 != xp.round(Ns2)).any()
+        xp.any(Ls2 != xp.round(Ls2))
+        or xp.any(Ms2 != xp.round(Ms2))
+        or xp.any(Ns2 != xp.round(Ns2))
     ):
         raise ValueError(
             f"The sum of the orders should be an integer. {Ls2=}, {Ms2=}, {Ns2=}"

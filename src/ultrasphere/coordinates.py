@@ -1,4 +1,4 @@
-from math import lgamma
+
 import sys
 import warnings
 from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -19,7 +19,7 @@ from .random import random_sphere
 from .special import szv
 from .symmetry import to_symmetric
 from .wave_expansion import harm_n_ndim, homogeneous_ndim
-
+from .special import lgamma, binom
 
 class BranchingType(StrEnum):
     """
@@ -118,7 +118,7 @@ def get_non_leaf_descendants(graph: nx.DiGraph) -> dict[Any, int]:
                 for successor in graph.successors(node)
             )
     for node in leaf_nodes:
-        non_leaf_descendants[node] = xp.nan
+        non_leaf_descendants[node] = np.nan
     return non_leaf_descendants
 
 
