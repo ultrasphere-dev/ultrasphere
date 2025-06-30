@@ -346,7 +346,7 @@ def potential_coef[TArray: Array](
                 # inner D
                 addition = 1 / 2
         elif limit == "warn":
-            if xp.isclose(x_abs, y_abs, rtol=1e-4, atol=0).any():
+            if xp.any(xpx.isclose(x_abs, y_abs, rtol=1e-4, atol=0)):
                 warnings.warn(
                     "As x_abs is close to y_abs "
                     "and requested to calculate D or D*, "
@@ -384,21 +384,21 @@ def lgamma(x: Array) -> Array:
 
     """
     if isinstance(x, Number):
-        from math import lgamma
-        return lgamma(x)
+        from math import lgamma as lgamma_
+        return lgamma_(x)
     elif is_jax_array(x):
-        from jax.lax import lgamma
-        return lgamma(x)
+        from jax.lax import lgamma as lgamma_
+        return lgamma_(x)
     elif is_numpy_array(x):
-        from scipy.special import gammaln
-        return gammaln(x)
+        from scipy.special import gammaln as lgamma_
+        return lgamma_(x)
     elif is_torch_array(x):
-        from torch import lgamma
-        return lgamma(x)
+        from torch import lgamma as lgamma_
+        return lgamma_(x)
     else:
         xp = array_namespace(x)
         if hasattr(xp, "lgamma"):
-            return lgamma(x)
+            return xp.lgamma(x)
         elif hasattr(xp, "gammaln"):
             return xp.gammaln(x)
         else:

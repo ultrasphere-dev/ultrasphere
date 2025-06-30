@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from typing import Any, Literal, Mapping, overload
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 import numpy as np
 from numpy._typing import NDArray
 
@@ -54,7 +54,7 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     device: Any | None = ...,
     dtype: Any | None = ...,
     type: Literal["uniform"] = ...,
@@ -66,7 +66,7 @@ def random_points(  # type: ignore
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     device: Any | None = ...,
     dtype: Any | None = ...,
     type: Literal["spherical"] = ...,
@@ -78,7 +78,7 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     device: Any | None = ...,
     dtype: Any | None = ...,
     type: Literal["spherical"] = ...,
@@ -89,7 +89,7 @@ def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
     type: Literal["uniform", "spherical"] = "uniform",

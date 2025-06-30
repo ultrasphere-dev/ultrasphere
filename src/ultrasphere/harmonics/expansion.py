@@ -330,7 +330,7 @@ def expand(
 
         return result
 
-    return c.integrate(  # type: ignore
+    return integrate(c,  # type: ignore
         inner, does_f_support_separation_of_variables, n, device=device, dtype=dtype
     )
 

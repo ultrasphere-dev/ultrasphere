@@ -1,6 +1,6 @@
 
 from typing import Literal, Mapping, overload
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from shift_nth_row_n_steps._torch_like import create_slice
 from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.flatten import flatten_mask_harmonics
@@ -12,7 +12,7 @@ def index_array_harmonics(
     node: TSpherical,
     *,
     n_end: int,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     expand_dims: bool = False,
     include_negative_m: bool = True,
 ) -> Array:
@@ -61,7 +61,7 @@ def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     include_negative_m: bool = ...,
     expand_dims: bool,
     as_array: Literal[False],
@@ -72,7 +72,7 @@ def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     include_negative_m: bool = ...,
     expand_dims: Literal[True],
     as_array: Literal[True],
@@ -83,7 +83,7 @@ def index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     include_negative_m: bool = True,
     expand_dims: bool,
     as_array: bool,

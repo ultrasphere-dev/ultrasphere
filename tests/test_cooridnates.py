@@ -4,7 +4,7 @@ from typing import Literal
 
 from ultrasphere.harmonics.harmonics import harmonics
 from array_api_compat import array_namespace
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 import pytest
 from ultrasphere.creation import from_branching_types, hopf, random, spherical, standard
 import array_api_extra as xpx
@@ -12,9 +12,9 @@ from matplotlib import pyplot as plt
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.cut import expand_cut
-from ultrasphere.harmonics.expansion import expand, expand_evaluate
+from ultrasphere.harmonics.expansion import expand, expand_evaluate, ndim_harmonics
 from ultrasphere.harmonics.flatten import flatten_harmonics, flatten_mask_harmonics, unflatten_harmonics
-from ultrasphere.harmonics.harmonics import harmonics
+from ultrasphere.harmonics.harmonics import harmonics as harmonics_
 from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
 from ultrasphere.harmonics.translation import harmonics_translation_coef, harmonics_twins_expansion
 from ultrasphere.integral import roots
@@ -40,7 +40,7 @@ def test_harmonics_orthogonal(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n: int,
     condon_shortley_phase: bool,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
 ) -> None:
     s, ws = roots(c,n=n, expand_dims_x=True, xp=xp)
     Y = harmonics(c, 
@@ -63,7 +63,7 @@ def test_harmonics_orthogonal(
     Yr = Y[(slice(None),) * c.s_ndim + (None,) * c.s_ndim + (slice(None),) * c.s_ndim]
     result = Yl * xp.conj(Yr)
     for w in ws.values():
-        result = xp.einsum("w,w...->...", w.astype(result.dtype), result)
+        result = xp.einsum("w,w...->...", xp.astype(w, result.dtype), result)
 
     # assert quantum numbers are the same for non-zero values
     expansion_nonzero = (result.abs() > 1e-3).nonzero(as_tuple=False)
@@ -97,7 +97,7 @@ def test_orthogonal_expand(
     n: int,
     condon_shortley_phase: bool,
     concat: bool,
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     def f(s: Mapping[TSpherical, Array]) -> Array:
         return harmonics(c,   # type: ignore
@@ -118,23 +118,23 @@ def test_orthogonal_expand(
     if not concat:
         for key, value in actual.items():
             # assert quantum numbers are the same for non-zero values
-            expansion_nonzero = (value.abs() > 1e-3).nonzero(as_tuple=False)
+            expansion_nonzero = (xp.abs(value) > 1e-3).nonzero(as_tuple=False)
             l, r = (
                 expansion_nonzero[:, : ndim_harmonics(c, key)],
                 expansion_nonzero[:, ndim_harmonics(c, key) :],
             )
             idx = (l[:-1, :] == r[:-1, :]).all(axis=-1).nonzero(as_tuple=False)
-            assert xp.all(l[idx, :], r[idx, :])
+            assert xp.all(l[idx, :] == r[idx, :])
 
             # assert non-zero values are all 1
     else:
         # assert quantum numbers are the same for non-zero values
-        expansion_nonzero = (actual.abs() > 1e-3).nonzero(as_tuple=False)
+        expansion_nonzero = (xp.abs(actual) > 1e-3).nonzero(as_tuple=False)
         l, r = expansion_nonzero[:, : c.s_ndim], expansion_nonzero[:, c.s_ndim :]
         assert xp.all(l== r), expansion_nonzero
 
         # assert non-zero values are all 1
-        expansion_nonzero_values = actual[(actual.abs() > 1e-3).nonzero()]
+        expansion_nonzero_values = actual[(xp.abs(actual) > 1e-3).nonzero()]
         assert xp.all(xpx.isclose(
             expansion_nonzero_values,
             xp.ones_like(expansion_nonzero_values),
@@ -161,7 +161,7 @@ def test_approximate(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     condon_shortley_phase: bool,
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     k = xp.random.random_uniform(low=0, high=1, shape=(c.e_ndim,))
 
@@ -219,7 +219,7 @@ def test_harmonics_regular_singular_j_expansion(
     concat: bool,
     expand_dims: bool,
     type: Literal["j", "y", "h1", "h2"],
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     shape = (5,)
     x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
@@ -286,7 +286,7 @@ def test_harmonics_regular_singular_j_expansion(
 def test_addition_theorem_same_x(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     """
     Test the addition theorem for spherical harmonics.
@@ -331,7 +331,7 @@ def test_addition_theorem(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     type: Literal["legendre", "gegenbauer", "gegenbauer-cohl"],
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     """
     Test the addition theorem for spherical harmonics.
@@ -422,7 +422,7 @@ def test_harmonics_translation_coef(
     n_end_add: int,
     condon_shortley_phase: bool,
     type: Literal["regular", "singular"],
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     shape = (20,)
     # get x, t, y := x + t
@@ -484,7 +484,7 @@ def test_harmonics_translation_coef(
 
 
 def test_harmonics_translation_coef_gumerov_table(
-    xp: ArrayNamespace) -> None:
+    xp: ArrayNamespaceFull) -> None:
     if "torch" in xp.__name__:
         pytest.skip("round_cpu not implemented in torch")
     # Gumerov, N.A., & Duraiswami, R. (2001). Fast, Exact,
@@ -564,7 +564,7 @@ def test_harmonics_twins_expansion(
     n_end: int,
     conj_1: bool,
     conj_2: bool,
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     actual = harmonics_twins_expansion(c, 
         n_end_1=n_end,
@@ -609,7 +609,7 @@ def test_harmonics_translation_coef_using_triplet(
     condon_shortley_phase: bool,
     from_: Literal["regular", "singular"],
     to_: Literal["regular", "singular"],
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
 ) -> None:
     shape = ()
     # get x, t, y := x + t
@@ -717,7 +717,7 @@ def test_harmonics_translation_coef_using_triplet(
 def test_flatten_mask_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> None:
     points = roots(c,n=n_end, expand_dims_x=True, xp=xp)[0]
     harmonics = harmonics(c, 
@@ -755,10 +755,11 @@ def test_flatten_mask_harmonics(
 )
 def test_flatten_unflatten_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
+    xp: ArrayNamespaceFull
 ) -> None:
     n_end = 4
     harmonics = harmonics_(c, 
-        roots(c,n=n_end, expand_dims_x=True)[0],
+        roots(c,n=n_end, expand_dims_x=True, xp=xp)[0],
         n_end=n_end,
         condon_shortley_phase=False,
         concat=True,

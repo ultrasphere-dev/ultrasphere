@@ -1,6 +1,6 @@
 from array_api_compat import array_namespace
 import array_api_extra as xpx
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 
 
 from .special import binom, lgamma
@@ -104,7 +104,7 @@ def log_jacobi_normalization_constant(
 
 
 def jacobi_normalization_constant(
-    *, alpha: Array, beta: Array, n: Array, xp: ArrayNamespace
+    *, alpha: Array, beta: Array, n: Array, xp: ArrayNamespaceFull
 ) -> Array:
     """
     Computes the normalization constant of

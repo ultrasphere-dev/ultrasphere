@@ -7,10 +7,10 @@ from array_api._2024_12 import Array
 
 from typing import Literal
 
-from ultrasphere.coordinates import SphericalCoordinates
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import hopf, random, spherical
 
-
+import array_api_extra as xpx
 def to_cartesian(
     *, r: Array, theta: Array, phi: Array
 ) -> tuple[Array, Array, Array]:

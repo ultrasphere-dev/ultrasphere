@@ -1,9 +1,9 @@
 import pytest
-from array_api._2024_12 import ArrayNamespace
+from array_api._2024_12 import ArrayNamespaceFull
 
 
 @pytest.mark.parametrize("backend", ["numpy", "torch"])
-def xp(backend: str) -> ArrayNamespace:
+def xp(backend: str) -> ArrayNamespaceFull:
     """
     Get the array namespace for the given backend.
     """

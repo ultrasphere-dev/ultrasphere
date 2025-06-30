@@ -1,7 +1,7 @@
 
 from typing import Literal, Mapping
 
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from array_api_compat import array_namespace
 
@@ -122,7 +122,7 @@ def harmonics_twins_expansion(
     n_end_1: int,
     n_end_2: int,
     condon_shortley_phase: bool,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     conj_1: bool = False,
     conj_2: bool = False,
     analytic: bool = False,
@@ -309,7 +309,7 @@ def harmonics_translation_coef_using_triplet(
     condon_shortley_phase: bool,
     k: Array,
     is_type_same: bool,
-    xp: ArrayNamespace
+    xp: ArrayNamespaceFull
 ) -> Array:
     r"""
     Translation coefficients between same or different type of elementary solutions.

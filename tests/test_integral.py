@@ -1,15 +1,17 @@
 from collections import defaultdict
 from tests import xp
-from ultrasphere.coordinates import SphericalCoordinates
+from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import hopf, random, spherical, standard
 
-
+import array_api_extra as xpx
 import pytest
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 
 
 from collections.abc import Callable, Mapping
 from typing import Any, Literal
+
+from ultrasphere.integral import integrate
 
 
 @pytest.mark.parametrize("n", [4, 8, 16])
@@ -20,7 +22,7 @@ def test_sphere_surface_integrate(
     expected: float,
 ) -> None:
     c = spherical()
-    assert c.integrate(
+    assert integrate(c,
         f, does_f_support_separation_of_variables=False, n=n
     ).item() == pytest.approx(expected, rel=1e-2)
 
@@ -37,7 +39,7 @@ def test_sphere_surface_integrate(
 )
 @pytest.mark.parametrize("concat", [True, False])
 def test_integrate(
-    c: SphericalCoordinates[TSpherical, TEuclidean], n: int, concat: bool, r: float, xp: ArrayNamespace
+    c: SphericalCoordinates[TSpherical, TEuclidean], n: int, concat: bool, r: float, xp: ArrayNamespaceFull
 ) -> None:
     # surface integral (area) of the sphere
     def f(s: Mapping[TSpherical, Array]) -> Array:
@@ -46,7 +48,7 @@ def test_integrate(
         else:
             return defaultdict(lambda: xp.asarray(r))
 
-    actual = c.integrate(f, does_f_support_separation_of_variables=not concat, n=n)  # type: ignore
+    actual = integrate(c,f, does_f_support_separation_of_variables=not concat, n=n)  # type: ignore
     if not concat:
         actual = xp.prod(list(actual.values()))
     expected = c.surface_area(r)
@@ -54,7 +56,7 @@ def test_integrate(
 
 
 @pytest.mark.parametrize("n", [3, 4, 5])
-def test_integrate_match(n: int, xp: ArrayNamespace) -> None:
+def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
     cs: list[SphericalCoordinates[Any, Any]] = [
         random(n - 1) for _ in range(4)
     ]
@@ -70,7 +72,7 @@ def test_integrate_match(n: int, xp: ArrayNamespace) -> None:
         return f
 
     actual = [
-        c.integrate(create_f(c), does_f_support_separation_of_variables=False, n=8)
+        integrate(c,create_f(c), does_f_support_separation_of_variables=False, n=8)
         for c in cs
     ]
-    assert xp.all(xpx.isclose(xp.asarray(actual)), actual[0], rtol=1e-3, atol=1e-3)
+    assert xp.all(xpx.isclose(xp.asarray(actual), actual[0], rtol=1e-3, atol=1e-3))

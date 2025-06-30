@@ -1,6 +1,6 @@
 from typing import Any, Callable, Literal, overload
 from .coordinates import BranchingType, SphericalCoordinates, TSpherical, get_child, TEuclidean
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 import array_api_extra as xpx
 
@@ -16,7 +16,7 @@ def roots(
     expand_dims_w: bool = False,
     device: Any | None = None,
     dtype: Any | None = None,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
 ) -> tuple[Mapping[TSpherical, Array], Mapping[TSpherical, Array]]:
     """
     Gauss-Jacobi quadrature roots and weights.

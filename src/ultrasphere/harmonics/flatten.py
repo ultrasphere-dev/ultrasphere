@@ -3,12 +3,12 @@ from ultrasphere.coordinates import BranchingType, SphericalCoordinates, TEuclid
 from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
 from ultrasphere.harmonics.index import index_array_harmonics_all
 import array_api_extra as xpx
-from array_api._2024_12 import Array, ArrayNamespace
+from array_api._2024_12 import Array, ArrayNamespaceFull
 
 def flatten_mask_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
-    xp: ArrayNamespace,
+    xp: ArrayNamespaceFull,
     include_negative_m: bool = True,
 ) -> Array:
     """
