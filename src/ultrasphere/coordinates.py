@@ -1,5 +1,3 @@
-import sys
-import warnings
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any, Generic, Literal, TypeVar, overload
 
@@ -7,7 +5,6 @@ import networkx as nx
 import numpy as np
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
-from joblib.memory import Memory
 from strenum import StrEnum
 
 from .special import lgamma
@@ -356,31 +353,6 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         self.s_nodes = [node for node in nodes if tree.out_degree(node) == 2]
         self.cos_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "cos"]
         self.sin_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "sin"]
-        if cache is True or (cache is None and "pytest" not in sys.modules):
-            self.memory = Memory(
-                location=f".cache/{self.__class__.__name__}", verbose=1
-            )
-            self.harmonics = self.memory.cache(  # type: ignore
-                self.harmonics, verbose=0
-            )
-            # self.harmonics_regular_singular = self.memory.cache(  # type: ignore
-            #     self.harmonics_regular_singular, verbose=0
-            # )
-            self.harmonics_twins_expansion = self.memory.cache(  # type: ignore
-                self.harmonics_twins_expansion, verbose=0
-            )
-            self.harmonics_translation_coef = self.memory.cache(  # type: ignore
-                self.harmonics_translation_coef, verbose=0
-            )
-            self.harmonics_translation_coef_using_triplet = self.memory.cache(  # type: ignore
-                self.harmonics_translation_coef_using_triplet, verbose=0
-            )
-        else:
-            warnings.warn(
-                "The harmonics twins expansion is not cached.",
-                RuntimeWarning,
-                stacklevel=2,
-            )
 
     def surface_area(self, r: float = 1) -> float:
         """
@@ -603,7 +575,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
         """
         xp = array_namespace(*spherical.values())
         if "r" in spherical:
-            jacobian = spherical["r"]
+            jacobian = spherical["r"]  # type: ignore
         else:
             jacobian = 1
         for node in self.s_nodes:

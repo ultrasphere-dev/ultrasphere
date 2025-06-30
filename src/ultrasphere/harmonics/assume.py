@@ -1,7 +1,6 @@
 from collections.abc import Mapping
 
 from array_api._2024_12 import Array
-from array_api_compat import array_namespace
 
 from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
@@ -25,18 +24,13 @@ def get_n_end_and_include_negative_m_from_expansion(
         n_end, include_negative_m
 
     """
-    xp = (
-        array_namespace(*expansion.values())
-        if isinstance(expansion, Mapping)
-        else array_namespace(expansion)
-    )
     if c.s_ndim == 0:
         return 0, False
     is_mapping = isinstance(expansion, Mapping)
     if is_mapping:
         sizes = [expansion[k].shape[-1] for k in c.s_nodes]
     else:
-        sizes = expansion.shape[-c.s_ndim :]
+        sizes = expansion.shape[-c.s_ndim :]  # type: ignore
     n_end = (max(sizes) + 1) // 2
     include_negative_m = not all(size == n_end for size in sizes)
     return n_end, include_negative_m

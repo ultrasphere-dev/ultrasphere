@@ -21,7 +21,7 @@ def test_sphere_surface_integrate(
 ) -> None:
     c = c_spherical()
     assert integrate(
-        c, f, does_f_support_separation_of_variables=False, n=n
+        c, f, does_f_support_separation_of_variables=False, n=n, xp=xp
     ).item() == pytest.approx(expected, rel=1e-2)
 
 
@@ -72,7 +72,9 @@ def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
         return f
 
     actual = [
-        integrate(c, create_f(c), does_f_support_separation_of_variables=False, n=8)
+        integrate(
+            c, create_f(c), does_f_support_separation_of_variables=False, n=8, xp=xp
+        )
         for c in cs
     ]
     assert xp.all(xpx.isclose(xp.asarray(actual), actual[0], rtol=1e-3, atol=1e-3))

@@ -769,7 +769,7 @@ def test_flatten_mask_harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
 ) -> None:
     points = roots(c, n=n_end, expand_dims_x=True, xp=xp)[0]
-    harmonics = harmonics(
+    harmonics = harmonics_(
         c,
         # random_points(c, shape=shape, type="spherical"),
         points,

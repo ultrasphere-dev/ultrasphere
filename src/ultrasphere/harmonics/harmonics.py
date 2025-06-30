@@ -10,7 +10,7 @@ from ultrasphere.coordinates import (
     TSpherical,
     get_child,
 )
-from ultrasphere.harmonics.expansion import concat_harmonics
+from ultrasphere.harmonics.expansion import concat_harmonics, expand_dims_harmonics
 
 from .eigenfunction import type_a, type_b, type_bdash, type_c
 

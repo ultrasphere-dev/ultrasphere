@@ -76,7 +76,10 @@ def test_gegenbauer(shape: tuple[int, ...], n_end: int, xp: ArrayNamespaceFull) 
 @pytest.mark.parametrize("n_end", [8])
 @pytest.mark.parametrize("type", ["gegenbauer", "jacobi"])
 def test_legendre(
-    shape: tuple[int, ...], n_end: int, type: Literal["gegenbauer", "jacobi"]
+    shape: tuple[int, ...],
+    n_end: int,
+    type: Literal["gegenbauer", "jacobi"],
+    xp: ArrayNamespaceFull,
 ) -> None:
     d = xp.random.randint(3, 8, shape=shape)
     alpha = (d - 3) / 2
@@ -106,7 +109,7 @@ def test_legendre(
 
 
 @pytest.mark.parametrize("alpha_eq_beta", [True, False])
-def test_jacobi_triplet_integral(alpha_eq_beta: bool) -> None:
+def test_jacobi_triplet_integral(alpha_eq_beta: bool, xp: ArrayNamespaceFull) -> None:
     n_samples = 20
     alphas = xp.random.randint(0, 5, shape=(3, n_samples))
     alphas[2, ...] = alphas[0, ...] + alphas[1, ...]

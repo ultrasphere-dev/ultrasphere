@@ -109,7 +109,7 @@ def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
     """
     G = get_digraph_from_branching_type("b")
     G = nx.relabel_nodes(G, {"theta0", "phi"})
-    return cls(G)  # type: ignore
+    return cls(G)
 
 
 def c_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]':
@@ -125,7 +125,7 @@ def c_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1
     G = get_digraph_from_branching_type("ba")
     # swap x0 and x2
     G = nx.relabel_nodes(G, {0: 2, 2: 1, 1: 0, "theta0": "theta", "theta1": "phi"})
-    return cls(G)  # type: ignore
+    return cls(G)
 
 
 def standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":

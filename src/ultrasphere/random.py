@@ -70,7 +70,7 @@ def random_points(
     surface: bool = ...,
 ) -> Array: ...
 @overload
-def random_points(  # type: ignore
+def random_points(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],

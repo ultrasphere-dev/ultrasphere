@@ -17,6 +17,7 @@ from ultrasphere.integral import integrate
 
 from .expansion import ndim_harmonics as ndim_harmonics_
 from .harmonics import harmonics as harmonics_
+from .harmonics import harmonics as harmonics__
 
 
 @overload
@@ -84,7 +85,7 @@ def expand_evaluate(
         else array_namespace(expansion)
     )
     n_end, _ = get_n_end_and_include_negative_m_from_expansion(c, expansion)
-    harmonics = harmonics_(
+    harmonics = harmonics__(
         c,  # type: ignore
         spherical,
         n_end,

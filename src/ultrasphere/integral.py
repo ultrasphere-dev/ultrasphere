@@ -3,7 +3,6 @@ from typing import Any, Literal, overload
 
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
-from array_api_compat import array_namespace
 from scipy.special import roots_jacobi
 
 from .coordinates import (
@@ -103,6 +102,7 @@ def integrate(
     does_f_support_separation_of_variables: Literal[True],
     n: int,
     *,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Mapping[TSpherical, Array]: ...
@@ -121,6 +121,7 @@ def integrate(
     does_f_support_separation_of_variables: Literal[False],
     n: int,
     *,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Array: ...
@@ -139,6 +140,7 @@ def integrate(
     does_f_support_separation_of_variables: bool,
     n: int,
     *,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Array | Mapping[TSpherical, Array]:
@@ -169,18 +171,6 @@ def integrate(
         The integrated value.
 
     """
-    if isinstance(f, Callable):  # type: ignore
-        try:
-            val = f(xs)  # type: ignore
-        except Exception as e:
-            raise RuntimeError(f"Error occurred while evaluating {f=}") from e
-    else:
-        val = f
-    xp = (
-        array_namespace(*val.values())
-        if isinstance(val, Mapping)
-        else array_namespace(val)
-    )
     xs, ws = roots(
         c,
         n,
@@ -189,6 +179,13 @@ def integrate(
         expand_dims_x=not does_f_support_separation_of_variables,
         xp=xp,
     )
+    if isinstance(f, Callable):  # type: ignore
+        try:
+            val = f(xs)  # type: ignore
+        except Exception as e:
+            raise RuntimeError(f"Error occurred while evaluating {f=}") from e
+    else:
+        val = f
 
     # in case f(theta1, ...) = f_1(theta1) * f_2(theta2) * ...
     if isinstance(val, Mapping):

@@ -1,4 +1,5 @@
 import warnings
+from numbers import Number
 from typing import Literal, TypeVar
 
 import array_api_extra as xpx
@@ -384,9 +385,6 @@ def potential_coef[TArray: Array](
     return result
 
 
-from numbers import Number
-
-
 def lgamma(x: Array) -> Array:
     """
     Compute the logarithm of the absolute value of the gamma function.
@@ -405,7 +403,7 @@ def lgamma(x: Array) -> Array:
     if isinstance(x, Number):
         from math import lgamma as lgamma_math
 
-        return lgamma_math(x)
+        return lgamma_math(x)  # type: ignore
     elif is_jax_array(x):
         from jax.lax import lgamma as lgamma_jax
 
