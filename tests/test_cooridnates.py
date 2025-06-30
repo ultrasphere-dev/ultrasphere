@@ -82,12 +82,12 @@ def test_harmonics_orthogonal(
         result = xp.einsum("w,w...->...", xp.astype(w, result.dtype), result)
 
     # assert quantum numbers are the same for non-zero values
-    expansion_nonzero = (result.abs() > 1e-3).nonzero(as_tuple=False)
+    expansion_nonzero = (xp.abs(result) > 1e-3).nonzero(as_tuple=False)
     l, r = expansion_nonzero[:, : c.s_ndim], expansion_nonzero[:, c.s_ndim :]
     assert xp.all(l == r), expansion_nonzero
 
     # assert non-zero values are all 1
-    expansion_nonzero_values = result[(result.abs() > 1e-3).nonzero()]
+    expansion_nonzero_values = result[(xp.abs(result) > 1e-3).nonzero()]
     assert xp.all(
         xpx.isclose(
             expansion_nonzero_values,
@@ -779,7 +779,7 @@ def test_flatten_mask_harmonics(
         concat=True,
         expand_dims=True,
     )
-    expected = (harmonics.abs() > 1e-3).any(
+    expected = (xp.abs(harmonics) > 1e-3).any(
         axis=tuple(range(harmonics.ndim - c.s_ndim)), keepdims=False
     )
     actual = flatten_mask_harmonics(c, n_end, xp=xp)
