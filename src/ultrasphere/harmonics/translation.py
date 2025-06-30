@@ -6,10 +6,9 @@ from array_api_compat import array_namespace
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.expansion import (
-    concat_harmonics,
     expand,
-    expand_dims_harmonics,
 )
+from ultrasphere.harmonics.harmonics import concat_harmonics, expand_dims_harmonics
 from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
 from ultrasphere.harmonics.index import index_array_harmonics
 

@@ -1,3 +1,4 @@
+import math
 from collections import defaultdict
 from collections.abc import Callable, Mapping
 from typing import Any, Literal
@@ -6,18 +7,18 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 
-from tests import xp
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import c_spherical, hopf, random, standard
 from ultrasphere.integral import integrate
 
 
 @pytest.mark.parametrize("n", [4, 8, 16])
-@pytest.mark.parametrize("f, expected", [(lambda s: xp.asarray(1), 4 * xp.pi)])
+@pytest.mark.parametrize("f, expected", [(lambda s: 1, 4 * math.pi)])
 def test_sphere_surface_integrate(
     f: Callable[[Mapping[Literal["theta", "phi"], Array]], Array],
     n: int,
     expected: float,
+    xp: ArrayNamespaceFull,
 ) -> None:
     c = c_spherical()
     assert integrate(

@@ -2,6 +2,8 @@ from collections.abc import Mapping
 
 from array_api._2024_12 import Array
 
+from ultrasphere.coordinates import BranchingType
+
 from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
 
@@ -34,3 +36,30 @@ def get_n_end_and_include_negative_m_from_expansion(
     n_end = (max(sizes) + 1) // 2
     include_negative_m = not all(size == n_end for size in sizes)
     return n_end, include_negative_m
+
+
+def ndim_harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    node: TSpherical,
+) -> int:
+    """
+    The number of dimensions of the eigenfunction
+    corresponding to the node.
+
+    Parameters
+    ----------
+    node : TSpherical
+        The node of the spherical coordinates.
+
+    Returns
+    -------
+    int
+        The number of dimensions.
+
+    """
+    return {
+        BranchingType.A: 1,
+        BranchingType.B: 2,
+        BranchingType.BP: 2,
+        BranchingType.C: 3,
+    }[c.branching_types[node]]
