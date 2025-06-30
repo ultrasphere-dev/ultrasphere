@@ -17,8 +17,8 @@ def setup(request: pytest.FixtureRequest) -> None:
 @pytest.mark.parametrize(
     "c",
     [
-        (SphericalCoordinates.spherical()),
-        (SphericalCoordinates.from_branching_types("bba")),
+        (spherical()),
+        (standard(3)),
     ],
 )
 @pytest.mark.parametrize("n_end", [30])
@@ -46,4 +46,4 @@ def test_plane_wave_decomposition(
         ),
         axis=-1,
     )
-    assert xp.allclose(actual, expected, rtol=1e-3, atol=1e-3)
+    assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))

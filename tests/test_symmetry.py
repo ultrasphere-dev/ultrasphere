@@ -39,7 +39,7 @@ def test_to_symmetric(
         ] = select(result_, 0, axis=axis).conj()
 
     # test if flipped result is equal to result if index 0 is removed
-    assert xp.allclose(result, flip_symmetric_tensor(result_, axis=axis))
+    assert xp.all(xpx.isclose(result, flip_symmetric_tensor(result_, axis=axis)))
 
     # test manually
     random_index = xp.randint(1, array.shape[axis], shape=(1,))
@@ -62,4 +62,4 @@ def test_to_symmetric_manual(asymmetric: bool, conjugate: bool) -> None:
         expected = [0, 1 + 1j, 1 - 1j]
     else:
         expected = [0, 1 + 1j, 1 + 1j]
-    assert xp.allclose(result, xp.asarray(expected))
+    assert xp.all(xpx.isclose(result, xp.asarray(expected)))

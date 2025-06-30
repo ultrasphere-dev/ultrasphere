@@ -43,7 +43,7 @@ def test_jacobi(shape: tuple[int, ...], n_end: int) -> None:
     ]
     expected = eval_jacobi(n, alpha[..., None], beta[..., None], x[..., None])
     actual = jacobi(x, alpha=alpha, beta=beta, n_end=n_end)
-    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.all(xpx.isclose(expected, actual, rtol=1e-3, atol=1e-3))
 
 
 @pytest.mark.parametrize(
@@ -68,7 +68,7 @@ def test_gegenbauer(shape: tuple[int, ...], n_end: int) -> None:
     ]
     expected = eval_gegenbauer(n, alpha[..., None], x[..., None])
     actual = gegenbauer(x, alpha=alpha, n_end=n_end)
-    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.all(xpx.isclose(expected, actual, rtol=1e-3, atol=1e-3))
 
 
 @pytest.mark.parametrize(
@@ -108,7 +108,7 @@ def test_legendre(
     else:
         raise ValueError(f"Invalid type {type}")
     actual = legendre(x, ndim=xp.asarray(d), n_end=n_end)
-    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.all(xpx.isclose(expected, actual, rtol=1e-3, atol=1e-3))
 
 
 @pytest.mark.parametrize("alpha_eq_beta", [True, False])
@@ -148,4 +148,4 @@ def test_jacobi_triplet_integral(alpha_eq_beta: bool) -> None:
         n3=ns[2, ...],
         normalized=False,
     )
-    assert xp.allclose(expected, actual, rtol=1e-3, atol=1e-3)
+    assert xp.all(xpx.isclose(expected, actual, rtol=1e-3, atol=1e-3))

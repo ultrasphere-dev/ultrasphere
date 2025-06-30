@@ -53,7 +53,7 @@ def plot_harm(n_end: Annotated[int, typer.Argument(help="Log the values")] = 5) 
     )
     for n in range(n_end):
         for m in range(-n, n + 1):
-            r = xp.abs(Y[..., m, n].real)
+            r = xp.abs(xp.real(Y[..., m, n]))
             # r = xp.abs(Y[..., m, n])
             x = r * xp.sin(theta) * xp.cos(phi)
             y = r * xp.sin(theta) * xp.sin(phi)
@@ -85,7 +85,7 @@ def _task(
     use_triplet: bool,
 ) -> DataFrame:
     xp.set_backend("numpy")
-    c = SphericalCoordinates.from_branching_types(branching_types)
+    c = from_branching_types(branching_types)
     dfs = []
     t = t_angle * ratio
     y = x + t
@@ -117,7 +117,7 @@ def _task(
         type=from_,
     )
     if use_triplet:
-        coef = c.harmonics_translation_coef_using_triplet(
+        coef = harmonics_translation_coef_using_triplet(c,
             t_spherical,
             n_end=n_end,
             n_end_add=n_end_add_max,
@@ -126,7 +126,7 @@ def _task(
             is_type_same=from_ == to_,
         )
     else:
-        coef = c.harmonics_translation_coef(
+        coef = harmonics_translation_coef(c,
             t,
             n_end=n_end,
             n_end_add=n_end_add_max,
@@ -136,8 +136,8 @@ def _task(
     x_RS_add = x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim]
 
     for n_end_add in range(n_end_add_max, 0, -1):
-        x_RS_add = c.expand_cut(x_RS_add, n_end_add)
-        coef = c.expand_cut(coef, n_end_add)
+        x_RS_add = expand_cut(c, x_RS_add, n_end_add)
+        coef = expand_cut(c, coef, n_end_add)
         y_RS_approx = xp.sum(
             x_RS_add * coef,
             axis=tuple(range(-c.s_ndim, 0)),
@@ -150,9 +150,9 @@ def _task(
             expand_dims=True,
             as_array=True,
         )[c.root_index, ...][None, ...].repeat(size, axis=0)
-        ae_flatten = c.flatten_harmonics(ae).flatten()
-        rel_flatten = c.flatten_harmonics(rel).flatten()
-        index_flatten = c.flatten_harmonics(index).flatten()
+        ae_flatten = flatten_harmonics(c,ae).flatten()
+        rel_flatten = flatten_harmonics(c,rel).flatten()
+        index_flatten = flatten_harmonics(c,index).flatten()
         df = DataFrame(
             {
                 "absolute_error": ae_flatten,
@@ -184,10 +184,10 @@ def plot_translation_error(
     condon_shortley_phase = False
     k = xp.asarray(complex(k)).to_numpy()
     n_end_add_max = n_end
-    c = SphericalCoordinates.from_branching_types(branching_types)
+    c = from_branching_types(branching_types)
     rng = np.random.default_rng(0)
-    x = c.random_points(shape=(size,), surface=True, rng=rng).to_numpy()
-    t_angle = c.random_points(shape=(size,), surface=True, rng=rng).to_numpy()
+    x = random_points(c, shape=(size,), surface=True, rng=rng).to_numpy()
+    t_angle = random_points(c, shape=(size,), surface=True, rng=rng).to_numpy()
 
     task_args = []
     for ratio in [1 / 4, 1 / 2, 1, 2, 4]:
