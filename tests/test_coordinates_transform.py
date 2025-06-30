@@ -4,7 +4,6 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import Array
 
-from tests import xp
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import c_spherical, hopf, random
 
