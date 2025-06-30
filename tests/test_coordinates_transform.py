@@ -2,13 +2,15 @@ from typing import Literal
 
 import array_api_extra as xpx
 import pytest
-from array_api._2024_12 import Array
+from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_compat import array_namespace
 
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import c_spherical, hopf, random
 
 
 def to_cartesian(*, r: Array, theta: Array, phi: Array) -> tuple[Array, Array, Array]:
+    xp = array_namespace(r, theta, phi)
     rsin = r * xp.sin(theta)
     x = rsin * xp.cos(phi)
     y = rsin * xp.sin(phi)
@@ -24,7 +26,7 @@ def to_cartesian(*, r: Array, theta: Array, phi: Array) -> tuple[Array, Array, A
         (4, 5, 6),
     ],
 )
-def test_spherical_to_3d(shape: tuple[int, ...]) -> None:
+def test_spherical_to_3d(shape: tuple[int, ...], xp: ArrayNamespaceFull) -> None:
     r = xp.random.random_uniform(low=0, high=1, shape=shape)
     theta = xp.random.random_uniform(low=0, high=xp.pi, shape=shape)
     phi = xp.random.random_uniform(low=0, high=2 * xp.pi, shape=shape)
@@ -41,6 +43,7 @@ def test_spherical_to_3d(shape: tuple[int, ...]) -> None:
 
 
 def to_spherical(*, x: Array, y: Array, z: Array) -> tuple[Array, Array, Array]:
+    xp = array_namespace(x, y, z)
     r = xp.linalg.vector_norm([x, y, z], axis=0)
     theta = xp.acos(z / r)
     phi = xp.atan2(y, x)
@@ -55,7 +58,9 @@ def to_spherical(*, x: Array, y: Array, z: Array) -> tuple[Array, Array, Array]:
         (4, 5, 6),
     ],
 )
-def test_cartesian_to_spherical_3d(shape: tuple[int, ...]) -> None:
+def test_cartesian_to_spherical_3d(
+    shape: tuple[int, ...], xp: ArrayNamespaceFull
+) -> None:
     x = xp.random.random_uniform(low=-1, high=1, shape=shape)
     y = xp.random.random_uniform(low=-1, high=1, shape=shape)
     z = xp.random.random_uniform(low=-1, high=1, shape=shape)
@@ -85,7 +90,9 @@ def test_cartesian_to_spherical_3d(shape: tuple[int, ...]) -> None:
     ],
 )
 def test_cartesian_to_spherical(
-    c: SphericalCoordinates[TSpherical, TEuclidean], shape: tuple[int, ...]
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    shape: tuple[int, ...],
+    xp: ArrayNamespaceFull,
 ) -> None:
     print(c.e_nodes)
     x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
