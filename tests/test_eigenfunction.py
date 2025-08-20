@@ -1,3 +1,4 @@
+import numpy as np
 import numpy as xp
 import pytest
 
@@ -120,13 +121,13 @@ def test_type_b() -> None:
         # https://en.wikipedia.org/wiki/Table_of_spherical_harmonics
         s_beta = 0
         # l = 0
-        assert type_b_scalar(theta, s_beta, 0, 0) == pytest.approx(xp.sqrt(1 / 2))
+        assert type_b_scalar(theta, s_beta, 0, 0) == pytest.approx(np.sqrt(1 / 2))
         # l = 1
         assert type_b_scalar(theta, s_beta, 1, 1) == pytest.approx(
-            xp.sqrt(3) / 2 * xp.sin(theta)
+            np.sqrt(3) / 2 * xp.sin(theta)
         )
         assert type_b_scalar(theta, s_beta, 0, 1) == pytest.approx(
-            xp.sqrt(3 / 2) * xp.cos(theta)
+            np.sqrt(3 / 2) * xp.cos(theta)
         )
 
 
@@ -136,9 +137,9 @@ def test_type_b() -> None:
 #     # https://en.wikipedia.org/wiki/Table_of_spherical_harmonics
 #     theta = xp.random.random_uniform(low=0, high=xp.pi, shape=shape)
 #     expected = {
-#         (0, 0, 0): xp.sqrt(1 / 2),
-#         (0, 1, 1): xp.sqrt(3) / 2 * xp.sin(theta),
-#         (1, 0, 1): xp.sqrt(3 / 2) * xp.cos(theta),
+#         (0, 0, 0): np.sqrt(1 / 2),
+#         (0, 1, 1): np.sqrt(3) / 2 * xp.sin(theta),
+#         (1, 0, 1): np.sqrt(3 / 2) * xp.cos(theta),
 #     }
 #     s_beta, l_beta, l = xp.asarray(list(expected.keys())).T
 #     s_beta_ = xp.reshape(s_beta,s_beta.shape + (1,) * theta.ndim)
@@ -182,7 +183,7 @@ def test_type_c(
                 index_with_surrogate_quantum_number,
             )
             if (l, l_alpha, l_beta) == (0, 0, 0):
-                assert res == pytest.approx(xp.sqrt(2))
+                assert res == pytest.approx(np.sqrt(2))
             elif (l, l_alpha, l_beta) == (1, 1, 0):
                 assert res == pytest.approx(xp.cos(theta) * 2)
             elif (l, l_alpha, l_beta) == (1, 0, 1):
@@ -190,4 +191,4 @@ def test_type_c(
             elif (l, l_alpha, l_beta) == (2, 0, 0):
                 # alpha = beta = 0, n = 1, phi = 2 * N_1^00 * P_1^00 (cos 2 theta)
                 # P_1^00(x) = x, N_1^00 = sqrt(3/2)
-                assert res == pytest.approx((xp.cos(2 * theta)) * xp.sqrt(3 / 2) * 2)
+                assert res == pytest.approx((xp.cos(2 * theta)) * np.sqrt(3 / 2) * 2)

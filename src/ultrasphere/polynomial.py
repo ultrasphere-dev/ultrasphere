@@ -1,4 +1,5 @@
 import array_api_extra as xpx
+import numpy as np
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
@@ -314,7 +315,7 @@ def jacobi_triplet_integral(
         for i in range(3)
     ]
     phase = (-1) ** (-Ls2[0] + Ls2[1] - betas[2, ...])
-    coef = phase / xp.sqrt(2) * xp.exp(xp.sum(logcoefs, axis=0))
+    coef = phase / np.sqrt(2) * xp.exp(xp.sum(logcoefs, axis=0))
     return (
         coef
         * wigner3j(
