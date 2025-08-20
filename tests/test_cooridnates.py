@@ -201,6 +201,7 @@ def test_approximate(
         n_end=n_end,
         does_f_support_separation_of_variables=False,
         condon_shortley_phase=condon_shortley_phase,
+        xp=xp,
     )
     for n_end_c in xp.linspace(1, n_end, 5).to_numpy():
         n_end_c = int(n_end_c)

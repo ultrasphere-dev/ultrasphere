@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping
 from typing import Any, Literal, overload
 
 import array_api_extra as xpx
-from array_api._2024_12 import Array
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
 from ultrasphere.coordinates import (
@@ -158,6 +158,7 @@ def expand(
     n: int,
     *,
     condon_shortley_phase: bool,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Mapping[TSpherical, Array]: ...
@@ -179,6 +180,7 @@ def expand(
     n: int,
     *,
     condon_shortley_phase: bool,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Array: ...
@@ -199,6 +201,7 @@ def expand(
     n: int,
     *,
     condon_shortley_phase: bool,
+    xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Array | Mapping[TSpherical, Array]:
@@ -353,4 +356,5 @@ def expand(
         n,
         device=device,
         dtype=dtype,
+        xp=xp,
     )

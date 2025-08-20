@@ -116,6 +116,7 @@ def harmonics_translation_coef(
         n=n_end + n_end_add - 1,
         n_end=n_end_add,
         condon_shortley_phase=condon_shortley_phase,
+        xp=xp,
     )
 
 
@@ -295,6 +296,7 @@ def harmonics_twins_expansion(
                     n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
                     n_end=n_end_1 + n_end_2 - 1,
                     condon_shortley_phase=condon_shortley_phase,
+                    xp=xp,
                 ),
             ),
         )
