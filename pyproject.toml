@@ -32,6 +32,7 @@ dependencies = [
   "matplotlib>=3.10.3",
   "networkx>=3.4.2",
   "pandas>=2.3.0",
+  "pygraphviz>=1.14",
   "rich>=10",
   "scipy>=1.15.3",
   "seaborn>=0.13.2",
