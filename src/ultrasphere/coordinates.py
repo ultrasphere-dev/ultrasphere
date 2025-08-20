@@ -453,7 +453,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The spherical coordinates.
 
         """
-        xp = array_namespace([euclidean[k] for k in self.e_nodes])
+        xp = array_namespace(*[euclidean[k] for k in self.e_nodes])
         r = (
             xp.linalg.vector_norm(
                 xp.stack(xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes])),
