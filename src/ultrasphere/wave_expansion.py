@@ -1,3 +1,4 @@
+import numpy as np
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 
@@ -84,6 +85,6 @@ def plane_wave_expansion_coef(n: int | Array, *, e_ndim: int | Array) -> Array:
         1j**n
         * (2 * n + e_ndim - 2)
         / (e_ndim - 2)
-        * xp.exp(lgamma(e_ndim / 2.0) + xp.log(2) * ((e_ndim - 1) / 2))
+        * xp.exp(lgamma(e_ndim / 2.0) + np.log(2) * ((e_ndim - 1) / 2))
         / xp.sqrt(xp.pi)
     )
