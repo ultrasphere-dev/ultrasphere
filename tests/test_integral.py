@@ -51,7 +51,13 @@ def test_integrate(
         else:
             return defaultdict(lambda: xp.asarray(r))
 
-    actual = integrate(c, f, does_f_support_separation_of_variables=not concat, n=n)  # type: ignore
+    actual = integrate(
+        c,
+        f,
+        does_f_support_separation_of_variables=not concat,  # type: ignore
+        n=n,
+        xp=xp,
+    )
     if not concat:
         actual = xp.prod(list(actual.values()))
     expected = c.surface_area(r)
