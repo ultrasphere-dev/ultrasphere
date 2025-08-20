@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Literal
 
 import array_api_extra as xpx
+import numpy as np
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from matplotlib import pyplot as plt
@@ -203,7 +204,7 @@ def test_approximate(
         condon_shortley_phase=condon_shortley_phase,
         xp=xp,
     )
-    for n_end_c in xp.linspace(1, n_end, 5).to_numpy():
+    for n_end_c in np.linspace(1, n_end, 5):
         n_end_c = int(n_end_c)
         expansion_cut = expand_cut(c, expansion, n_end_c)
         approx = expand_evaluate(

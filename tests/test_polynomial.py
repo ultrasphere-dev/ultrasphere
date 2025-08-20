@@ -125,9 +125,7 @@ def test_jacobi_triplet_integral(alpha_eq_beta: bool, xp: ArrayNamespaceFull) ->
         alpha, beta, n = alphas[..., sample], betas[..., sample], ns[..., sample]
 
         # expected
-        x, w = roots_jacobi(
-            24, xp.sum(alpha).to_numpy() / 2, xp.sum(beta).to_numpy() / 2
-        )
+        x, w = roots_jacobi(24, float(xp.sum(alpha)) / 2, float(xp.sum(beta)) / 2)
         js = [eval_jacobi(n[i], alpha[i], beta[i], x) for i in range(3)]
         expected.append(xp.sum(js[0] * js[1] * js[2] * w, axis=-1))
     expected = xp.stack(expected, axis=-1)
