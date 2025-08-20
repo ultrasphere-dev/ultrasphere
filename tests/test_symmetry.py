@@ -35,7 +35,7 @@ def test_to_symmetric(
     assert xp.all(xpx.isclose(result, flip_symmetric_tensor(result_, axis=axis)))
 
     # test manually
-    random_index = xp.randint(1, array.shape[axis], shape=(1,))
+    random_index = xp.random.integers(1, array.shape[axis], shape=(1,))
     assert xp.all(
         xpx.isclose(
             select(result, random_index, axis=axis),
