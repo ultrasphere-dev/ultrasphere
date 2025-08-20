@@ -81,7 +81,7 @@ def expand_evaluate(
     """
     is_mapping = isinstance(expansion, Mapping)
     xp = (
-        array_namespace(*expansion.values())
+        array_namespace(*[expansion[k] for k in c.s_nodes])
         if is_mapping
         else array_namespace(expansion)
     )

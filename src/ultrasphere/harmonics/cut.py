@@ -47,7 +47,7 @@ def expand_cut(
 
     """
     xp = (
-        array_namespace(*expansion.values())
+        array_namespace(*[expansion[k] for k in c.s_nodes])
         if isinstance(expansion, Mapping)
         else array_namespace(expansion)
     )

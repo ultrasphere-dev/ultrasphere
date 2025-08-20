@@ -242,12 +242,12 @@ def concat_harmonics(
         The concatenated harmonics.
 
     """
-    xp = array_namespace(*harmonics.values())
+    xp = array_namespace(*[harmonics[k] for k in c.s_nodes])
     try:
         if c.s_ndim == 0:
             return xp.asarray(1)
         return xp.prod(
-            xp.stack(xp.broadcast_arrays(*harmonics.values()), axis=0), axis=0
+            xp.stack(xp.broadcast_arrays(*[harmonics[k] for k in c.s_nodes]), axis=0), axis=0
         )
     except Exception as e:
         shapes = {k: v.shape for k, v in harmonics.items()}

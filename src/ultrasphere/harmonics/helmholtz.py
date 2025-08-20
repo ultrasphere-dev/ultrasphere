@@ -89,7 +89,7 @@ def harmonics_regular_singular(
     """
     xp = array_namespace(
         *(
-            *spherical.values(),
+            *[spherical[k] for k in c.s_nodes],
             k,
             *(harmonics.values() if isinstance(harmonics, Mapping) else (harmonics,)),
         )

@@ -56,7 +56,7 @@ def harmonics_translation_coef(
         which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
 
     """
-    xp = array_namespace(*euclidean.values())
+    xp = array_namespace(*[euclidean[k] for k in c.e_nodes])
     _, k = xp.broadcast_arrays(euclidean[c.e_nodes[0]], k)
     n = index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True)[
         (...,) + (None,) * c.s_ndim
@@ -347,7 +347,7 @@ def harmonics_translation_coef_using_triplet(
         which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
 
     """
-    xp = array_namespace(*spherical.values())
+    xp = array_namespace(*[spherical[k] for k in c.s_nodes])
     # [user1,...,userM,n1,...,nN,nsummed1,...,nsummedN,ntemp1,...,ntempN]
     n = index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True, xp=xp)[
         (...,) + (None,) * (2 * c.s_ndim)

@@ -453,7 +453,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The spherical coordinates.
 
         """
-        xp = array_namespace(*euclidean.values())
+        xp = array_namespace([euclidean[k] for k in self.e_nodes])
         r = (
             xp.linalg.vector_norm(
                 xp.stack(xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes])),
@@ -521,7 +521,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The Euclidean coordinates.
 
         """
-        xp = array_namespace(*spherical.values())
+        xp = array_namespace(*[spherical[k] for k in self.s_nodes])
         result = {self.root: spherical.get("r", 1)}  # type: ignore
         for node in nx.topological_sort(self.G):
             if node in self.e_nodes:
@@ -573,7 +573,7 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             The Jacobian of the spherical coordinates.
 
         """
-        xp = array_namespace(*spherical.values())
+        xp = array_namespace(*[spherical[k] for k in self.s_nodes])
         if "r" in spherical:
             jacobian = spherical["r"]  # type: ignore
         else:
