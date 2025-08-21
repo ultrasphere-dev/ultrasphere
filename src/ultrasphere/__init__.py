@@ -11,7 +11,7 @@ from ._creation import (
 )
 from ._draw import draw
 from ._integral import integrate, roots
-from ._random import random_ball, random_sphere
+from ._random import random_ball
 
 __all__ = [
     "SphericalCoordinates",
@@ -24,7 +24,6 @@ __all__ = [
     "random",
     "random",
     "random_ball",
-    "random_sphere",
     "roots",
     "standard",
     "standard_prime",

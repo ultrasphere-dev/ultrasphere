@@ -13,7 +13,7 @@ from ultrasphere._coordinates import (
 )
 
 
-def random_sphere(
+def _random_sphere(
     shape: Sequence[int],
     dim: int,
     *,
@@ -21,7 +21,7 @@ def random_sphere(
     rng: np.random.Generator | None = None,
 ) -> NDArray[np.float64]:
     r"""
-    Generate random points on / in a unit hypersphere.
+    Generate random points in a unit ball / sphere.
 
     Parameters
     ----------
@@ -105,7 +105,7 @@ def random_ball(
     surface: bool = False,
 ) -> Array | Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]:
     r"""
-    Generate random points in/on the unit sphere.
+    Generate random points in the unit ball / sphere.
 
     Parameters
     ----------
@@ -141,7 +141,7 @@ def random_ball(
     rng = np.random.default_rng() if rng is None else rng
     if type == "uniform":
         return xp.asarray(
-            random_sphere(shape, dim=c.e_ndim, surface=surface, rng=rng),
+            _random_sphere(shape, dim=c.e_ndim, surface=surface, rng=rng),
             device=device,
             dtype=dtype,
         )
