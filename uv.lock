@@ -40,6 +40,18 @@ wheels = [
 ]
 
 [[package]]
+name = "array-api-extra"
+version = "0.8.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "array-api-compat" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/40/86/4a0a306877d2bbee20f564ebbc0fa3550db3ac411620bbb1ff07de019495/array_api_extra-0.8.0.tar.gz", hash = "sha256:1358c2111768317acf7ae5e397d04ed321ccc1f0c1d7a42347b0fba69f0bdf4e", size = 148171, upload-time = "2025-06-03T15:48:43.96Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bc/da/693816d1b09287c95425846b9009daf70968e72aaadf65ccb6b79a2b1626/array_api_extra-0.8.0-py3-none-any.whl", hash = "sha256:6833bbd9aa6b5d6ead44a4dddceed54f9320510f94e30aef8524b198ae2870d8", size = 46495, upload-time = "2025-06-03T15:48:41.549Z" },
+]
+
+[[package]]
 name = "babel"
 version = "2.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1697,6 +1709,7 @@ version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
+    { name = "array-api-extra" },
     { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "networkx", version = "3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "rich" },
@@ -1730,6 +1743,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.12.0" },
+    { name = "array-api-extra", specifier = ">=0.8.0" },
     { name = "matplotlib", marker = "extra == 'plot'", specifier = ">=3.10.3" },
     { name = "networkx", specifier = ">=3.4.2" },
     { name = "pydot", marker = "extra == 'plot'", specifier = ">=4.0.1" },

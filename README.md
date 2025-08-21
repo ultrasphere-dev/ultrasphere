@@ -44,7 +44,15 @@ hyperspherical coordinates and spherical harmonics
 
 Install this via pip (or your favourite package manager):
 
-`pip install ultrasphere`
+```shell
+pip install ultrasphere
+```
+
+## Usage
+
+```python
+
+```
 
 ## Contributors ✨
 
