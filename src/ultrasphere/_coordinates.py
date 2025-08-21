@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar, overload
+from typing import Any, Literal, TypeVar, overload
 
 import networkx as nx
 import numpy as np
@@ -243,7 +243,7 @@ def get_branching_type_from_digraph(G: nx.DiGraph, /) -> Iterable[BranchingType]
         yield branching_type
 
 
-class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
+class SphericalCoordinates[TSpherical, TEuclidean]:
     """Stores the spherical coordinates using the method of trees by Vilenkin."""
 
     G: nx.DiGraph
