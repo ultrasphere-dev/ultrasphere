@@ -58,7 +58,7 @@ def random_sphere(
 
 
 @overload
-def random_points(
+def random_ball(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
@@ -70,7 +70,7 @@ def random_points(
     surface: bool = ...,
 ) -> Array: ...
 @overload
-def random_points(
+def random_ball(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
@@ -82,7 +82,7 @@ def random_points(
     surface: Literal[False] = ...,
 ) -> Mapping[TSpherical | Literal["r"], Array]: ...
 @overload
-def random_points(
+def random_ball(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],
@@ -93,7 +93,7 @@ def random_points(
     rng: np.random.Generator | None = ...,
     surface: Literal[True] = ...,
 ) -> Mapping[TSpherical, Array]: ...
-def random_points(
+def random_ball(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     shape: Sequence[int],

@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 from ultrasphere._coordinates import SphericalCoordinates
 from ultrasphere._creation import c_spherical, hopf, random
-from ultrasphere.draw import draw
+from ultrasphere._draw import draw
 
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)

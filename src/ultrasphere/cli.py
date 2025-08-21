@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import typer
 
 from ._creation import from_branching_types
-from .draw import draw
+from ._draw import draw
 
 app = typer.Typer()
 

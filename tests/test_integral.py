@@ -9,7 +9,7 @@ from array_api._2024_12 import Array, ArrayNamespaceFull
 
 from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere._creation import c_spherical, hopf, random, standard
-from ultrasphere.integral import integrate
+from ultrasphere._integral import integrate
 
 
 @pytest.mark.parametrize("n", [4, 8, 16])
