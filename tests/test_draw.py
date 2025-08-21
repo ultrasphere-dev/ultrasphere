@@ -21,6 +21,11 @@ Path.mkdir(PATH, exist_ok=True)
     ],
 )
 def test_draw(name: str, c: SphericalCoordinates[str, int]) -> None:
+    try:
+        import pydot  # noqa
+        import pygraphviz  # noqa
+    except ImportError:
+        pytest.skip("pydot is not installed, skipping draw test")
     draw(c)
     plt.savefig(PATH / f"{name}.jpg")
     plt.close()

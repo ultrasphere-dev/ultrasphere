@@ -1697,17 +1697,21 @@ version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
-    { name = "matplotlib" },
     { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "networkx", version = "3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "pydot" },
-    { name = "pygraphviz" },
     { name = "rich" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "strenum" },
     { name = "typer" },
     { name = "types-array-api" },
+]
+
+[package.optional-dependencies]
+plot = [
+    { name = "matplotlib" },
+    { name = "pydot" },
+    { name = "pygraphviz" },
 ]
 
 [package.dev-dependencies]
@@ -1726,16 +1730,17 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.12.0" },
-    { name = "matplotlib", specifier = ">=3.10.3" },
+    { name = "matplotlib", marker = "extra == 'plot'", specifier = ">=3.10.3" },
     { name = "networkx", specifier = ">=3.4.2" },
-    { name = "pydot", specifier = ">=4.0.1" },
-    { name = "pygraphviz", specifier = ">=1.14" },
+    { name = "pydot", marker = "extra == 'plot'", specifier = ">=4.0.1" },
+    { name = "pygraphviz", marker = "extra == 'plot'", specifier = ">=1.14" },
     { name = "rich", specifier = ">=10" },
     { name = "scipy", specifier = ">=1.15.3" },
     { name = "strenum", specifier = ">=0.4.15" },
     { name = "typer", specifier = ">=0.15,<1" },
     { name = "types-array-api", specifier = ">=1.1.4" },
 ]
+provides-extras = ["plot"]
 
 [package.metadata.requires-dev]
 dev = [
