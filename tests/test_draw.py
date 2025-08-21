@@ -21,7 +21,6 @@ Path.mkdir(PATH, exist_ok=True)
     ],
 )
 def test_draw(name: str, c: SphericalCoordinates[str, int]) -> None:
-    fig, _ = plt.subplots(layout="constrained")
-    w, h = draw(c)
+    draw(c)
     plt.savefig(PATH / f"{name}.jpg")
     plt.close()

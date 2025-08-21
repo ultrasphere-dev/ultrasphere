@@ -12,7 +12,7 @@ from ultrasphere.special._bessel import sjv, syv
 @pytest.mark.parametrize("d", [2, 3])
 @pytest.mark.parametrize("type", ["j", "y"])
 def test_sjyn(d: Literal[2, 3], type: Literal["j", "y"], derivative: bool) -> None:
-    n = np.random.random_integers(5, size=(10, 10))
+    n = np.random.randint(5, size=(10, 10))
     z = np.random.random((10, 10))
     if type == "j":
         actual = sjv(n, np.array(d), z, derivative=derivative)
