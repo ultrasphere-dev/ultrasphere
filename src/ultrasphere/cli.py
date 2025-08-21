@@ -9,7 +9,7 @@ app = typer.Typer()
 
 
 @app.command()
-def main(branching_types: str, format: str = "jpg") -> None:
+def main(branching_types: str, format: str = "jpg", theme: str = "boxy_dark") -> None:
     """
     Create a spherical coordinate system from branching types.
 
@@ -17,10 +17,16 @@ def main(branching_types: str, format: str = "jpg") -> None:
     ----------
     branching_types : str
         String representation of the branching types, e.g. "aabcc".
+    format : str, optional
+        The format to save the figure, by default "jpg".
+    theme : str, optional
+        The theme to apply to the plot, by default "boxy_dark".
+        Set to "none" to disable theming.
 
     """
-    theme = load_theme("boxy_dark")
-    theme.apply()
+    if theme != "none":
+        theme_ = load_theme(theme)
+        theme_.apply()
     fig, ax = plt.subplots()
     c = from_branching_types(branching_types)
     draw(c, ax=ax)
