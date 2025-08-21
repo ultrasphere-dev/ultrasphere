@@ -1710,6 +1710,7 @@ source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
     { name = "array-api-extra" },
+    { name = "matplotlib" },
     { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "networkx", version = "3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "rich" },
@@ -1722,7 +1723,6 @@ dependencies = [
 
 [package.optional-dependencies]
 plot = [
-    { name = "matplotlib" },
     { name = "pydot" },
     { name = "pygraphviz" },
 ]
@@ -1744,7 +1744,7 @@ docs = [
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.12.0" },
     { name = "array-api-extra", specifier = ">=0.8.0" },
-    { name = "matplotlib", marker = "extra == 'plot'", specifier = ">=3.10.3" },
+    { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "networkx", specifier = ">=3.4.2" },
     { name = "pydot", marker = "extra == 'plot'", specifier = ">=4.0.1" },
     { name = "pygraphviz", marker = "extra == 'plot'", specifier = ">=1.14" },
