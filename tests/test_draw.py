@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 from matplotlib import pyplot as plt
 
-from ultrasphere.coordinates import SphericalCoordinates
-from ultrasphere.creation import c_spherical, hopf, random
+from ultrasphere._coordinates import SphericalCoordinates
+from ultrasphere._creation import c_spherical, hopf, random
 from ultrasphere.draw import draw
 
 PATH = Path("tests/.cache/")
@@ -24,5 +24,5 @@ def test_draw(name: str, c: SphericalCoordinates[str, int]) -> None:
     fig, _ = plt.subplots(layout="constrained")
     w, h = draw(c)
     plt.savefig(PATH / f"{name}.svg")
-    plt.savefig(PATH / f"{name}.png", dpi=600)
+    plt.savefig(PATH / f"{name}.png")
     plt.close()

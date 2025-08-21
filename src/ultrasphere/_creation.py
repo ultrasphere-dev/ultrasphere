@@ -5,11 +5,11 @@ from typing import Any, Literal
 import networkx as nx
 import numpy as np
 
-from ultrasphere.coordinates import BranchingType, SphericalCoordinates
-from ultrasphere.coordinates import SphericalCoordinates as cls
+from ultrasphere._coordinates import BranchingType, SphericalCoordinates
+from ultrasphere._coordinates import SphericalCoordinates as cls
 
 
-def get_digraph_from_branching_type(
+def _get_digraph_from_branching_type(
     branching_types: str | Sequence[BranchingType],
 ) -> nx.DiGraph:
     """
@@ -107,7 +107,7 @@ def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
         The polar coordinates.
 
     """
-    G = get_digraph_from_branching_type("b")
+    G = _get_digraph_from_branching_type("b")
     G = nx.relabel_nodes(G, {"theta0", "phi"})
     return cls(G)
 
@@ -122,7 +122,7 @@ def c_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1
         The spherical coordinates.
 
     """
-    G = get_digraph_from_branching_type("ba")
+    G = _get_digraph_from_branching_type("ba")
     # swap x0 and x2
     G = nx.relabel_nodes(G, {0: 2, 2: 1, 1: 0, "theta0": "theta", "theta1": "phi"})
     return cls(G)
@@ -145,7 +145,7 @@ def standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
     """
     if s_ndim == 0:
         return from_branching_types("")
-    return cls(get_digraph_from_branching_type("b" * (s_ndim - 1) + "a"))
+    return cls(_get_digraph_from_branching_type("b" * (s_ndim - 1) + "a"))
 
 
 def standard_prime(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
@@ -165,7 +165,7 @@ def standard_prime(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
     """
     if s_ndim == 0:
         return from_branching_types("")
-    return cls(get_digraph_from_branching_type("bp" * (s_ndim - 1) + "a"))
+    return cls(_get_digraph_from_branching_type("bp" * (s_ndim - 1) + "a"))
 
 
 def hopf(q: int) -> "SphericalCoordinates[Any, Any]":
@@ -194,7 +194,7 @@ def hopf(q: int) -> "SphericalCoordinates[Any, Any]":
             return "a"
         return f"c{_hoph(q - 1)}{_hoph(q - 1)}"
 
-    return cls(get_digraph_from_branching_type(_hoph(q)))
+    return cls(_get_digraph_from_branching_type(_hoph(q)))
 
 
 def from_branching_types(
@@ -214,7 +214,7 @@ def from_branching_types(
         The spherical coordinates.
 
     """
-    return cls(get_digraph_from_branching_type(branching_types))
+    return cls(_get_digraph_from_branching_type(branching_types))
 
 
 def _s_node_name_default(idx: int) -> Any:
@@ -253,7 +253,7 @@ def _e_node_name_default(idx: int) -> Any:
     return idx
 
 
-def get_random_digraph(
+def _get_random_digraph(
     s_ndim: int, *, rng: np.random.Generator | None = None
 ) -> nx.DiGraph:
     """
@@ -314,4 +314,4 @@ def random(
         The random spherical coordinates.
 
     """
-    return cls(get_random_digraph(s_ndim, rng=rng))
+    return cls(_get_random_digraph(s_ndim, rng=rng))

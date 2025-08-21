@@ -7,7 +7,11 @@ from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 from strenum import StrEnum
 
-from .special.lgamma import lgamma
+from .special._lgamma import lgamma
+
+TEuclidean = TypeVar("TEuclidean")
+TSpherical = TypeVar("TSpherical")
+COSSIN = Literal["cos", "sin"]
 
 
 class BranchingType(StrEnum):
@@ -23,12 +27,7 @@ class BranchingType(StrEnum):
     C = "c"
 
 
-TEuclidean = TypeVar("TEuclidean")
-TSpherical = TypeVar("TSpherical")
-COSSIN = Literal["cos", "sin"]
-
-
-def check_tree(graph: nx.DiGraph) -> None:
+def check_tree(graph: nx.DiGraph, /) -> None:
     """
     Check if the graph is a valid tree representing the coordinates.
     Definition of "a tree representing the coordinates":
@@ -80,7 +79,7 @@ def check_tree(graph: nx.DiGraph) -> None:
             )
 
 
-def get_non_leaf_descendants(graph: nx.DiGraph) -> dict[Any, int]:
+def get_non_leaf_descendants(graph: nx.DiGraph, /) -> dict[Any, int]:
     """
     Calculate the number of non-leaf descendants for each node in a rooted tree.
 
@@ -111,7 +110,7 @@ def get_non_leaf_descendants(graph: nx.DiGraph) -> dict[Any, int]:
     return non_leaf_descendants
 
 
-def get_child(G: nx.DiGraph, node: Any, type: COSSIN) -> Any:
+def get_child(G: nx.DiGraph, node: Any, type: COSSIN, /) -> Any:
     """
     Get the child node of the given type in a rooted tree representing the coordinates.
 
@@ -141,7 +140,7 @@ def get_child(G: nx.DiGraph, node: Any, type: COSSIN) -> Any:
     return child_candidates[0]
 
 
-def get_parent(G: nx.DiGraph, node: Any) -> Any | None:
+def get_parent(G: nx.DiGraph, node: Any, /) -> Any | None:
     """
     Get the parent node in a rooted tree representing the coordinates.
 
@@ -171,13 +170,13 @@ def get_parent(G: nx.DiGraph, node: Any) -> Any | None:
     return predecessors[0]
 
 
-def get_branching_types(graph: nx.DiGraph) -> dict[Any, BranchingType]:
+def get_branching_types(G: nx.DiGraph, /) -> dict[Any, BranchingType]:
     """
     Get the branching types of each node in a rooted tree.
 
     Parameters
     ----------
-    graph : nx.DiGraph
+    G : nx.DiGraph
         A rooted tree.
 
     Returns
@@ -187,13 +186,13 @@ def get_branching_types(graph: nx.DiGraph) -> dict[Any, BranchingType]:
 
     """
     branching_types = {}
-    for node in graph.nodes:
-        if graph.out_degree(node) == 0:
+    for node in G.nodes:
+        if G.out_degree(node) == 0:
             continue
-        sin_child = get_child(graph, node, "sin")
-        cos_child = get_child(graph, node, "cos")
-        sin_child_is_leaf = graph.out_degree(sin_child) == 0
-        cos_child_is_leaf = graph.out_degree(cos_child) == 0
+        sin_child = get_child(G, node, "sin")
+        cos_child = get_child(G, node, "cos")
+        sin_child_is_leaf = G.out_degree(sin_child) == 0
+        cos_child_is_leaf = G.out_degree(cos_child) == 0
         if cos_child_is_leaf and sin_child_is_leaf:
             branching_types[node] = BranchingType.A
         elif cos_child_is_leaf and not sin_child_is_leaf:
@@ -205,7 +204,7 @@ def get_branching_types(graph: nx.DiGraph) -> dict[Any, BranchingType]:
     return branching_types
 
 
-def get_branching_type_from_digraph(G: nx.DiGraph) -> Iterable[BranchingType]:
+def get_branching_type_from_digraph(G: nx.DiGraph, /) -> Iterable[BranchingType]:
     """
     Get the branching types of each node in a rooted tree.
 

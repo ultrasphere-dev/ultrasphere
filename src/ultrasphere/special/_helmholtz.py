@@ -5,7 +5,7 @@ import array_api_extra as xpx
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 
-from ultrasphere.special.bessel import shn1, sjv
+from ultrasphere.special._bessel import shn1, sjv
 
 TArray = TypeVar("TArray", bound=Array)
 

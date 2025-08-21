@@ -5,8 +5,8 @@ import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.creation import c_spherical, hopf, random
+from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere._creation import c_spherical, hopf, random
 
 
 def to_cartesian(*, r: Array, theta: Array, phi: Array) -> tuple[Array, Array, Array]:

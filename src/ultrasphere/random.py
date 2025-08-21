@@ -5,7 +5,7 @@ import numpy as np
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from numpy._typing import NDArray
 
-from ultrasphere.coordinates import (
+from ultrasphere._coordinates import (
     BranchingType,
     SphericalCoordinates,
     TEuclidean,

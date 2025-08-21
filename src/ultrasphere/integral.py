@@ -6,7 +6,7 @@ import numpy as np
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from scipy.special import roots_jacobi
 
-from .coordinates import (
+from ._coordinates import (
     BranchingType,
     SphericalCoordinates,
     TEuclidean,

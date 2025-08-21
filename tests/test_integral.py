@@ -7,8 +7,8 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.creation import c_spherical, hopf, random, standard
+from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere._creation import c_spherical, hopf, random, standard
 from ultrasphere.integral import integrate
 
 

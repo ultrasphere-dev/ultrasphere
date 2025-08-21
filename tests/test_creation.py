@@ -1,6 +1,6 @@
 import pytest
 
-from ultrasphere.creation import hopf, random, standard, standard_prime
+from ultrasphere._creation import hopf, random, standard, standard_prime
 
 
 @pytest.mark.parametrize("s_ndim", [0, 1, 2, 3, 6, 103])

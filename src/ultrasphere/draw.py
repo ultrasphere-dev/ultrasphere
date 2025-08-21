@@ -8,7 +8,7 @@ from matplotlib.patches import Circle
 from networkx.algorithms.dag import dag_longest_path
 from networkx.drawing.nx_pydot import graphviz_layout
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
 
 def draw(
