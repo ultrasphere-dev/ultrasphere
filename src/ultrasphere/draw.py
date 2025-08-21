@@ -3,6 +3,7 @@ import warnings
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle
 from networkx.algorithms.dag import dag_longest_path
@@ -10,9 +11,43 @@ from networkx.drawing.nx_pydot import graphviz_layout
 
 from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
+_ASCII_TO_GREEK = {
+    "alpha": "α",  # noqa
+    "beta": "β",
+    "gamma": "γ",  # noqa
+    "delta": "δ",
+    "epsilon": "ε",
+    "zeta": "ζ",
+    "theta": "θ",
+    "iota": "ι",  # noqa
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",  # noqa
+    "xi": "ξ",
+    "pi": "π",
+    "rho": "ρ",  # noqa
+    "sigma": "σ",  # noqa
+    "tau": "τ",
+    "upsilon": "υ",  # noqa
+    "phi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "eta": "η",  # last
+}
+
+
+def _ascii_to_greek(s: str) -> str:
+    for k, v in _ASCII_TO_GREEK.items():
+        s = s.replace(k, v)
+    return s
+
 
 def draw(
-    c: SphericalCoordinates[TSpherical, TEuclidean], root_bottom: bool = True
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    root_bottom: bool = True,
+    ax: Axes | None = None,
 ) -> tuple[float, float]:
     """
     Nicely draw the rooted tree representing the coordinates.
@@ -28,44 +63,16 @@ def draw(
         The recommended width and height of the figure (in inches).
 
     """
-    ASCII_TO_GREEK = {
-        "alpha": "α",  # noqa
-        "beta": "β",
-        "gamma": "γ",  # noqa
-        "delta": "δ",
-        "epsilon": "ε",
-        "zeta": "ζ",
-        "theta": "θ",
-        "iota": "ι",  # noqa
-        "kappa": "κ",
-        "lambda": "λ",
-        "mu": "μ",
-        "nu": "ν",  # noqa
-        "xi": "ξ",
-        "pi": "π",
-        "rho": "ρ",  # noqa
-        "sigma": "σ",  # noqa
-        "tau": "τ",
-        "upsilon": "υ",  # noqa
-        "phi": "φ",
-        "chi": "χ",
-        "psi": "ψ",
-        "omega": "ω",
-        "eta": "η",  # last
-    }
-
-    def ascii_to_greek(s: str) -> str:
-        for k, v in ASCII_TO_GREEK.items():
-            s = s.replace(k, v)
-        return s
 
     # plt.rcParams["text.usetex"] = True
     # remove spines
-    plt.box(False)
-    plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
+    ax = ax or plt.gca()
+    fig = ax.figure
+    ax.set_frame_on(False)
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
     width = max(c.e_ndim * 0.5 + 1, 3.5)
     height = max((len(dag_longest_path(c.G)) + 1) * 0.5, 3.5)
-    plt.gcf().set_size_inches(width, height)
+    fig.set_size_inches(width, height)
 
     # layout
     try:
@@ -90,16 +97,18 @@ def draw(
         pos,
         nodelist=c.s_nodes,
         node_color="darkgray",
-        node_size=800,
+        node_size=850,
         label="Spherical",
+        ax=ax,
     )
     nx.draw_networkx_labels(
         c.G,
         pos,
         labels={
-            n: f"{ascii_to_greek(str(n))}{c.branching_types[n].value}/{c.S[n]}"
+            n: f"{_ascii_to_greek(str(n))}\n{c.branching_types[n].value}/{c.S[n]}"
             for n in c.s_nodes
         },
+        ax=ax,
     )
 
     # Euclidean
@@ -110,8 +119,9 @@ def draw(
         node_color="lightgray",
         node_shape="s",
         label="Euclidean",
+        ax=ax,
     )
-    nx.draw_networkx_labels(c.G, pos, labels={n: f"{n}" for n in c.e_nodes})
+    nx.draw_networkx_labels(c.G, pos, labels={n: f"{n}" for n in c.e_nodes}, ax=ax)
 
     # edges
     cos_color = "orange"
@@ -123,9 +133,10 @@ def draw(
         edge_color=cos_color,
         label="cos",
         style="dashed",
+        ax=ax,
     )
     nx.draw_networkx_edges(
-        c.G, pos, edgelist=c.sin_edges, edge_color=sin_color, label="sin"
+        c.G, pos, edgelist=c.sin_edges, edge_color=sin_color, label="sin", ax=ax
     )
 
     # legend
@@ -140,7 +151,7 @@ def draw(
         Line2D([0], [0], color=cos_color, lw=2, label="cos", linestyle="dashed"),
         Line2D([0], [0], color=sin_color, lw=2, label="sin"),
     ]
-    plt.legend(handles=handles, loc="lower right" if root_bottom else "upper right")
-    plt.title(f"Type {c.branching_types_expression_str} coordinates")
+    fig.legend(handles=handles, loc="lower right" if root_bottom else "upper right")
+    ax.set_title(f"Type {c.branching_types_expression_str} coordinates")
 
     return width, height
