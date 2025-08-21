@@ -2,6 +2,7 @@ from collections.abc import Callable, Mapping
 from typing import Any, Literal, overload
 
 import array_api_extra as xpx
+import numpy as np
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from scipy.special import roots_jacobi
 
@@ -62,12 +63,12 @@ def roots(
             s_beta = c.S[get_child(c.G, node, "sin")]
             beta = s_beta / 2
             x, w = roots_jacobi(n, beta, beta)
-            x = xp.acos(x)
+            x = np.acos(x)
         elif branching_type == BranchingType.BP:
             s_alpha = c.S[get_child(c.G, node, "cos")]
             alpha = s_alpha / 2
             x, w = roots_jacobi(n, alpha, alpha)
-            x = xp.asin(x)
+            x = np.asin(x)
         elif branching_type == BranchingType.C:
             s_alpha = c.S[get_child(c.G, node, "cos")]
             s_beta = c.S[get_child(c.G, node, "sin")]
@@ -75,7 +76,7 @@ def roots(
             beta = s_beta / 2
             x, w = roots_jacobi(n, alpha, beta)
             w /= 2 ** (alpha + beta + 2)
-            x = xp.acos(x) / 2
+            x = np.acos(x) / 2
         else:
             raise ValueError(f"Invalid branching type {branching_type}.")
         x = xp.asarray(x, device=device, dtype=dtype)

@@ -20,9 +20,12 @@ def test_sphere_surface_integrate(
     expected: float,
     xp: ArrayNamespaceFull,
 ) -> None:
+    def f2(s):
+        return xp.asarray(f(s))
+
     c = c_spherical()
     assert integrate(
-        c, f, does_f_support_separation_of_variables=False, n=n, xp=xp
+        c, f2, does_f_support_separation_of_variables=False, n=n, xp=xp
     ).item() == pytest.approx(expected, rel=1e-2)
 
 
@@ -59,7 +62,7 @@ def test_integrate(
         xp=xp,
     )
     if not concat:
-        actual = xp.prod(list(actual.values()))
+        actual = xp.prod(xp.stack(list(actual.values())))
     expected = c.surface_area(r)
     assert actual.item() == pytest.approx(expected, rel=1e-2)
 
@@ -74,7 +77,7 @@ def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
     ) -> Callable[[Mapping[TSpherical, Array]], Array]:
         def f(s: Mapping[TSpherical, Array]) -> Array:
             x = c.to_euclidean(s, as_array=True)
-            return xp.einsum("v,v...->...", k.astype(x.dtype), x)
+            return xp.einsum("v,v...->...", xp.astype(k, x.dtype), x)
 
         return f
 

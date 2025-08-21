@@ -7,7 +7,7 @@ from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 from strenum import StrEnum
 
-from .special import lgamma
+from .special.lgamma import lgamma
 
 
 class BranchingType(StrEnum):

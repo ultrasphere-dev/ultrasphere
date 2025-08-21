@@ -50,7 +50,7 @@ def get_digraph_from_branching_type(
     type_c_stack: list[Any] = []
     next_e_idx = 0
     next_s_idx = 0
-    current_node = s_node_name(next_s_idx)
+    current_node = _s_node_name_default(next_s_idx)
     G.add_node(current_node)
     next_s_idx += 1
     for i, branching_type in enumerate(branching_types_):
@@ -72,26 +72,26 @@ def get_digraph_from_branching_type(
             G.add_node(next_e_idx)
             G.add_edge(current_node, next_e_idx, type="cos")
             next_e_idx += 1
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="sin")
-            next_node = s_node_name(next_s_idx)
+            G.add_node(_s_node_name_default(next_s_idx))
+            G.add_edge(current_node, _s_node_name_default(next_s_idx), type="sin")
+            next_node = _s_node_name_default(next_s_idx)
             next_s_idx += 1
         elif branching_type == BranchingType.BP:
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="cos")
-            next_node = s_node_name(next_s_idx)
+            G.add_node(_s_node_name_default(next_s_idx))
+            G.add_edge(current_node, _s_node_name_default(next_s_idx), type="cos")
+            next_node = _s_node_name_default(next_s_idx)
             next_s_idx += 1
             G.add_node(next_e_idx)
             G.add_edge(current_node, next_e_idx, type="sin")
             next_e_idx += 1
         elif branching_type == BranchingType.C:
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="cos")
-            next_node = s_node_name(next_s_idx)
+            G.add_node(_s_node_name_default(next_s_idx))
+            G.add_edge(current_node, _s_node_name_default(next_s_idx), type="cos")
+            next_node = _s_node_name_default(next_s_idx)
             next_s_idx += 1
-            G.add_node(s_node_name(next_s_idx))
-            G.add_edge(current_node, s_node_name(next_s_idx), type="sin")
-            type_c_stack.append(s_node_name(next_s_idx))
+            G.add_node(_s_node_name_default(next_s_idx))
+            G.add_edge(current_node, _s_node_name_default(next_s_idx), type="sin")
+            type_c_stack.append(_s_node_name_default(next_s_idx))
             next_s_idx += 1
         current_node = next_node
     return G
@@ -217,7 +217,7 @@ def from_branching_types(
     return cls(get_digraph_from_branching_type(branching_types))
 
 
-def s_node_name(idx: int) -> Any:
+def _s_node_name_default(idx: int) -> Any:
     """
     The naming convention for the spherical node.
 
@@ -235,7 +235,7 @@ def s_node_name(idx: int) -> Any:
     return f"theta{idx}"
 
 
-def e_node_name(idx: int) -> Any:
+def _e_node_name_default(idx: int) -> Any:
     """
     The naming convention for the Euclidean node.
 
@@ -289,8 +289,8 @@ def get_random_digraph(
     non_leaf_nodes = set(G.nodes) - set(leaf_nodes)
     G = nx.relabel_nodes(
         G,
-        {node: e_node_name(i) for i, node in enumerate(leaf_nodes)}
-        | {node: s_node_name(i) for i, node in enumerate(non_leaf_nodes)},
+        {node: _e_node_name_default(i) for i, node in enumerate(leaf_nodes)}
+        | {node: _s_node_name_default(i) for i, node in enumerate(non_leaf_nodes)},
     )
     return G
 

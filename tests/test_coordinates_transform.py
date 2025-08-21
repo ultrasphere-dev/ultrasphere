@@ -44,7 +44,7 @@ def test_spherical_to_3d(shape: tuple[int, ...], xp: ArrayNamespaceFull) -> None
 
 def to_spherical(*, x: Array, y: Array, z: Array) -> tuple[Array, Array, Array]:
     xp = array_namespace(x, y, z)
-    r = xp.linalg.vector_norm([x, y, z], axis=0)
+    r = xp.linalg.vector_norm(xp.stack([x, y, z], axis=0), axis=0)
     theta = xp.acos(z / r)
     phi = xp.atan2(y, x)
     return r, theta, phi

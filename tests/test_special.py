@@ -5,7 +5,7 @@ import pytest
 from numpy.testing import assert_allclose
 from scipy.special import jv, jvp, spherical_jn, spherical_yn, yv, yvp
 
-from ultrasphere.special import sjv, syv
+from ultrasphere.special.bessel import sjv, syv
 
 
 @pytest.mark.parametrize("derivative", [True, False])

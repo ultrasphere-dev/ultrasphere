@@ -9,7 +9,7 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
     """
     backend = request.param
     if backend == "numpy":
-        import numpy as xp
+        from array_api_compat import numpy as xp
 
         rng = xp.random.default_rng()
 
@@ -22,7 +22,7 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
     elif backend == "torch":
-        import torch as xp
+        from array_api_compat import torch as xp
 
         def random_uniform(low=0, high=1, shape=None):
             return xp.rand(shape) * (high - low) + low
