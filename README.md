@@ -90,10 +90,31 @@ c = us.standard_prime(4) # b'b'b'a coordinates
 c = us.hopf(3) # ccaacaa coordinates
 c = us.from_branching_types("cbab'a")
 c = us.random(10)
-print(f"{c.branching_types_expression_str} coordinates")
+print(c.branching_types_expression_str)
 ```
 
-### Drawing Vi
+```text
+ccabbab'b'ba
+```
+
+### Drawing spherical coordinates using rooted trees (Vilenkin's method of trees)
+
+#### Python
+
+```python
+import ultrasphere as us
+
+c = us.random(10)
+us.draw(c)
+```
+
+#### CLI
+
+```shell
+ultrasphere "ccabbab'b'ba"
+```
+
+![ccabbab'b'ba](https://raw.githubusercontent.com/34j/ultrasphere/main/coordinates.png)
 
 ## Contributors ✨
 

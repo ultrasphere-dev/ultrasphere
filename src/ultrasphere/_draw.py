@@ -7,7 +7,7 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle
 from networkx.algorithms.dag import dag_longest_path
-from networkx.drawing.nx_pydot import graphviz_layout
+from networkx.drawing.nx_agraph import graphviz_layout
 
 from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
 
@@ -69,14 +69,21 @@ def draw(
     ax = ax or plt.gca()
     fig = ax.figure
     ax.set_frame_on(False)
-    fig.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
+    ax.grid(False)
     width = max(c.e_ndim * 0.5 + 1, 3.5)
     height = max((len(dag_longest_path(c.G)) + 1) * 0.5, 3.5)
-    fig.set_size_inches(width, height)
+    additional_width = 0.8
+    fig.set_size_inches(width + additional_width, height)
+    fig.subplots_adjust(
+        right=0.9 - additional_width / (width + additional_width),
+        left=0,
+        top=0.9,
+        bottom=0,
+    )
 
     # layout
     try:
-        pos = graphviz_layout(c.G, prog="dot")
+        pos = graphviz_layout(c.G, prog="dot", args='-GTBbalance="max"')
         if root_bottom:
             # invert y-axis
             y_center = np.mean([y for x, y in pos.values()])
@@ -100,6 +107,7 @@ def draw(
         node_size=850,
         label="Spherical",
         ax=ax,
+        margins=0.1,
     )
     nx.draw_networkx_labels(
         c.G,
@@ -151,7 +159,10 @@ def draw(
         Line2D([0], [0], color=cos_color, lw=2, label="cos", linestyle="dashed"),
         Line2D([0], [0], color=sin_color, lw=2, label="sin"),
     ]
-    fig.legend(handles=handles, loc="lower right" if root_bottom else "upper right")
+    fig.legend(
+        handles=handles,
+        loc="lower right" if root_bottom else "upper right",
+    )
     ax.set_title(f"Type {c.branching_types_expression_str} coordinates")
 
     return width, height
