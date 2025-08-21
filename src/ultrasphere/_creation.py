@@ -107,8 +107,8 @@ def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
         The polar coordinates.
 
     """
-    G = _get_digraph_from_branching_type("b")
-    G = nx.relabel_nodes(G, {"theta0", "phi"})
+    G = _get_digraph_from_branching_type("a")
+    G = nx.relabel_nodes(G, {"theta0": "phi"})
     return cls(G)
 
 

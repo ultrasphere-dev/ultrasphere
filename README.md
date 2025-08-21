@@ -38,7 +38,7 @@
 
 ---
 
-hyperspherical coordinates and spherical harmonics
+Hyperspherical coordinates in NumPy / PyTorch / JAX.
 
 ## Installation
 
@@ -50,9 +50,50 @@ pip install ultrasphere
 
 ## Usage
 
-```python
+### Spherical Coordinates ↔ Cartesian Coordinates
 
+```python
+import ultrasphere as us
+import torch
+
+# structure of spherical coordinates
+c = us.c_spherical()
 ```
+
+```python
+# get spherical coordinates from euclidean coordinates
+spherical = c.from_euclidean(torch.asarray([1.0, 2.0, 3.0]))
+print(spherical)
+```
+
+```text
+{'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
+```
+
+```python
+# get euclidean coordinates from spherical coordinates
+euclidean = c.to_euclidean(spherical)
+print(euclidean)
+```
+
+```text
+{0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
+```
+
+### Using various spherical coordinates
+
+```python
+c = us.polar() # polar coordinates
+c = us.c_spherical() # spherical coordinates
+c = us.standard(3) # bba coordinates
+c = us.standard_prime(4) # b'b'b'a coordinates
+c = us.hopf(3) # ccaacaa coordinates
+c = us.from_branching_types("cbab'a")
+c = us.random(10)
+print(f"{c.branching_types_expression_str} coordinates")
+```
+
+### Drawing Vi
 
 ## Contributors ✨
 
