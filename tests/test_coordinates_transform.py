@@ -86,7 +86,7 @@ def test_cartesian_to_spherical_3d(
     [
         (1,),
         (2, 3),
-        (4, 5, 6),
+        (2, 4, 6),
     ],
 )
 def test_cartesian_to_spherical(
@@ -94,7 +94,6 @@ def test_cartesian_to_spherical(
     shape: tuple[int, ...],
     xp: ArrayNamespaceFull,
 ) -> None:
-    print(c.e_nodes)
     x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
     spherical = c.from_euclidean(x)
     x_reconstructed = c.to_euclidean(spherical)
