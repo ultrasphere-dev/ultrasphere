@@ -8,7 +8,6 @@ from array_api_compat import array_namespace
 from strenum import StrEnum
 
 from .special import lgamma
-from .wave_expansion import harm_n_ndim, homogeneous_ndim
 
 
 class BranchingType(StrEnum):
@@ -391,50 +390,6 @@ class SphericalCoordinates(Generic[TSpherical, TEuclidean]):
             / np.exp(lgamma(self.e_ndim / 2.0 + 1.0))
             * r**self.e_ndim
         )
-
-    def homogeneous_ndim(self, n: int | Array) -> int | Array:
-        """
-        The dimension of the homogeneous polynomials of degree n.
-
-        Parameters
-        ----------
-        n : int | Array
-            The degree.
-
-        Returns
-        -------
-        int | Array
-            The dimension.
-
-        References
-        ----------
-        McLean, W. (2000). Strongly Elliptic Systems and
-        Boundary Integral Equations. p.250
-
-        """
-        return homogeneous_ndim(n, e_ndim=self.e_ndim)
-
-    def harm_n_ndim(self, n: int | Array) -> int | Array:
-        """
-        The dimension of the spherical harmonics of degree n.
-
-        Parameters
-        ----------
-        n : int | Array
-            The degree.
-
-        Returns
-        -------
-        int | Array
-            The dimension.
-
-        References
-        ----------
-        McLean, W. (2000). Strongly Elliptic Systems and
-        Boundary Integral Equations. p.251
-
-        """
-        return harm_n_ndim(n, e_ndim=self.e_ndim)
 
     def from_euclidean(
         self, euclidean: Mapping[TEuclidean, Array]

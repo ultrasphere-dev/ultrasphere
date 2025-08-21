@@ -1,10 +1,14 @@
+from pathlib import Path
+
 import pytest
 from matplotlib import pyplot as plt
 
-from tests.test_expansion import PATH
 from ultrasphere.coordinates import SphericalCoordinates
 from ultrasphere.creation import c_spherical, hopf, random
 from ultrasphere.draw import draw
+
+PATH = Path("tests/.cache/")
+Path.mkdir(PATH, exist_ok=True)
 
 
 @pytest.mark.parametrize(
