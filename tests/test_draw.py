@@ -1,7 +1,7 @@
 import pytest
 from matplotlib import pyplot as plt
 
-from tests.test_cooridnates import PATH
+from tests.test_expansion import PATH
 from ultrasphere.coordinates import SphericalCoordinates
 from ultrasphere.creation import c_spherical, hopf, random
 from ultrasphere.draw import draw
