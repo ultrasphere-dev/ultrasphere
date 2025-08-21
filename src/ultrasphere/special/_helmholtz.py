@@ -179,5 +179,8 @@ def fundamental_solution(
     xp = array_namespace(d, z)
     coef = k ** (d - 2) * 1j / (2 * (2 * xp.pi) ** ((d - 1) / 2))
     return coef * shn1(
-        xp.asarray(0), d, k * xp.linalg.vector_norm(z, axis=-1), derivative
+        xp.asarray(0, device=z.device, dtype=xp.int32),
+        d,
+        k * xp.linalg.vector_norm(z, axis=-1),
+        derivative,
     )

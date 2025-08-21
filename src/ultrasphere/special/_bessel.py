@@ -71,7 +71,7 @@ def szv(
             raise AssertionError()
     return (
         xp.sqrt(xp.pi / 2)
-        * xp.asarray(zv((v + d_half_minus_1), (z)))
+        * xp.asarray(zv(v + d_half_minus_1, z), device=z.device, dtype=z.dtype)
         / (z**d_half_minus_1)
     )
 
