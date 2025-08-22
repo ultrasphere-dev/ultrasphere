@@ -157,7 +157,7 @@ print(points_sphere, np.linalg.vector_norm(points_sphere))
 [-0.68194186  0.71310149 -0.16260864] 1.0
 ```
 
-#### Reference
+#### References
 
 - Barthe, F., Guedon, O., Mendelson, S., & Naor, A. (2005). A probabilistic approach to the geometry of the \ell_p^n-ball. arXiv, math/0503650. Retrieved from https://arxiv.org/abs/math/0503650v1
 
