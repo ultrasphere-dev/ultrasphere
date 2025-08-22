@@ -5,13 +5,13 @@ requires = [ "setuptools" ]
 [project]
 name = "ultrasphere"
 version = "1.0.0"
-description = "hyperspherical coordinates and spherical harmonics"
+description = "Hyperspherical coordinates in NumPy / PyTorch / JAX."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
   { name = "34j", email = "34j.95a2p@simplelogin.com" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Intended Audience :: Developers",
@@ -26,8 +26,16 @@ classifiers = [
 ]
 
 dependencies = [
+  "aquarel>=0.0.7",
+  "array-api-compat>=1.12.0",
+  "array-api-extra>=0.8.0",
+  "matplotlib>=3.10.3",
+  "networkx>=3.5",
   "rich>=10",
+  "scipy>=1.15.3",
+  "strenum>=0.4.15",
   "typer>=0.15,<1",
+  "types-array-api>=1.1.4",
 ]
 urls."Bug Tracker" = "https://github.com/34j/ultrasphere/issues"
 urls.Changelog = "https://github.com/34j/ultrasphere/blob/main/CHANGELOG.md"
@@ -35,10 +43,17 @@ urls.documentation = "https://ultrasphere.readthedocs.io"
 urls.repository = "https://github.com/34j/ultrasphere"
 scripts.ultrasphere = "ultrasphere.cli:app"
 
+[project.optional-dependencies]
+plot = [
+    "pydot>=4.0.1",
+    "pygraphviz>=1.14",
+]
+
 [dependency-groups]
 dev = [
   "pytest>=8,<9",
   "pytest-cov>=6,<7",
+  "torch>=2.7.1",
 ]
 docs = [
   "furo>=2023.5.20; python_version>='3.11'",
@@ -51,7 +66,7 @@ docs = [
 line-length = 88
 lint.select = [
   "B",   # flake8-bugbear
-  "D",   # flake8-docstrings
+  # "D",   # flake8-docstrings
   "C4",  # flake8-comprehensions
   "S",   # flake8-bandit
   "F",   # pyflake
@@ -60,14 +75,19 @@ lint.select = [
   "UP",  # pyupgrade
   "I",   # isort
   "RUF", # ruff specific
+  # "TID"
 ]
 lint.ignore = [
   "D203", # 1 blank line required before class docstring
+  "D205",
   "D212", # Multi-line docstring summary should start at the first line
   "D100", # Missing docstring in public module
   "D104", # Missing docstring in public package
   "D107", # Missing docstring in `__init__`
   "D401", # First line of docstring should be in imperative mood
+  "E741",
+  "D200",
+  "E501"
 ]
 lint.per-file-ignores."conftest.py" = [ "D100" ]
 lint.per-file-ignores."docs/conf.py" = [ "D100" ]

@@ -44,8 +44,13 @@ repos:
     rev: v0.12.10
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [--fix, --exit-non-zero-on-fix, --unsafe-fixes]
       - id: ruff-format
+      - id: ruff-format
+        types_or: [markdown, rst]
+        require_serial: true
+        entry: doccmd --language python --no-pad-file --command "ruff format"
+        additional_dependencies: ["doccmd"]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
@@ -54,4 +59,8 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
-        additional_dependencies: []
+        additional_dependencies: [strenum, attrs]
+  - repo: https://github.com/NixOS/nixfmt
+    rev: v1.0.0
+    hooks:
+      - id: nixfmt
