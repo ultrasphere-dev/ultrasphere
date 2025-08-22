@@ -56,15 +56,15 @@ pip install ultrasphere
 import ultrasphere as us
 import torch
 
-# structure of spherical coordinates
+# 1. specify the structure of spherical coordinates
 c = us.c_spherical()
 
-# get spherical coordinates from euclidean coordinates
+# 2. get spherical coordinates from euclidean coordinates
 spherical = c.from_euclidean(torch.asarray([1.0, 2.0, 3.0]))
 print(spherical)
 # {'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
 
-# get euclidean coordinates from spherical coordinates
+# 3. get euclidean coordinates from spherical coordinates
 euclidean = c.to_euclidean(spherical)
 print(euclidean)
 # {0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
@@ -80,6 +80,8 @@ c = us.standard_prime(4)  # b'b'b'a coordinates
 c = us.hopf(3)  # ccaacaa coordinates
 c = us.from_branching_types("cbab'a")
 c = us.random(10)
+
+# get the branching types expression
 print(c.branching_types_expression_str)
 # ccabbab'b'ba
 ```
@@ -91,7 +93,10 @@ print(c.branching_types_expression_str)
 ```python
 import ultrasphere as us
 
+# 1. specify the structure of spherical coordinates
 c = us.random(10)
+
+# 2. draw the rooted tree
 us.draw(c)
 ```
 
@@ -111,7 +116,10 @@ Output:
 import ultrasphere as us
 import numpy as np
 
+# 1. specify the structure of spherical coordinates
 c = us.c_spherical()
+
+# 2. integrate a function over the sphere
 integral = us.integrate(
     c, lambda spherical: spherical["theta"] ** 2 * spherical["phi"], False, 10, xp=np
 )
@@ -125,13 +133,15 @@ print(integral)
 import ultrasphere as us
 import numpy as np
 
+# 1. specify the structure of spherical coordinates
 c = us.c_spherical()
+
+# 2. sample random points uniformly from the ball
 points_ball = us.random_ball(c, shape=(), xp=np)
 print(points_ball, np.linalg.vector_norm(points_ball))
 # [ 0.83999061  0.02552206 -0.29185517] 0.8896151114371893
-```
 
-```python
+# 3. sample random points uniformly from the sphere
 points_sphere = us.random_ball(c, shape=(), xp=np, surface=True)
 print(points_sphere, np.linalg.vector_norm(points_sphere))
 # [-0.68194186  0.71310149 -0.16260864] 1.0
