@@ -32,6 +32,10 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
 
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
+        import torch
+
+        if torch.cuda.is_available():
+            xp.set_default_device("cuda")
     else:
         raise ValueError(f"Unknown backend: {backend}")
     return xp
