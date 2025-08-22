@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1 (2025-08-22)
+
+### Bug fixes
+
+- Fix docs image link ([`7de5d4e`](https://github.com/34j/ultrasphere/commit/7de5d4e9b2a7002730303a43fa8a0e8770e395ce))
+
 ## v1.1.0 (2025-08-22)
 
 ### Features
