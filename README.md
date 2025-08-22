@@ -58,26 +58,16 @@ import torch
 
 # structure of spherical coordinates
 c = us.c_spherical()
-```
 
-```python
 # get spherical coordinates from euclidean coordinates
 spherical = c.from_euclidean(torch.asarray([1.0, 2.0, 3.0]))
 print(spherical)
-```
+# {'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
 
-```text
-{'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
-```
-
-```python
 # get euclidean coordinates from spherical coordinates
 euclidean = c.to_euclidean(spherical)
 print(euclidean)
-```
-
-```text
-{0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
+# {0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
 ```
 
 ### Using various spherical coordinates
@@ -91,10 +81,7 @@ c = us.hopf(3)  # ccaacaa coordinates
 c = us.from_branching_types("cbab'a")
 c = us.random(10)
 print(c.branching_types_expression_str)
-```
-
-```text
-ccabbab'b'ba
+# ccabbab'b'ba
 ```
 
 ### Drawing spherical coordinates using rooted trees (Vilenkin's method of trees)
@@ -114,6 +101,8 @@ us.draw(c)
 ultrasphere "ccabbab'b'ba"
 ```
 
+Output:
+
 ![ccabbab'b'ba](https://raw.githubusercontent.com/34j/ultrasphere/main/coordinates.png)
 
 ### Integration over sphere using spherical coordinates
@@ -127,10 +116,7 @@ integral = us.integrate(
     c, lambda spherical: spherical["theta"] ** 2 * spherical["phi"], False, 10, xp=np
 )
 print(integral)
-```
-
-```text
-110.02620812972036
+# 110.02620812972036
 ```
 
 ### Random sampling
@@ -142,19 +128,13 @@ import numpy as np
 c = us.c_spherical()
 points_ball = us.random_ball(c, shape=(), xp=np)
 print(points_ball, np.linalg.vector_norm(points_ball))
-```
-
-```text
-[ 0.83999061  0.02552206 -0.29185517] 0.8896151114371893
+# [ 0.83999061  0.02552206 -0.29185517] 0.8896151114371893
 ```
 
 ```python
 points_sphere = us.random_ball(c, shape=(), xp=np, surface=True)
 print(points_sphere, np.linalg.vector_norm(points_sphere))
-```
-
-```text
-[-0.68194186  0.71310149 -0.16260864] 1.0
+# [-0.68194186  0.71310149 -0.16260864] 1.0
 ```
 
 #### References
