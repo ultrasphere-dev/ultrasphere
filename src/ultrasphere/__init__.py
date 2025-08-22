@@ -1,4 +1,4 @@
-__version__ = "1.1.0"
+__version__ = "1.1.1-rc.1"
 from ._coordinates import SphericalCoordinates
 from ._creation import (
     c_spherical,
