@@ -108,7 +108,7 @@ ultrasphere "ccabbab'b'ba"
 
 Output:
 
-![ccabbab'b'ba](https://raw.githubusercontent.com/34j/ultrasphere/main/coordinates.png)
+![ccabbab'b'ba](https://raw.githubusercontent.com/34j/ultrasphere/main/coordinates.jpg)
 
 ### Integration over sphere using spherical coordinates
 
