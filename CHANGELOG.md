@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.2-rc.1 (2025-08-23)
+
+### Bug fixes
+
+- Export more ([`2e7ce3b`](https://github.com/34j/ultrasphere/commit/2e7ce3bb84a66e0bdacdd3f688834015bdfbd214))
+
 ## v1.1.1 (2025-08-22)
 
 ### Bug fixes
