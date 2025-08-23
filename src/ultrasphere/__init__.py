@@ -1,4 +1,4 @@
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 from ._coordinates import BranchingType, SphericalCoordinates, get_child, get_parent
 from ._creation import (
     c_spherical,
