@@ -1,5 +1,5 @@
 __version__ = "1.1.1"
-from ._coordinates import SphericalCoordinates
+from ._coordinates import BranchingType, SphericalCoordinates, get_child, get_parent
 from ._creation import (
     c_spherical,
     from_branching_types,
@@ -24,11 +24,14 @@ from .special import (
 )
 
 __all__ = [
+    "BranchingType",
     "SphericalCoordinates",
     "c_spherical",
     "draw",
     "from_branching_types",
     "fundamental_solution",
+    "get_child",
+    "get_parent",
     "hopf",
     "integrate",
     "lgamma",
