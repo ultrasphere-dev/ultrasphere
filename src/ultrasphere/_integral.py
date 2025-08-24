@@ -150,12 +150,20 @@ def integrate(
 
     Parameters
     ----------
-    f : Callable[ [Mapping[TSpherical, Array]],
-        Mapping[TSpherical, Array] | Array, ]
-        | Mapping[TSpherical, Array] | Array
-            The function to integrate or the values of the function.
-        In case of vectorized function, the function should add extra
-        axis to the last dimension, not the first dimension.
+    f : Callable[ [Mapping[TSpherical, Array]], Mapping[TSpherical, Array] | Array, ] | Mapping[TSpherical, Array] | Array # noqa: E501
+        The function to integrate or the values of the function.
+
+        If mapping, the separated parts of the function for each spherical coordinate.
+
+        If mapping, the shapes do not need to be broadcastable.
+
+        If function, if does_f_support_separation_of_variables is True,
+        1D array of integration points are passed,
+        and extra axis should be added to the last dimension.
+
+        If function, if does_f_support_separation_of_variables is False,
+        ``c.s_ndim``-D array of integration points are passed,
+        and extra axis should be added to the last dimension.
     does_f_support_separation_of_variables : bool
         Whether the function supports separation of variables.
         This could significantly reduce the computational cost.
@@ -170,6 +178,7 @@ def integrate(
     -------
     Array | Mapping[TSpherical, Array]
         The integrated value.
+        Has the same shape as the return values of f or the values of f.
 
     """
     xs, ws = roots(
@@ -199,13 +208,25 @@ def integrate(
             # theta(node),u1,...,uM
             xpx.broadcast_shapes(value.shape[:1], ws[node].shape)
             w = xp.reshape(ws[node], (-1,) + (1,) * (value.ndim - 1))
-            result[node] = xp.sum(value * w, axis=0)
+            if value.shape[0] == 1:
+                result[node] = value[0, ...] * xp.sum(w)
+            else:
+                result[node] = xp.vecdot(value, w, axis=0)
         # we don't know how to einsum the result
         return result
+    if val.ndim < c.s_ndim:
+        raise ValueError(
+            f"The dimension of the return value of f should be at least {c.s_ndim}, got {val.ndim}."
+        )
+    xpx.broadcast_shapes(
+        val.shape[: c.s_ndim],
+        xpx.broadcast_shapes(*(xs[node].shape for node in c.s_nodes)),
+    )
     # theta1,...,thetaN,u1,...,uM\
     for node in c.s_nodes:
         w = ws[node]
-        xpx.broadcast_shapes(val.shape[:1], w.shape)
-        # val = xp.einsum("i...,i->...", val, w.astype(val.dtype))
-        val = xp.sum(val * w[(slice(None),) + (None,) * (val.ndim - 1)], axis=0)
+        if val.shape[0] == 1:
+            val = val[0, ...] * xp.sum(w)
+        else:
+            val = xp.vecdot(val, w[(slice(None),) + (None,) * (val.ndim - 1)], axis=0)
     return val

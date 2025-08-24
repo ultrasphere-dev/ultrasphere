@@ -1,5 +1,4 @@
 import math
-from collections import defaultdict
 from collections.abc import Callable, Mapping
 from typing import Any, Literal
 
@@ -21,7 +20,7 @@ def test_sphere_surface_integrate(
     xp: ArrayNamespaceFull,
 ) -> None:
     def f2(s):
-        return xp.asarray(f(s))
+        return xp.asarray(f(s)) * xp.ones_like(s["theta"])
 
     c = c_spherical()
     assert integrate(
@@ -50,9 +49,9 @@ def test_integrate(
     # surface integral (area) of the sphere
     def f(s: Mapping[TSpherical, Array]) -> Array:
         if concat:
-            return xp.asarray(r**c.s_ndim)
+            return xp.asarray(r**c.s_ndim) * xp.ones_like(next(iter(s.values())))
         else:
-            return defaultdict(lambda: xp.asarray(r))
+            return {k: xp.asarray(r) * xp.ones_like(s[k]) for k in c.s_nodes}
 
     actual = integrate(
         c,
