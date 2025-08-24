@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.3-rc.1 (2025-08-24)
+
+### Performance improvements
+
+- Better integral ([`bb986ed`](https://github.com/34j/ultrasphere/commit/bb986ed382bab098d9cf97fc8c43c26bb9eb203d))
+
 ## v1.1.2 (2025-08-23)
 
 ### Bug fixes
