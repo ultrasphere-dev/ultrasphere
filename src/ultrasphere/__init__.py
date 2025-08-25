@@ -14,7 +14,6 @@ from ._integral import integrate, roots
 from ._random import random_ball
 from .special import (
     fundamental_solution,
-    lgamma,
     potential_coef,
     shn1,
     shn2,
@@ -34,7 +33,6 @@ __all__ = [
     "get_parent",
     "hopf",
     "integrate",
-    "lgamma",
     "polar",
     "potential_coef",
     "random",
