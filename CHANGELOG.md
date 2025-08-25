@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.5 (2025-08-25)
+
+### Bug fixes
+
+- Remove lgamma ([`d11b06a`](https://github.com/34j/ultrasphere/commit/d11b06aafe87ab36eaa8e4cc47b8319bec9bb7ee))
+
 ## v1.1.4 (2025-08-25)
 
 ### Bug fixes
