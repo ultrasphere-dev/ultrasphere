@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.6 (2025-08-25)
+
+### Bug fixes
+
+- Fix `integrate()` returning conj value due to `xp.vecdot()` ([`59c52be`](https://github.com/34j/ultrasphere/commit/59c52bead101bab067378c3544e757d11337ac41))
+
 ## v1.1.5 (2025-08-25)
 
 ### Bug fixes
