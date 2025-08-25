@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.4 (2025-08-25)
+
+### Bug fixes
+
+- Fix special._bessel not working ([`add1b63`](https://github.com/34j/ultrasphere/commit/add1b637949ac9b29d862167c5a8ca9fd4d3c371))
+
 ## v1.1.3 (2025-08-24)
 
 ### Performance improvements
