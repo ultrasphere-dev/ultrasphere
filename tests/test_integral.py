@@ -12,7 +12,9 @@ from ultrasphere._integral import integrate
 
 
 @pytest.mark.parametrize("n", [4, 8, 16])
-@pytest.mark.parametrize("f, expected", [(lambda s: 1, 4 * math.pi)])
+@pytest.mark.parametrize(
+    "f, expected", [(lambda s: 1, 4 * math.pi), (lambda s: 1j, 4j * math.pi)]
+)
 def test_sphere_surface_integrate(
     f: Callable[[Mapping[Literal["theta", "phi"], Array]], Array],
     n: int,
