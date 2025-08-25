@@ -211,7 +211,7 @@ def integrate(
             if value.shape[0] == 1:
                 result[node] = value[0, ...] * xp.sum(w)
             else:
-                result[node] = xp.vecdot(value, w, axis=0)
+                result[node] = xp.vecdot(w, value, axis=0)
         # we don't know how to einsum the result
         return result
     if val.ndim < c.s_ndim:
@@ -228,5 +228,5 @@ def integrate(
         if val.shape[0] == 1:
             val = val[0, ...] * xp.sum(w)
         else:
-            val = xp.vecdot(val, w[(slice(None),) + (None,) * (val.ndim - 1)], axis=0)
+            val = xp.vecdot(w[(slice(None),) + (None,) * (val.ndim - 1)], val, axis=0)
     return val
