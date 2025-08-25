@@ -61,17 +61,21 @@ def szv(
             zv = yv
     elif type == "h1":
         if derivative:
-            zv = hankel1
-        else:
             raise AssertionError()
+        else:
+            zv = hankel1
     elif type == "h2":
         if derivative:
-            zv = hankel2
-        else:
             raise AssertionError()
+        else:
+            zv = hankel2
+
+    dtype = xp.result_type(v, d, z)
+    if type in ("h1", "h2"):
+        dtype = xp.result_type(dtype, xp.complex64)
     return (
-        xp.sqrt(xp.pi / 2)
-        * xp.asarray(zv(v + d_half_minus_1, z), device=z.device, dtype=z.dtype)
+        xp.sqrt(xp.asarray(xp.pi / 2, device=z.device, dtype=dtype))
+        * xp.asarray(zv(v + d_half_minus_1, z), device=z.device, dtype=dtype)
         / (z**d_half_minus_1)
     )
 
