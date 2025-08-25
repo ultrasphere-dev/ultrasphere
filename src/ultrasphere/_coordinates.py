@@ -5,9 +5,8 @@ import networkx as nx
 import numpy as np
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
+from jacobi_poly import lgamma
 from strenum import StrEnum
-
-from .special import lgamma
 
 TEuclidean = TypeVar("TEuclidean")
 TSpherical = TypeVar("TSpherical")
