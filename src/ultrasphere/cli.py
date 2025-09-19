@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import typer
 from aquarel import load_theme
 
-from ._creation import from_branching_types
+from ._creation import create_from_branching_types
 from ._draw import draw
 
 app = typer.Typer()
@@ -28,6 +28,6 @@ def main(branching_types: str, format: str = "jpg", theme: str = "boxy_dark") ->
         theme_ = load_theme(theme)
         theme_.apply()
     fig, ax = plt.subplots()
-    c = from_branching_types(branching_types)
+    c = create_from_branching_types(branching_types)
     draw(c, ax=ax)
     fig.savefig(f"{branching_types}.{format}")

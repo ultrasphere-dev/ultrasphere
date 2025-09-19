@@ -352,8 +352,11 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
         self.sin_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "sin"]
 
     def surface_area(self, r: float = 1) -> float:
-        """
+        r"""
         The surface area of the unit sphere.
+
+        .. math::
+            |\mathbb{S}^{d-1}| = \frac{2 \pi^{d/2}}{\Gamma(d/2)} r^{d-1}
 
         Returns
         -------
@@ -369,8 +372,11 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
         )
 
     def volume(self, r: float = 1) -> float:
-        """
+        r"""
         The volume of the unit sphere.
+
+        .. math::
+            \Upsilon_d = \frac{\pi^{d/2}}{\Gamma(d/2 + 1)} r^d
 
         Returns
         -------

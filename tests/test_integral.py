@@ -7,7 +7,12 @@ import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 
 from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere._creation import c_spherical, hopf, random, standard
+from ultrasphere._creation import (
+    create_hopf,
+    create_random,
+    create_spherical,
+    create_standard,
+)
 from ultrasphere._integral import integrate
 
 
@@ -24,7 +29,7 @@ def test_sphere_surface_integrate(
     def f2(s):
         return xp.asarray(f(s)) * xp.ones_like(s["theta"])
 
-    c = c_spherical()
+    c = create_spherical()
     assert integrate(
         c, f2, does_f_support_separation_of_variables=False, n=n, xp=xp
     ).item() == pytest.approx(expected, rel=1e-2)
@@ -35,9 +40,9 @@ def test_sphere_surface_integrate(
 @pytest.mark.parametrize(
     "c",
     [
-        (c_spherical()),
-        (standard(3)),
-        (hopf(2)),
+        (create_spherical()),
+        (create_standard(3)),
+        (create_hopf(2)),
     ],
 )
 @pytest.mark.parametrize("concat", [True, False])
@@ -70,7 +75,7 @@ def test_integrate(
 
 @pytest.mark.parametrize("n", [3, 4, 5])
 def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
-    cs: list[SphericalCoordinates[Any, Any]] = [random(n - 1) for _ in range(4)]
+    cs: list[SphericalCoordinates[Any, Any]] = [create_random(n - 1) for _ in range(4)]
     k = xp.random.random_uniform(low=0, high=1, shape=(n,))
 
     def create_f(
