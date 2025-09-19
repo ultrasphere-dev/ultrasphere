@@ -40,11 +40,11 @@ def potential_coef[TArray: Array](
     .. math::
         \forall d \in \mathbb{N} \setminus \{1\}.
         \forall x_a, y_a \in (0, \infty).
-        \forall T \in \{S_{y_a \mathbb{S}^{d-1}}, D_{y_a \mathbb{S}^{d-1}}, D^*_{y_a \mathbb{S}^{d-1}}, N_{y_a \mathbb{S}^{d-1}}\}.
+        \forall T \in \{S_{y_a \mathbb{S}^{d-1}}, D_{y_a \mathbb{S}^{d-1}}, D^*_{y_a \mathbb{S}^{d-1}}, N_{y_a \mathbb{S}^{d-1}}\}. \\
         \forall x \in x_a \mathbb{S}^{d-1}.
         \forall n \in \mathbb{N}_0.
-        \forall Y_n \in \mathcal{H}(\mathbb{S}^{d-1}).
-        T Y_n (\frac{x}{x_a}) = \text{potential\_coef}(T) Y_n (\frac{x}{x_a})
+        \forall Y_n \in \mathcal{H}(\mathbb{S}^{d-1}). \\
+        T Y_n \left(\frac{x}{x_a}\right) = \text{potential_coef}(T) Y_n \left(\frac{x}{x_a}\right)
 
 
     Parameters
