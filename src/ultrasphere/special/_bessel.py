@@ -1,9 +1,7 @@
 from typing import Literal, TypeVar
 
 from array_api._2024_12 import Array
-from array_api_compat import (
-    array_namespace,
-)
+from array_api_compat import array_namespace, to_device
 from scipy.special import hankel1, hankel2, jv, jvp, yv, yvp
 
 TArray = TypeVar("TArray", bound=Array)
@@ -83,7 +81,11 @@ def szv(
         dtype = xp.result_type(dtype, xp.complex64)
     return (
         xp.sqrt(xp.asarray(xp.pi / 2, device=z.device, dtype=dtype))
-        * xp.asarray(zv(v + d_half_minus_1, z), device=z.device, dtype=dtype)
+        * xp.asarray(
+            zv(to_device(v + d_half_minus_1, "cpu"), to_device(z, "cpu")),
+            device=z.device,
+            dtype=dtype,
+        )
         / (z**d_half_minus_1)
     )
 
