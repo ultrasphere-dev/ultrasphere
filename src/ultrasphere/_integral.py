@@ -154,7 +154,7 @@ def integrate(
     Integrate the function over the hypersphere.
 
     .. math::
-        \int_\mathbb{S}^{d-1} f d\omega^{d-1}
+        \int_{\mathbb{S}^{d-1}} f d\omega^{d-1}
 
     Parameters
     ----------
