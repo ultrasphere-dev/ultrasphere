@@ -33,10 +33,11 @@ def potential_coef[TArray: Array](
 
     y is the integral variable.
 
-    ..math::
+    .. math::
         r \mathbb{S}^{d-1} :=
         \{ x \in \mathbb{R}^d : \left|x\right| = r \}
 
+    .. math::
         \forall d \in \mathbb{N} \setminus \{1\}.
         \forall x_a, y_a \in (0, \infty).
         \forall T \in \{S_{y_a \mathbb{S}^{d-1}}, D_{y_a \mathbb{S}^{d-1}}, D^*_{y_a \mathbb{S}^{d-1}}, N_{y_a \mathbb{S}^{d-1}}\}.

@@ -30,8 +30,8 @@ def roots(
 
     .. math::
         \int_\mathbb{S}^{d-1} f d\omega^{d-1} \approx
-        \sum_{(\theta_1, w_1)} w_1 \cdots \sum_{(\theta_N, w_N)} w_N
-        f(\theta_1, \ldots, \theta_N)
+        \sum_{(\theta_1, w_1)} w_1 \cdots \sum_{(\theta_{d-1}, w_{d-1})} w_{d-1}
+        f(\theta_1, \ldots, \theta_{d-1})
 
     Parameters
     ----------
