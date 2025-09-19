@@ -16,8 +16,11 @@ def szv(
     type: Literal["j", "y", "h1", "h2"],
     derivative: bool = False,
 ) -> TArray:
-    """
+    r"""
     Utility function to compute hyperspherical functions.
+
+    .. math::
+        f_v^{(d)} (z) = \sqrt{\frac{\pi}{2}} \frac{F_{v + d/2 - 1}(z)}{z^{d/2 - 1}}
 
     Parameters
     ----------
@@ -37,6 +40,11 @@ def szv(
     -------
     TArray
         The hyperspherical function.
+
+    References
+    ----------
+    McLean, W. (2000). Strongly Elliptic Systems and
+    Boundary Integral Equations. p.279
 
     """
 
@@ -86,8 +94,11 @@ def sjv(
     z: TArray,
     derivative: bool = False,
 ) -> TArray:
-    """
+    r"""
     Hyperspherical Bessel function of the first kind.
+
+    .. math::
+        j_v^{(d)} (z) = \sqrt{\frac{\pi}{2}} \frac{J_{v + d/2 - 1}(z)}{z^{d/2 - 1}}
 
     Parameters
     ----------
@@ -121,8 +132,11 @@ def syv(
     z: TArray,
     derivative: bool = False,
 ) -> TArray:
-    """
+    r"""
     Hyperspherical Bessel function of the second kind.
+
+    .. math::
+        y_v^{(d)} (z) = \sqrt{\frac{\pi}{2}} \frac{Y_{v + d/2 - 1}(z)}{z^{d/2 - 1}}
 
     Parameters
     ----------
@@ -156,8 +170,11 @@ def shn1(
     z: TArray,
     derivative: bool = False,
 ) -> TArray:
-    """
+    r"""
     Hyperspherical Hankel function of the first kind.
+
+    .. math::
+        h_v^{(1)(d)} (z) = \sqrt{\frac{\pi}{2}} \frac{H^{(1)}_{v + d/2 - 1}(z)}{z^{d/2 - 1}}
 
     Parameters
     ----------
@@ -186,8 +203,11 @@ def shn2(
     z: TArray,
     derivative: bool = False,
 ) -> TArray:
-    """
+    r"""
     Hyperspherical Hankel function of the second kind.
+
+    .. math::
+        h_v^{(2)(d)} (z) = \sqrt{\frac{\pi}{2}} \frac{H^{(2)}_{v + d/2 - 1}(z)}{z^{d/2 - 1}}
 
     Parameters
     ----------

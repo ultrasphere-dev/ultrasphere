@@ -24,7 +24,7 @@ def potential_coef[TArray: Array](
     limit: Literal[False, "x_larger", "y_larger", "warn"] = "warn",
     for_func: Literal["harmonics", "solution"] = "harmonics",
 ) -> Array:
-    """
+    r"""
     The coefficients for layer potentials.
 
     The coefficients for single-layer or double-layer potential
@@ -32,6 +32,21 @@ def potential_coef[TArray: Array](
     (maximum quantum number) n.
 
     y is the integral variable.
+
+    ..math::
+        r \mathbb{S}^{d-1} :=
+        \{ x \in \mathbb{R}^d : |x| = r \}
+
+        \forall d \in \mathbb{N} \setminus \{1\}.
+        \forall x_a, y_a \in (0, \infty).
+        \forall T \in
+        \{S_{y_a \mathbb{S}^{d-1}}, D_{y_a \mathbb{S}^{d-1}},
+        D^*_{y_a \mathbb{S}^{d-1}}, N_{y_a \mathbb{S}^{d-1}}\}.
+        \forall x \in x_a \mathbb{S}^{d-1}.
+        \forall n \in \mathbb{N}_0.
+        \forall Y_n \in \mathcal{H}(\mathbb{S}^{d-1}).
+        T Y_n (\frac{x}{x_a}) = \text{potential\_coef}(T) Y_n (\frac{x}{x_a})
+
 
     Parameters
     ----------
@@ -157,7 +172,7 @@ def fundamental_solution(
     derivative: bool = False,
 ) -> TArray:
     """
-    Fundamental solution of the Laplace equation in d dimensions.
+    Fundamental solution of the Helmholtz equation in d dimensions.
 
     Parameters
     ----------

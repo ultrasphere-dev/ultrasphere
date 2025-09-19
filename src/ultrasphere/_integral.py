@@ -25,8 +25,13 @@ def roots(
     dtype: Any | None = None,
     xp: ArrayNamespaceFull,
 ) -> tuple[Mapping[TSpherical, Array], Mapping[TSpherical, Array]]:
-    """
+    r"""
     Gauss-Jacobi quadrature roots and weights.
+
+    .. math::
+        \int_\mathbb{S}^{d-1} f d\omega^{d-1} \approx
+        \sum_{(\theta_1, w_1)} \cdots \sum_{(\theta_N, w_N)}
+        f(\theta_1, \ldots, \theta_N) w_1 \cdots w_N
 
     Parameters
     ----------
@@ -145,8 +150,11 @@ def integrate(
     device: Any | None = None,
     dtype: Any | None = None,
 ) -> Array | Mapping[TSpherical, Array]:
-    """
+    r"""
     Integrate the function over the hypersphere.
+
+    .. math::
+        \int_\mathbb{S}^{d-1} f d\omega^{d-1}
 
     Parameters
     ----------

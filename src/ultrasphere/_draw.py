@@ -50,7 +50,7 @@ def draw(
     ax: Axes | None = None,
 ) -> tuple[float, float]:
     """
-    Nicely draw the rooted tree representing the coordinates.
+    Nicely draw the rooted tree representing the coordinates using matplotlib.
 
     Parameters
     ----------
