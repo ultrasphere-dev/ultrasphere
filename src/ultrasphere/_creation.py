@@ -97,9 +97,13 @@ def _get_digraph_from_branching_type(
     return G
 
 
-def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
-    """
+def create_polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
+    r"""
     Polar coordinates.
+
+    .. math::
+        x_0 &= r \cos(\phi) \\
+        x_1 &= r \sin(\phi)
 
     Returns
     -------
@@ -112,9 +116,16 @@ def polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
     return cls(G)
 
 
-def c_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]':
-    """
+def create_spherical() -> (
+    'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]'
+):
+    r"""
     Spherical coordinates.
+
+    .. math::
+        x_0 &= r \sin(\theta) \cos(\phi) \\
+        x_1 &= r \sin(\theta) \sin(\phi) \\
+        x_2 &= r \cos(\theta)
 
     Returns
     -------
@@ -128,9 +139,16 @@ def c_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1
     return cls(G)
 
 
-def standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
-    """
+def create_standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
+    r"""
     Standard spherical coordinates.
+
+    .. math::
+        x_0 &= \cos(\theta_0) \\
+        x_1 &= \sin(\theta_0) \cos(\theta_1) \\
+        x_2 &= \sin(\theta_0) \sin(\theta_1) \cos(\theta_2) \\
+        x_3 &= \sin(\theta_0) \sin(\theta_1) \sin(\theta_2) \cos(\theta_3) \\
+        &\vdots \\
 
     Parameters
     ----------
@@ -144,13 +162,20 @@ def standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
 
     """
     if s_ndim == 0:
-        return from_branching_types("")
+        return create_from_branching_types("")
     return cls(_get_digraph_from_branching_type("b" * (s_ndim - 1) + "a"))
 
 
-def standard_prime(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
-    """
+def create_standard_prime(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
+    r"""
     Standard prime spherical coordinates.
+
+    .. math::
+        x_0 &= \sin(\theta_0) \\
+        x_1 &= \cos(\theta_0) \sin(\theta_1) \\
+        x_2 &= \cos(\theta_0) \cos(\theta_1) \sin(\theta_2) \\
+        x_3 &= \cos(\theta_0) \cos(\theta_1) \cos(\theta_2) \sin(\theta_3) \\
+        &\vdots \\
 
     Parameters
     ----------
@@ -164,11 +189,11 @@ def standard_prime(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
 
     """
     if s_ndim == 0:
-        return from_branching_types("")
+        return create_from_branching_types("")
     return cls(_get_digraph_from_branching_type("bp" * (s_ndim - 1) + "a"))
 
 
-def hopf(q: int) -> "SphericalCoordinates[Any, Any]":
+def create_hopf(q: int) -> "SphericalCoordinates[Any, Any]":
     """
     Hopf coordinates.
 
@@ -197,7 +222,7 @@ def hopf(q: int) -> "SphericalCoordinates[Any, Any]":
     return cls(_get_digraph_from_branching_type(_hoph(q)))
 
 
-def from_branching_types(
+def create_from_branching_types(
     branching_types: str | Sequence[BranchingType],
 ) -> "SphericalCoordinates[Any, Any]":
     """
@@ -295,7 +320,7 @@ def _get_random_digraph(
     return G
 
 
-def random(
+def create_random(
     s_ndim: int, *, rng: np.random.Generator | None = None
 ) -> "SphericalCoordinates[Any, Any]":
     """

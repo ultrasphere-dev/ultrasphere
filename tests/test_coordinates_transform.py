@@ -6,7 +6,7 @@ from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
 from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere._creation import c_spherical, hopf, random
+from ultrasphere._creation import create_hopf, create_random, create_spherical
 
 
 def to_cartesian(*, r: Array, theta: Array, phi: Array) -> tuple[Array, Array, Array]:
@@ -36,7 +36,7 @@ def test_spherical_to_3d(shape: tuple[int, ...], xp: ArrayNamespaceFull) -> None
         "phi": phi,
     }
     excepted = to_cartesian(r=r, theta=theta, phi=phi)
-    actual = c_spherical().to_euclidean(spherical)
+    actual = create_spherical().to_euclidean(spherical)
     for i, value in enumerate(excepted):
         assert xp.all(xpx.isclose(value, actual[i], rtol=1e-3, atol=1e-3))  # type: ignore
     assert set(actual.keys()) == {0, 1, 2}
@@ -66,7 +66,7 @@ def test_cartesian_to_spherical_3d(
     z = xp.random.random_uniform(low=-1, high=1, shape=shape)
     r_expected, theta_expected, phi_expected = to_spherical(x=x, y=y, z=z)
     excepted = {"r": r_expected, "theta": theta_expected, "phi": phi_expected}
-    actual = c_spherical().from_euclidean({0: x, 1: y, 2: z})
+    actual = create_spherical().from_euclidean({0: x, 1: y, 2: z})
     for key, value in excepted.items():
         assert xp.all(xpx.isclose(value, actual[key], rtol=1e-3, atol=1e-3))  # type: ignore
     assert set(actual.keys()) == {"r", "theta", "phi"}
@@ -75,10 +75,10 @@ def test_cartesian_to_spherical_3d(
 @pytest.mark.parametrize(
     "c",
     [
-        c_spherical(),
-        hopf(3),
-        random(1),
-        random(5),
+        create_spherical(),
+        create_hopf(3),
+        create_random(1),
+        create_random(5),
     ],
 )
 @pytest.mark.parametrize(
