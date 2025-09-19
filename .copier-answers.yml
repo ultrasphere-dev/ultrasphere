@@ -6,9 +6,9 @@ cli_name: ultrasphere
 copyright_year: '2025'
 documentation: true
 email: 34j.95a2p@simplelogin.com
-full_name: 34j
+full_name: ultrasphere-dev
 github_app_installation_ids: 31487150,37771054
-github_username: 34j
+github_username: ultrasphere-dev
 has_cli: true
 initial_commit: false
 is_django_package: false

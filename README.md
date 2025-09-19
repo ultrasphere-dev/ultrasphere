@@ -1,14 +1,14 @@
 # ultrasphere
 
 <p align="center">
-  <a href="https://github.com/34j/ultrasphere/actions/workflows/ci.yml?query=branch%3Amain">
-    <img src="https://img.shields.io/github/actions/workflow/status/34j/ultrasphere/ci.yml?branch=main&label=CI&logo=github&style=flat-square" alt="CI Status" >
+  <a href="https://github.com/ultrasphere-dev/ultrasphere/actions/workflows/ci.yml?query=branch%3Amain">
+    <img src="https://img.shields.io/github/actions/workflow/status/ultrasphere-dev/ultrasphere/ci.yml?branch=main&label=CI&logo=github&style=flat-square" alt="CI Status" >
   </a>
   <a href="https://ultrasphere.readthedocs.io">
     <img src="https://img.shields.io/readthedocs/ultrasphere.svg?logo=read-the-docs&logoColor=fff&style=flat-square" alt="Documentation Status">
   </a>
-  <a href="https://codecov.io/gh/34j/ultrasphere">
-    <img src="https://img.shields.io/codecov/c/github/34j/ultrasphere.svg?logo=codecov&logoColor=fff&style=flat-square" alt="Test coverage percentage">
+  <a href="https://codecov.io/gh/ultrasphere-dev/ultrasphere">
+    <img src="https://img.shields.io/codecov/c/github/ultrasphere-dev/ultrasphere.svg?logo=codecov&logoColor=fff&style=flat-square" alt="Test coverage percentage">
   </a>
 </p>
 <p align="center">
@@ -34,7 +34,7 @@
 
 **Documentation**: <a href="https://ultrasphere.readthedocs.io" target="_blank">https://ultrasphere.readthedocs.io </a>
 
-**Source Code**: <a href="https://github.com/34j/ultrasphere" target="_blank">https://github.com/34j/ultrasphere </a>
+**Source Code**: <a href="https://github.com/ultrasphere-dev/ultrasphere" target="_blank">https://github.com/ultrasphere-dev/ultrasphere </a>
 
 ---
 
@@ -108,7 +108,7 @@ ultrasphere "ccabbab'b'ba"
 
 Output:
 
-![ccabbab'b'ba](https://raw.githubusercontent.com/34j/ultrasphere/main/coordinates.jpg)
+![ccabbab'b'ba](https://raw.githubusercontent.com/ultrasphere-dev/ultrasphere/main/coordinates.jpg)
 
 ### Integration over sphere using spherical coordinates
 

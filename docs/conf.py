@@ -13,8 +13,8 @@ from sphinx.ext import apidoc
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "ultrasphere"
-copyright = "2025, 34j"
-author = "34j"
+copyright = "2025, ultrasphere-dev"
+author = "ultrasphere-dev"
 release = "1.1.6"
 
 # -- General configuration ---------------------------------------------------
