@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.8 (2025-09-19)
+
+### Bug fixes
+
+- Fix szv on torch cuda ([`5274862`](https://github.com/ultrasphere-dev/ultrasphere/commit/5274862b4d163bcaf743215f3def3f13ab0d5732))
+
 ## v1.1.7 (2025-09-19)
 
 ### Bug fixes
