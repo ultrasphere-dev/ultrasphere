@@ -29,6 +29,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
 ]
 myst_enable_extensions = [
     "amsmath",
