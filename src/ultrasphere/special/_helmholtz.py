@@ -35,13 +35,11 @@ def potential_coef[TArray: Array](
 
     ..math::
         r \mathbb{S}^{d-1} :=
-        \{ x \in \mathbb{R}^d : |x| = r \}
+        \{ x \in \mathbb{R}^d : \left|x\right| = r \}
 
         \forall d \in \mathbb{N} \setminus \{1\}.
         \forall x_a, y_a \in (0, \infty).
-        \forall T \in
-        \{S_{y_a \mathbb{S}^{d-1}}, D_{y_a \mathbb{S}^{d-1}},
-        D^*_{y_a \mathbb{S}^{d-1}}, N_{y_a \mathbb{S}^{d-1}}\}.
+        \forall T \in \{S_{y_a \mathbb{S}^{d-1}}, D_{y_a \mathbb{S}^{d-1}}, D^*_{y_a \mathbb{S}^{d-1}}, N_{y_a \mathbb{S}^{d-1}}\}.
         \forall x \in x_a \mathbb{S}^{d-1}.
         \forall n \in \mathbb{N}_0.
         \forall Y_n \in \mathcal{H}(\mathbb{S}^{d-1}).
@@ -70,10 +68,11 @@ def potential_coef[TArray: Array](
     derivative : Literal["S", "D", "D*", "N"] | None, optional
         The shorthand for the derivative.
         Note that the integral variable is y.
-        "S" <=> x_abs_derivative = False, y_abs_derivative = False
-        "D" <=> x_abs_derivative = False, y_abs_derivative = True
-        "D*" <=> x_abs_derivative = True, y_abs_derivative = False
-        "N" <=> x_abs_derivative = True, y_abs_derivative = True
+
+        - "S" <=> x_abs_derivative = False, y_abs_derivative = False
+        - "D" <=> x_abs_derivative = False, y_abs_derivative = True
+        - "D*" <=> x_abs_derivative = True, y_abs_derivative = False
+        - "N" <=> x_abs_derivative = True, y_abs_derivative = True
     limit : Literal[False, "x_larger", "y_larger"], optional
         Whether to return the directional derivative
         of the potential with respect to x
