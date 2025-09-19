@@ -145,9 +145,9 @@ def create_standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
 
     .. math::
         x_0 &= \cos(\theta_0) \\
-        x_1 =& \sin(\theta_0) \cos(\theta_1) \\
-        x_2 =& \sin(\theta_0) \sin(\theta_1) \cos(\theta_2) \\
-        x_3 =& \sin(\theta_0) \sin(\theta_1) \sin(\theta_2) \cos(\theta_3) \\
+        x_1 &= \sin(\theta_0) \cos(\theta_1) \\
+        x_2 &= \sin(\theta_0) \sin(\theta_1) \cos(\theta_2) \\
+        x_3 &= \sin(\theta_0) \sin(\theta_1) \sin(\theta_2) \cos(\theta_3) \\
         &\vdots \\
 
     Parameters
