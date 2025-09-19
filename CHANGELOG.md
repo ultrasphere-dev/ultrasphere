@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.7-rc.1 (2025-09-19)
+
+### Bug fixes
+
+- Update urls ([`f31af9f`](https://github.com/ultrasphere-dev/ultrasphere/commit/f31af9ff36e1dc7304847afb1bc20c25c6ee56b7))
+
 ## v1.1.6 (2025-08-25)
 
 ### Bug fixes
