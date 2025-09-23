@@ -39,7 +39,8 @@ Especially, hyperspherical harmonics, which are spherical harmonics in higher di
 
 # Statement of need
 
-`ultrasphere` and `ultrasphere-harmonics` are Python packages for Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems [@vilenkin_representation_1993] and hyperspherical harmonics.
+`ultrasphere` is a Python package for Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems [@vilenkin_representation_1993].
+`ultrasphere-harmonics` implements hyperspherical harmonics methods for any type of polyspherical coordinates based on `ultrasphere`.
 The main goal of these packages is to provide a unified framework for implementing spherical harmonics techniques in arbitrary dimensions and coordinate systems.
 This would allow researchers to easily extend their work to higher dimensions, for example, from 2D to 3D and further to 4D, without having to duplicate code for each dimension.
 To demonstrate this, we implemented code for solving acoustic scattering from a single sound-soft sphere using any type of polyspherical coordinates as a command-line application.
