@@ -40,11 +40,12 @@ Our packages would allow researchers to easily extend their work to higher dimen
 
 # Statement of need
 
-`ultrasphere` is a Python package for Vilenkin–Kuznetsov–Smorodinsky (VKS) polyspherical coordinate systems [@vilenkin_representation_1993].
+`ultrasphere` is a Python package for Vilenkin–Kuznetsov–Smorodinsky (VKS) polyspherical coordinate systems [@vilenkin_representation_1993; @cohl_fourier_2012].
 `ultrasphere-harmonics` implements hyperspherical harmonics methods for any type of polyspherical coordinates based on `ultrasphere`.
 While spherical harmonics in 3D itself have been widely implemented in various software packages, such as Scipy [@2020SciPy-NMeth], hyperspherical harmonics are rarely implemented, and software packages which supports arbitrary VKS polyspherical coordinates are not known.
-The main goal of out packages is to provide a unified framework for implementing spherical harmonics techniques in arbitrary VKS polyspherical coordinates and dimensions.
-To demonstrate this, code for solving acoustic scattering from a single sound-soft sphere using any type of polyspherical coordinates is implemented within `ultrasphere-harmonics` as a command-line application.
+To remedy this, our packages allows to convert between Cartesian coordinates and VKS polyspherical coordinates, compute hyperspherical harmonics, elementary solutions to the Helmholtz equation, hyperspherical expansion of a function, and the translational coefficients of elementary solutions of the Helmholtz equation under arbitrary VKS polyspherical coordinates and dimensions.
+Our package especially utilizes NetworkX [@hagberg_exploring_2008] to make use of the tree structure of VKS polyspherical coordinates, which is known as
+To illustrate the usage of our packages, example code for solving acoustic scattering from a single sound-soft sphere using any type of VKS polyspherical coordinates is implemented in `ultrasphere-harmonics` as a command-line application.
 
 Spherical expansion methods are sometimes computationally expensive, especially in higher dimensions.
 To utilize HPC resources, which environment is recently diversified, our api is made to be compatible with the array API standard [@meurer_python_2023], which enables writing code which runs on multiple array libraries (e.g., NumPy[@harris_array_2020], PyTorch[@paszke_pytorch_2019]) and multiple hardware (e.g., CPU, GPU).
