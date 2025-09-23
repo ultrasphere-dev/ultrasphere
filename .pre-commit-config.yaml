@@ -47,11 +47,11 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --unsafe-fixes]
       - id: ruff-format
-      - id: ruff-format
-        types_or: [markdown, rst]
-        require_serial: true
-        entry: doccmd --language python --no-pad-file --command "ruff format"
-        additional_dependencies: ["doccmd"]
+      # - id: ruff-format
+      #   types_or: [markdown, rst]
+      #   require_serial: true
+      #   entry: doccmd --language python --no-pad-file --command "ruff format"
+      #   additional_dependencies: ["doccmd"]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
