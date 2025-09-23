@@ -38,14 +38,14 @@ Especially, hyperspherical harmonics, which are spherical harmonics in higher di
 
 # Statement of need
 
-`ultrasphere` and `ultrasphere-harmonics` are Python packages for hyperspherical coordinates and hyperspherical harmonics techniques.
-Our packages is that they support any type of Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems [@vilenkin_representation_1993].
-This allows to write codes that work in any type of polyspherical coordinates and thus in any number of dimensions.
-To demonstrate this, we implemented acoustic scattering from a single sphere for any type of polyspherical coordinates, which could be verified by command-line interface.
+`ultrasphere` and `ultrasphere-harmonics` are Python packages for Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems [@vilenkin_representation_1993] and hyperspherical harmonics.
+The main goal of these packages is to provide a unified framework for implementing spherical harmonics techniques in arbitrary dimensions and coordinate systems.
+This would allow researchers to easily extend their work to higher dimensions, for example, from 2D to 3D and further to 4D, without having to duplicate code for each dimension.
+To demonstrate this, we implemented code for solving acoustic scattering from a single sound-soft sphere using any type of polyspherical coordinates as a command-line application.
 
-Our api is compatible with the array API standard [@meurer_python_2023].
-This enables writing code which runs on multiple array libraries (e.g., NumPy[@harris_array_2020], PyTorch[@paszke_pytorch_2019]) and multiple hardware (e.g., CPU, GPU).
-Our packages fully support vectorization for high performance computing.
+Spherical expansion methods are sometimes computationally expensive, especially in higher dimensions.
+To address the recent diversification of HPC environment, our api is made to be compatible with the array API standard [@meurer_python_2023], which enables writing code which runs on multiple array libraries (e.g., NumPy[@harris_array_2020], PyTorch[@paszke_pytorch_2019]) and multiple hardware (e.g., CPU, GPU).
+Our packages fully support vectorization to leverage the performance of these libraries.
 
 # Acknowledgements
 
