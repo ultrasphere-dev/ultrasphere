@@ -45,7 +45,7 @@ Hyperspherical coordinates in NumPy / PyTorch / JAX.
 Install this via pip (or your favourite package manager):
 
 ```shell
-pip install ultrasphere
+pip install ultrasphere[plot]
 ```
 
 ## Usage
