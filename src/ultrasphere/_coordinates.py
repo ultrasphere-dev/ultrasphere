@@ -8,7 +8,7 @@ from array_api_compat import array_namespace
 from jacobi_poly import lgamma
 from strenum import StrEnum
 
-TEuclidean = TypeVar("TEuclidean")
+TCartesian = TypeVar("TCartesian")
 TSpherical = TypeVar("TSpherical")
 COSSIN = Literal["cos", "sin"]
 
@@ -242,7 +242,7 @@ def get_branching_type_from_digraph(G: nx.DiGraph, /) -> Iterable[BranchingType]
         yield branching_type
 
 
-class SphericalCoordinates[TSpherical, TEuclidean]:
+class SphericalCoordinates[TSpherical, TCartesian]:
     """Stores the spherical coordinates using the method of trees by Vilenkin."""
 
     G: nx.DiGraph
@@ -253,11 +253,11 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
     """The branching types of each node."""
     s_nodes: Sequence[TSpherical]
     """The spherical nodes."""
-    e_nodes: Sequence[TEuclidean]
-    """The Euclidean nodes."""
-    cos_edges: Sequence[tuple[TSpherical, TEuclidean | TSpherical]]
+    e_nodes: Sequence[TCartesian]
+    """The Cartesian nodes."""
+    cos_edges: Sequence[tuple[TSpherical, TCartesian | TSpherical]]
     """The edges with type 'cos'."""
-    sin_edges: Sequence[tuple[TSpherical, TEuclidean | TSpherical]]
+    sin_edges: Sequence[tuple[TSpherical, TCartesian | TSpherical]]
     """The edges with type 'sin'."""
 
     def __hash__(self) -> int:
@@ -315,7 +315,7 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
 
     @property
     def e_ndim(self) -> int:
-        """The number of Euclidean dimensions."""
+        """The number of Cartesian dimensions."""
         return len(self.e_nodes)
 
     def __init__(self, tree: nx.DiGraph, cache: bool | None = None) -> None:
@@ -395,16 +395,16 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
             * r**self.e_ndim
         )
 
-    def from_euclidean(
-        self, euclidean: Mapping[TEuclidean, Array]
+    def from_cartesian(
+        self, cartesian: Mapping[TCartesian, Array]
     ) -> Mapping[TSpherical | Literal["r"], Array]:
         """
-        Convert the Euclidean coordinates to the spherical coordinates.
+        Convert the Cartesian coordinates to the spherical coordinates.
 
         Parameters
         ----------
-        euclidean : Mapping[TEuclidean, Array]
-            The Euclidean coordinates.
+        cartesian : Mapping[TCartesian, Array]
+            The Cartesian coordinates.
 
         Returns
         -------
@@ -412,17 +412,17 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
             The spherical coordinates.
 
         """
-        xp = array_namespace(*[euclidean[k] for k in self.e_nodes])
+        xp = array_namespace(*[cartesian[k] for k in self.e_nodes])
         r = (
             xp.linalg.vector_norm(
-                xp.stack(xp.broadcast_arrays(*[euclidean[k] for k in self.e_nodes])),
+                xp.stack(xp.broadcast_arrays(*[cartesian[k] for k in self.e_nodes])),
                 axis=0,
             )
             if self.s_ndim > 0
-            else euclidean[self.e_nodes[0]]
+            else cartesian[self.e_nodes[0]]
         )
         result: dict[TSpherical | Literal["r"], Array] = {"r": r}
-        tmp = {k: euclidean[k] for k in self.e_nodes}
+        tmp = {k: cartesian[k] for k in self.e_nodes}
         for node in reversed(list(nx.topological_sort(self.G))):
             if node in self.e_nodes:
                 continue
@@ -439,16 +439,16 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
         return result
 
     @overload
-    def to_euclidean(
+    def to_cartesian(
         self,
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
         as_array: Literal[False] = ...,
-    ) -> Mapping[TEuclidean, Array]: ...
+    ) -> Mapping[TCartesian, Array]: ...
 
     @overload
-    def to_euclidean(
+    def to_cartesian(
         self,
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
@@ -456,15 +456,15 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
         as_array: Literal[True] = ...,
     ) -> Array: ...
 
-    def to_euclidean(
+    def to_cartesian(
         self,
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
         as_array: bool = False,
-    ) -> Mapping[TEuclidean, Array] | Array:
+    ) -> Mapping[TCartesian, Array] | Array:
         """
-        Convert the spherical coordinates to the Euclidean coordinates.
+        Convert the spherical coordinates to the Cartesian coordinates.
 
         Parameters
         ----------
@@ -477,7 +477,7 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
         Returns
         -------
         Array
-            The Euclidean coordinates.
+            The Cartesian coordinates.
 
         """
         xp = array_namespace(*[spherical[k] for k in self.s_nodes])
@@ -504,7 +504,7 @@ class SphericalCoordinates[TSpherical, TEuclidean]:
 
     @property
     def is_e_keys_range(self) -> bool:
-        """Whether the Euclidean keys are 0, 1, ..., e_ndim - 1."""
+        """Whether the Cartesian keys are 0, 1, ..., e_ndim - 1."""
         return set(self.e_nodes) == set(range(self.e_ndim))
 
     @property

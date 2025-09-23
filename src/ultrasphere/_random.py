@@ -8,7 +8,7 @@ from numpy._typing import NDArray
 from ultrasphere._coordinates import (
     BranchingType,
     SphericalCoordinates,
-    TEuclidean,
+    TCartesian,
     TSpherical,
 )
 
@@ -59,7 +59,7 @@ def _random_sphere(
 
 @overload
 def random_ball(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     *,
     shape: Sequence[int],
     xp: ArrayNamespaceFull,
@@ -71,7 +71,7 @@ def random_ball(
 ) -> Array: ...
 @overload
 def random_ball(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     *,
     shape: Sequence[int],
     xp: ArrayNamespaceFull,
@@ -83,7 +83,7 @@ def random_ball(
 ) -> Mapping[TSpherical | Literal["r"], Array]: ...
 @overload
 def random_ball(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     *,
     shape: Sequence[int],
     xp: ArrayNamespaceFull,
@@ -94,7 +94,7 @@ def random_ball(
     surface: Literal[True] = ...,
 ) -> Mapping[TSpherical, Array]: ...
 def random_ball(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     *,
     shape: Sequence[int],
     xp: ArrayNamespaceFull,

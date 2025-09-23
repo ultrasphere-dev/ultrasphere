@@ -59,14 +59,14 @@ import torch
 # 1. specify the structure of spherical coordinates
 c = us.c_spherical()
 
-# 2. get spherical coordinates from euclidean coordinates
-spherical = c.from_euclidean(torch.asarray([1.0, 2.0, 3.0]))
+# 2. get spherical coordinates from cartesian coordinates
+spherical = c.from_cartesian(torch.asarray([1.0, 2.0, 3.0]))
 print(spherical)
 # {'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
 
-# 3. get euclidean coordinates from spherical coordinates
-euclidean = c.to_euclidean(spherical)
-print(euclidean)
+# 3. get cartesian coordinates from spherical coordinates
+cartesian = c.to_cartesian(spherical)
+print(cartesian)
 # {0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
 ```
 

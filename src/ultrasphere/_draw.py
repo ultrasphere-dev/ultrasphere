@@ -9,7 +9,7 @@ from matplotlib.patches import Circle
 from networkx.algorithms.dag import dag_longest_path
 from networkx.drawing.nx_agraph import graphviz_layout
 
-from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere._coordinates import SphericalCoordinates, TCartesian, TSpherical
 
 _ASCII_TO_GREEK = {
     "alpha": "α",  # noqa
@@ -45,7 +45,7 @@ def _ascii_to_greek(s: str) -> str:
 
 
 def draw(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     root_bottom: bool = True,
     ax: Axes | None = None,
 ) -> tuple[float, float]:
@@ -119,14 +119,14 @@ def draw(
         ax=ax,
     )
 
-    # Euclidean
+    # Cartesian
     nx.draw_networkx_nodes(
         c.G,
         pos,
         nodelist=c.e_nodes,
         node_color="lightgray",
         node_shape="s",
-        label="Euclidean",
+        label="Cartesian",
         ax=ax,
     )
     nx.draw_networkx_labels(c.G, pos, labels={n: f"{n}" for n in c.e_nodes}, ax=ax)
@@ -155,7 +155,7 @@ def draw(
             facecolor="darkgray",
             label="Spherical(Name\nBranching type\n/Descendants)",
         ),
-        Circle((0, 0), 0.12, facecolor="lightgray", label="Euclidean(Name)"),
+        Circle((0, 0), 0.12, facecolor="lightgray", label="Cartesian(Name)"),
         Line2D([0], [0], color=cos_color, lw=2, label="cos", linestyle="dashed"),
         Line2D([0], [0], color=sin_color, lw=2, label="sin"),
     ]
