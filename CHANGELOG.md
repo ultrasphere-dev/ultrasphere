@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.0.1 (2025-09-23)
+
+### Bug fixes
+
+- Update classifiers ([`be3c171`](https://github.com/ultrasphere-dev/ultrasphere/commit/be3c1712d4bbf5f01ded9ef36b3ea210a736bc58))
+
+### Documentation
+
+- Add notes about doctest ([`f3f8e20`](https://github.com/ultrasphere-dev/ultrasphere/commit/f3f8e20faf01859b8795330a97d85cdeb90ca988))
+- Use plot option ([`b7e9b14`](https://github.com/ultrasphere-dev/ultrasphere/commit/b7e9b1448d54efe2865ebd93c05d3e8fd4b83665))
+
 ## v2.0.0 (2025-09-23)
 
 ### Bug fixes
