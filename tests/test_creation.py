@@ -17,4 +17,4 @@ def test_generate(s_ndim: int) -> None:
 
 @pytest.mark.parametrize("q", [0, 1, 2, 5])
 def test_generate_hopf(q: int) -> None:
-    assert create_hopf(q).e_ndim == 2**q
+    assert create_hopf(q).c_ndim == 2**q

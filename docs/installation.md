@@ -7,5 +7,3 @@ The package is published on [PyPI](https://pypi.org/project/ultrasphere/) and ca
 ```bash
 pip install ultrasphere
 ```
-
-Next, see the {ref}`section about usage <usage>` to see how to use it.

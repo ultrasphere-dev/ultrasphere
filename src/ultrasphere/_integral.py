@@ -9,14 +9,14 @@ from scipy.special import roots_jacobi
 from ._coordinates import (
     BranchingType,
     SphericalCoordinates,
-    TEuclidean,
+    TCartesian,
     TSpherical,
     get_child,
 )
 
 
 def roots(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     n: int,
     *,
     expand_dims_x: bool,
@@ -97,7 +97,7 @@ def roots(
 
 @overload
 def integrate(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     f: (
         Callable[
             [Mapping[TSpherical, Array]],
@@ -116,7 +116,7 @@ def integrate(
 
 @overload
 def integrate(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     f: (
         Callable[
             [Mapping[TSpherical, Array]],
@@ -134,7 +134,7 @@ def integrate(
 
 
 def integrate(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     f: (
         Callable[
             [Mapping[TSpherical, Array]],

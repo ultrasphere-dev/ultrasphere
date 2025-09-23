@@ -52,53 +52,63 @@ pip install ultrasphere
 
 ### Spherical Coordinates ↔ Cartesian Coordinates
 
+First import the module and create a spherical coordinates object.
+
 ```python
-import ultrasphere as us
-import torch
+>>> import ultrasphere as us
+>>> from array_api_compat import numpy as np
+>>> from array_api_compat import torch
+>>> rng = np.random.default_rng(0)
+>>> c = us.create_spherical()
+```
 
-# 1. specify the structure of spherical coordinates
-c = us.c_spherical()
+Getting spherical coordinates from cartesian coordinates:
 
-# 2. get spherical coordinates from euclidean coordinates
-spherical = c.from_euclidean(torch.asarray([1.0, 2.0, 3.0]))
-print(spherical)
-# {'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
+```python
+>>> spherical = c.from_cartesian(torch.asarray([1.0, 2.0, 3.0]))
+>>> spherical
+{'r': tensor(3.7417), 'phi': tensor(1.1071), 'theta': tensor(0.6405)}
+```
 
-# 3. get euclidean coordinates from spherical coordinates
-euclidean = c.to_euclidean(spherical)
-print(euclidean)
-# {0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
+Getting cartesian coordinates from spherical coordinates:
+
+```python
+>>> c.to_cartesian(spherical)
+{0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
 ```
 
 ### Using various spherical coordinates
 
 ```python
-c = us.polar()  # polar coordinates
-c = us.c_spherical()  # spherical coordinates
-c = us.standard(3)  # bba coordinates
-c = us.standard_prime(4)  # b'b'b'a coordinates
-c = us.hopf(3)  # ccaacaa coordinates
-c = us.from_branching_types("cbab'a")
-c = us.random(10)
-
-# get the branching types expression
-print(c.branching_types_expression_str)
-# ccabbab'b'ba
+>>> us.create_polar()
+SphericalCoordinates(a)
+>>> us.create_spherical()
+SphericalCoordinates(ba)
+>>> us.create_standard(3)
+SphericalCoordinates(bba)
+>>> us.create_standard_prime(4)
+SphericalCoordinates(b'b'b'a)
+>>> us.create_hopf(3)
+SphericalCoordinates(ccaacaa)
+>>> us.create_from_branching_types("cbab'a")
+SphericalCoordinates(cbab'a)
+>>> us.create_random(10, rng=rng)
+SphericalCoordinates(cacccaaaba)
 ```
 
 ### Drawing spherical coordinates using rooted trees (Vilenkin's method of trees)
 
 #### Python
 
+<!-- skip: start -->
+
 ```python
-import ultrasphere as us
-
-# 1. specify the structure of spherical coordinates
-c = us.random(10)
-
-# 2. draw the rooted tree
-us.draw(c)
+>>> c = us.create_from_branching_types("ccabbab'b'ba")
+>>> us.draw(c)
+(6.5, 3.5)
 ```
+
+<!-- skip: end -->
 
 #### CLI
 
@@ -113,38 +123,34 @@ Output:
 ### Integration over sphere using spherical coordinates
 
 ```python
-import ultrasphere as us
-import numpy as np
-
-# 1. specify the structure of spherical coordinates
-c = us.c_spherical()
-
-# 2. integrate a function over the sphere
-integral = us.integrate(
-    c, lambda spherical: spherical["theta"] ** 2 * spherical["phi"], False, 10, xp=np
-)
-print(integral)
-# 110.02620812972036
+>>> c = us.create_spherical()
+>>> np.round(us.integrate(
+...     c, lambda spherical: spherical["theta"] ** 2 * spherical["phi"], False, 10, xp=np
+... ), 5)
+np.float64(110.02621)
 ```
 
 ### Random sampling
 
+Sampling random points uniformly from the unit ball:
+
 ```python
-import ultrasphere as us
-import numpy as np
+>>> c = us.create_spherical()
+>>> points_ball = us.random_ball(c, shape=(), xp=np, rng=rng)
+>>> points_ball
+array([0.12504754, 0.45095196, 0.32752147])
+>>> np.linalg.vector_norm(points_ball)
+np.float64(0.5711960026239531)
+```
 
-# 1. specify the structure of spherical coordinates
-c = us.c_spherical()
+Sampling random points uniformly from the sphere (does not include interior points):
 
-# 2. sample random points uniformly from the ball
-points_ball = us.random_ball(c, shape=(), xp=np)
-print(points_ball, np.linalg.vector_norm(points_ball))
-# [ 0.83999061  0.02552206 -0.29185517] 0.8896151114371893
-
-# 3. sample random points uniformly from the sphere
-points_sphere = us.random_ball(c, shape=(), xp=np, surface=True)
-print(points_sphere, np.linalg.vector_norm(points_sphere))
-# [-0.68194186  0.71310149 -0.16260864] 1.0
+```python
+>>> points_sphere = us.random_ball(c, shape=(), xp=np, surface=True, rng=rng)
+>>> points_sphere
+array([-0.89670228, -0.44166441,  0.02928439])
+>>> np.linalg.vector_norm(points_sphere)
+np.float64(1.0)
 ```
 
 #### References

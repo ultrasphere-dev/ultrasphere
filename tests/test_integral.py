@@ -6,7 +6,7 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 
-from ultrasphere._coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere._coordinates import SphericalCoordinates, TCartesian, TSpherical
 from ultrasphere._creation import (
     create_hopf,
     create_random,
@@ -47,7 +47,7 @@ def test_sphere_surface_integrate(
 )
 @pytest.mark.parametrize("concat", [True, False])
 def test_integrate(
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TCartesian],
     n: int,
     concat: bool,
     r: float,
@@ -79,10 +79,10 @@ def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
     k = xp.random.random_uniform(low=0, high=1, shape=(n,))
 
     def create_f(
-        c: SphericalCoordinates[TSpherical, TEuclidean],
+        c: SphericalCoordinates[TSpherical, TCartesian],
     ) -> Callable[[Mapping[TSpherical, Array]], Array]:
         def f(s: Mapping[TSpherical, Array]) -> Array:
-            x = c.to_euclidean(s, as_array=True)
+            x = c.to_cartesian(s, as_array=True)
             return xp.einsum("v,v...->...", xp.astype(k, x.dtype), x)
 
         return f

@@ -200,7 +200,7 @@ def create_hopf(q: int) -> "SphericalCoordinates[Any, Any]":
     Parameters
     ----------
     q : int
-        Where 2^q = c.e_ndim.
+        Where 2^q = c.c_ndim.
 
     Returns
     -------
@@ -262,17 +262,17 @@ def _s_node_name_default(idx: int) -> Any:
 
 def _e_node_name_default(idx: int) -> Any:
     """
-    The naming convention for the Euclidean node.
+    The naming convention for the Cartesian node.
 
     Parameters
     ----------
     idx : int
-        The index of the Euclidean node.
+        The index of the Cartesian node.
 
     Returns
     -------
     str
-        The name of the Euclidean node.
+        The name of the Cartesian node.
 
     """
     return idx

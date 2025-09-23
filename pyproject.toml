@@ -54,6 +54,7 @@ plot = [
 dev = [
   "pytest>=8,<9",
   "pytest-cov>=7,<8",
+  "sybil>=9.2.0",
   "torch>=2.7.1",
 ]
 docs = [
@@ -61,6 +62,7 @@ docs = [
   "myst-parser>=0.16; python_version>='3.11'",
   "sphinx>=4; python_version>='3.11'",
   "sphinx-autobuild>=2025,<2026; python_version>='3.11'",
+  "sphinx-math-dollar>=1.2.1",
 ]
 
 [tool.ruff]
