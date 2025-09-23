@@ -8,11 +8,13 @@ authors:
     orcid: 0000-0000-0000-0000
     equal-contrib: true
     affiliation: 1
-  - name: Author 2
+  - given-names: Kei
+    surname: Matsushima
     affiliation: 2
-  - name: Author 3
-    corresponding: true
+  - given-names: Takayuki
+    surname: Yamada
     affiliation: 3
+    corresponding: true
 affiliations:
   - name: Department of Mechanical Engineering, Graduate School of Engineering, The University of Tokyo, Japan
     index: 1
@@ -30,15 +32,18 @@ bibliography: paper.bib
 # Summary
 
 Spherical harmonics, which are the solutions to the angular part of the laplace equation, have been widely used in various fields of science and engineering.
-
-2-dimensional spherical harmonics are known as Fourier series .
+Especially, hyperspherical harmonics, which are spherical harmonics in higher dimensions, have been applied to many-body problems in quantum mechanics and nuclear physics
 
 # Statement of need
 
 `ultrasphere` and `ultrasphere-harmonics` are Python packages for hyperspherical coordinates and hyperspherical harmonics techniques.
-Our packages is that they support any type of Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems. This allows to write codes that work in any type of polyspherical coordinates and any number of dimensions without modification. To demonstrate this, we implemented acoustic scattering from a single sphere for any type of polyspherical coordinates, which could be verified by command-line interface.
+Our packages is that they support any type of Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems [@vilenkin_representation_1993].
+This allows to write codes that work in any type of polyspherical coordinates and thus in any number of dimensions.
+To demonstrate this, we implemented acoustic scattering from a single sphere for any type of polyspherical coordinates, which could be verified by command-line interface.
 
-Our api is compatible with the array API standard. This enables writing code which runs on multiple array libraries (e.g., NumPy, CuPy, JAX, PyTorch, TensorFlow) and multiple hardware (e.g., CPU, GPU) without modification. Our packages fully support vectorization for high performance computing.
+Our api is compatible with the array API standard [@meurer_python_2023].
+This enables writing code which runs on multiple array libraries (e.g., NumPy[@harris_array_2020], PyTorch[@paszke_pytorch_2019]) and multiple hardware (e.g., CPU, GPU).
+Our packages fully support vectorization for high performance computing.
 
 # Acknowledgements
 
