@@ -178,3 +178,6 @@ This package was created with
 [Copier](https://copier.readthedocs.io/) and the
 [browniebroke/pypackage-template](https://github.com/browniebroke/pypackage-template)
 project template.
+
+The code examples in the documentation and docstrings are
+automatically tested as doctests using [Sybil](https://sybil.readthedocs.io/).
