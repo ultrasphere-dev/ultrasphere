@@ -34,19 +34,22 @@ bibliography: paper.bib
 # Summary
 
 Spherical harmonics, which are the solutions to the angular part of the laplace equation, have been widely used in various fields of science and engineering.
-Spherical harmonics in 3D are well-known
-Especially, hyperspherical harmonics, which are spherical harmonics in higher dimensions, have been applied to many-body problems in quantum mechanics [@fock_zur_1935], representation of crystallographic textures [@bonvallet_3d_2007], description of 3D models [@bonvallet_3d_2007], representation of brain structures [@hosseinbor_4d_2013], representation of the Head-Related Transfer Function, which characterizes how an ear receives a sound from a point in space [@szwajcowski_continuous_2023], and so on.
+Spherical harmonics in 3D are well-known and have various applications, and many software packages have been developed for them.
+Hyperspherical harmonics, which are spherical harmonics in higher dimensions, have been applied to many-body problems in quantum mechanics [@fock_zur_1935], representation of crystallographic textures [@bonvallet_3d_2007], description of 3D models [@bonvallet_3d_2007], representation of brain structures [@hosseinbor_4d_2013], representation of the Head-Related Transfer Function, which characterizes how an ear receives a sound from a point in space [@szwajcowski_continuous_2023], and so on.
+However, an attempt to develop a framework which allows codes to work on both 3D and higher dimensions has not been made.
+Therefore, we aim to provide a unified framework for implementing spherical harmonics techniques in arbitrary dimensions and coordinate systems.
+Our packages would allow researchers to easily extend their work to higher dimensions, for example, from 2D to 3D and further to 4D, without having to duplicate code for each dimension.
 
 # Statement of need
 
-`ultrasphere` is a Python package for Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinate systems [@vilenkin_representation_1993].
+`ultrasphere` is a Python package for Vilenkin–Kuznetsov–Smorodinsky (VKS) polyspherical coordinate systems [@vilenkin_representation_1993].
 `ultrasphere-harmonics` implements hyperspherical harmonics methods for any type of polyspherical coordinates based on `ultrasphere`.
-The main goal of these packages is to provide a unified framework for implementing spherical harmonics techniques in arbitrary dimensions and coordinate systems.
-This would allow researchers to easily extend their work to higher dimensions, for example, from 2D to 3D and further to 4D, without having to duplicate code for each dimension.
-To demonstrate this, we implemented code for solving acoustic scattering from a single sound-soft sphere using any type of polyspherical coordinates as a command-line application.
+While spherical harmonics in 3D itself have been widely implemented in various software packages, such as [@2020SciPy-NMeth], hyperspherical harmonics are rarely implemented, and software packages which supports arbitrary VKS polyspherical coordinates are not known.
+The main goal of out packages is to provide a unified framework for implementing spherical harmonics techniques in arbitrary VKS polyspherical coordinates and dimensions.
+To demonstrate this, code for solving acoustic scattering from a single sound-soft sphere using any type of polyspherical coordinates is implemented within `ultrasphere-harmonics` as a command-line application.
 
 Spherical expansion methods are sometimes computationally expensive, especially in higher dimensions.
-To address the recent diversification of HPC environment, our api is made to be compatible with the array API standard [@meurer_python_2023], which enables writing code which runs on multiple array libraries (e.g., NumPy[@harris_array_2020], PyTorch[@paszke_pytorch_2019]) and multiple hardware (e.g., CPU, GPU).
+To utilize HPC resources, which environment is recently diversified, our api is made to be compatible with the array API standard [@meurer_python_2023], which enables writing code which runs on multiple array libraries (e.g., NumPy[@harris_array_2020], PyTorch[@paszke_pytorch_2019]) and multiple hardware (e.g., CPU, GPU).
 Our packages fully support vectorization to leverage the performance of these libraries.
 
 # Acknowledgements
