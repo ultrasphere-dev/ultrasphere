@@ -1207,6 +1207,18 @@ wheels = [
 ]
 
 [[package]]
+name = "sphinx-math-dollar"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sphinx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9f/63/9227668066d044b6b6a582f000ade4b9e679978466555710dd2a15f21a3a/sphinx-math-dollar-1.2.1.tar.gz", hash = "sha256:03427240f21fdf23c7b8415289aa1a0e307ac32c198e02f840c59a4b1b0d950c", size = 25758, upload-time = "2022-04-25T21:48:38.71Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/58/f4df1f1cd8a2bd7c5720870fcd1373fbd6de934f74c887bbc40eef9d8328/sphinx_math_dollar-1.2.1-py3-none-any.whl", hash = "sha256:0b1523a4d7023b9020ddf3a9301f651d64427a0f1d802af534a87eaf24fbdf19", size = 8074, upload-time = "2022-04-25T21:48:47.289Z" },
+]
+
+[[package]]
 name = "sphinxcontrib-applehelp"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1440,6 +1452,7 @@ docs = [
     { name = "myst-parser" },
     { name = "sphinx" },
     { name = "sphinx-autobuild" },
+    { name = "sphinx-math-dollar" },
 ]
 
 [package.metadata]
@@ -1472,6 +1485,7 @@ docs = [
     { name = "myst-parser", marker = "python_full_version >= '3.11'", specifier = ">=0.16" },
     { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = ">=4" },
     { name = "sphinx-autobuild", marker = "python_full_version >= '3.11'", specifier = ">=2025,<2026" },
+    { name = "sphinx-math-dollar", specifier = ">=1.2.1" },
 ]
 
 [[package]]

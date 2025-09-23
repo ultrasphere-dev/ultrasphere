@@ -30,6 +30,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx_math_dollar",
 ]
 myst_enable_extensions = [
     "amsmath",
