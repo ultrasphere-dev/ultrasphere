@@ -100,13 +100,15 @@ SphericalCoordinates(cacccaaaba)
 
 #### Python
 
-<!-- skip: next -->
+<!-- skip: start -->
 
 ```python
 >>> c = us.create_from_branching_types("ccabbab'b'ba")
 >>> us.draw(c)
 (6.5, 3.5)
 ```
+
+<!-- skip: end -->
 
 #### CLI
 
