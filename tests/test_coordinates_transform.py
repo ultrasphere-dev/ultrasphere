@@ -94,8 +94,8 @@ def test_cartesian_to_spherical(
     shape: tuple[int, ...],
     xp: ArrayNamespaceFull,
 ) -> None:
-    x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
+    x = xp.random.random_uniform(low=-1, high=1, shape=(c.c_ndim, *shape))
     spherical = c.from_cartesian(x)
     x_reconstructed = c.to_cartesian(spherical)
-    x_reconstructed = xp.stack([x_reconstructed[key] for key in range(c.e_ndim)])  # type: ignore
+    x_reconstructed = xp.stack([x_reconstructed[key] for key in range(c.c_ndim)])  # type: ignore
     assert xp.all(xpx.isclose(x, x_reconstructed, rtol=1e-6, atol=1e-6))

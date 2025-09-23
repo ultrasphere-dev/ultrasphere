@@ -253,7 +253,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
     """The branching types of each node."""
     s_nodes: Sequence[TSpherical]
     """The spherical nodes."""
-    e_nodes: Sequence[TCartesian]
+    c_nodes: Sequence[TCartesian]
     """The Cartesian nodes."""
     cos_edges: Sequence[tuple[TSpherical, TCartesian | TSpherical]]
     """The edges with type 'cos'."""
@@ -314,9 +314,9 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         return len(self.s_nodes)
 
     @property
-    def e_ndim(self) -> int:
+    def c_ndim(self) -> int:
         """The number of Cartesian dimensions."""
-        return len(self.e_nodes)
+        return len(self.c_nodes)
 
     def __init__(self, tree: nx.DiGraph, cache: bool | None = None) -> None:
         """
@@ -344,9 +344,9 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         self.S = get_non_leaf_descendants(tree)
         self.branching_types = get_branching_types(tree)
         nodes = list(nx.topological_sort(tree))
-        # even if sorted by name, e_nodes are still topologically sorted
+        # even if sorted by name, c_nodes are still topologically sorted
         # because they do not have any successors
-        self.e_nodes = sorted(node for node in nodes if tree.out_degree(node) == 0)
+        self.c_nodes = sorted(node for node in nodes if tree.out_degree(node) == 0)
         self.s_nodes = [node for node in nodes if tree.out_degree(node) == 2]
         self.cos_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "cos"]
         self.sin_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "sin"]
@@ -366,8 +366,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         """
         return (
             2
-            * (np.pi ** (self.e_ndim / 2))
-            / np.exp(lgamma(self.e_ndim / 2.0))
+            * (np.pi ** (self.c_ndim / 2))
+            / np.exp(lgamma(self.c_ndim / 2.0))
             * r**self.s_ndim
         )
 
@@ -390,9 +390,9 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
         """
         return (
-            (np.pi ** (self.e_ndim / 2))
-            / np.exp(lgamma(self.e_ndim / 2.0 + 1.0))
-            * r**self.e_ndim
+            (np.pi ** (self.c_ndim / 2))
+            / np.exp(lgamma(self.c_ndim / 2.0 + 1.0))
+            * r**self.c_ndim
         )
 
     def from_cartesian(
@@ -412,19 +412,19 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             The spherical coordinates.
 
         """
-        xp = array_namespace(*[cartesian[k] for k in self.e_nodes])
+        xp = array_namespace(*[cartesian[k] for k in self.c_nodes])
         r = (
             xp.linalg.vector_norm(
-                xp.stack(xp.broadcast_arrays(*[cartesian[k] for k in self.e_nodes])),
+                xp.stack(xp.broadcast_arrays(*[cartesian[k] for k in self.c_nodes])),
                 axis=0,
             )
             if self.s_ndim > 0
-            else cartesian[self.e_nodes[0]]
+            else cartesian[self.c_nodes[0]]
         )
         result: dict[TSpherical | Literal["r"], Array] = {"r": r}
-        tmp = {k: cartesian[k] for k in self.e_nodes}
+        tmp = {k: cartesian[k] for k in self.c_nodes}
         for node in reversed(list(nx.topological_sort(self.G))):
-            if node in self.e_nodes:
+            if node in self.c_nodes:
                 continue
             elif node not in self.s_nodes:
                 raise AssertionError()
@@ -483,7 +483,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         xp = array_namespace(*[spherical[k] for k in self.s_nodes])
         result = {self.root: spherical.get("r", 1)}  # type: ignore
         for node in nx.topological_sort(self.G):
-            if node in self.e_nodes:
+            if node in self.c_nodes:
                 continue
             elif node not in self.s_nodes:
                 raise AssertionError()
@@ -493,19 +493,19 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             sin = xp.sin(spherical[node])
             result[cos_child] = result[node] * cos
             result[sin_child] = result[node] * sin
-        result = {k: result[k] for k in self.e_nodes}
+        result = {k: result[k] for k in self.c_nodes}
         if as_array:
             return xp.stack(
-                xp.broadcast_arrays(*[result[k] for k in self.e_nodes]),
+                xp.broadcast_arrays(*[result[k] for k in self.c_nodes]),
                 axis=0,
             )
 
         return result
 
     @property
-    def is_e_keys_range(self) -> bool:
-        """Whether the Cartesian keys are 0, 1, ..., e_ndim - 1."""
-        return set(self.e_nodes) == set(range(self.e_ndim))
+    def is_c_keys_range(self) -> bool:
+        """Whether the Cartesian keys are 0, 1, ..., c_ndim - 1."""
+        return set(self.c_nodes) == set(range(self.c_ndim))
 
     @property
     def is_s_keys_range(self) -> bool:

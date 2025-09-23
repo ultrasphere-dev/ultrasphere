@@ -141,7 +141,7 @@ def random_ball(
     rng = np.random.default_rng() if rng is None else rng
     if type == "uniform":
         return xp.asarray(
-            _random_sphere(shape, dim=c.e_ndim, surface=surface, rng=rng),
+            _random_sphere(shape, dim=c.c_ndim, surface=surface, rng=rng),
             device=device,
             dtype=dtype,
         )

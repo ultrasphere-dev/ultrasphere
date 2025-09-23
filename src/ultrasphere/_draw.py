@@ -70,7 +70,7 @@ def draw(
     fig = ax.figure
     ax.set_frame_on(False)
     ax.grid(False)
-    width = max(c.e_ndim * 0.5 + 1, 3.5)
+    width = max(c.c_ndim * 0.5 + 1, 3.5)
     height = max((len(dag_longest_path(c.G)) + 1) * 0.5, 3.5)
     additional_width = 0.8
     fig.set_size_inches(width + additional_width, height)
@@ -123,13 +123,13 @@ def draw(
     nx.draw_networkx_nodes(
         c.G,
         pos,
-        nodelist=c.e_nodes,
+        nodelist=c.c_nodes,
         node_color="lightgray",
         node_shape="s",
         label="Cartesian",
         ax=ax,
     )
-    nx.draw_networkx_labels(c.G, pos, labels={n: f"{n}" for n in c.e_nodes}, ax=ax)
+    nx.draw_networkx_labels(c.G, pos, labels={n: f"{n}" for n in c.c_nodes}, ax=ax)
 
     # edges
     cos_color = "orange"

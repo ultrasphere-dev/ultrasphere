@@ -200,7 +200,7 @@ def create_hopf(q: int) -> "SphericalCoordinates[Any, Any]":
     Parameters
     ----------
     q : int
-        Where 2^q = c.e_ndim.
+        Where 2^q = c.c_ndim.
 
     Returns
     -------
