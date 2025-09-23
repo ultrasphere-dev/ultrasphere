@@ -38,7 +38,7 @@
 
 ---
 
-Hyperspherical coordinates in NumPy / PyTorch / JAX.
+Hyperspherical coordinates in NumPy / PyTorch
 
 ## Installation
 
