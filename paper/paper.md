@@ -1,5 +1,5 @@
 ---
-title: "ultrasphere and ultrasphere-harmonics: Python packages for Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinates and hyperspherical harmonics techniques in array API"
+title: "ultrasphere and ultrasphere-harmonics: Python packages for Vilenkin–Kuznetsov–Smorodinsky polyspherical coordinates and hyperspherical harmonics methods in array API"
 tags:
   - Python
 authors:
@@ -34,7 +34,7 @@ bibliography: paper.bib
 # Summary
 
 Spherical harmonics, which are the solutions to the angular part of the laplace equation, have been widely used in various fields of science and engineering.
-Especially, hyperspherical harmonics, which are spherical harmonics in higher dimensions, have been applied to many-body problems in quantum mechanics and nuclear physics
+Especially, hyperspherical harmonics, which are spherical harmonics in higher dimensions, have been applied to many-body problems in quantum mechanics [@fock_zur_1935], representation of crystallographic textures [@bonvallet_3d_2007], description of 3D models [@bonvallet_3d_2007], representation of brain structures [@hosseinbor_4d_2013].
 
 # Statement of need
 
