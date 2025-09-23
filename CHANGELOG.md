@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.0 (2025-09-23)
+
+### Bug fixes
+
+- Trigger release ([`64b2b22`](https://github.com/ultrasphere-dev/ultrasphere/commit/64b2b22b73dfec9e7df20e63cd428dcf1ec7ca77))
+
 ## v1.1.8 (2025-09-19)
 
 ### Bug fixes
