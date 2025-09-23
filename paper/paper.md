@@ -10,10 +10,12 @@ authors:
     affiliation: 1
   - given-names: Kei
     surname: Matsushima
+    equal-contrib: false
     affiliation: 2
   - given-names: Takayuki
     surname: Yamada
     affiliation: 3
+    equal-contrib: false
     corresponding: true
 affiliations:
   - name: Department of Mechanical Engineering, Graduate School of Engineering, The University of Tokyo, Japan
