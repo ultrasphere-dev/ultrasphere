@@ -1,34 +1,28 @@
 ---
-title: "Gala: A Python package for galactic dynamics"
+title: "ultrasphere and ultrasphere-harmonics: Python packages for hyperspherical coordinates and hyperspherical harmonics techniques"
 tags:
   - Python
-  - astronomy
-  - dynamics
-  - galactic dynamics
-  - milky way
 authors:
-  - name: Adrian M. Price-Whelan
+  - given-names: Hiromochi
+    surname: Itoh
     orcid: 0000-0000-0000-0000
     equal-contrib: true
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name: Author Without ORCID
-    equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
+    affiliation: 1
+  - name: Author 2
     affiliation: 2
-  - name: Author with no affiliation
-    corresponding: true # (This is how to denote the corresponding author)
-    affiliation: 3
-  - given-names: Ludwig
-    dropping-particle: van
-    surname: Beethoven
+  - name: Author 3
+    corresponding: true
     affiliation: 3
 affiliations:
-  - name: Lyman Spitzer, Jr. Fellow, Princeton University, United States
+  - name: Department of Mechanical Engineering, Graduate School of Engineering, The University of Tokyo, Japan
     index: 1
-    ror: 00hx57361
-  - name: Institution Name, Country
+    ror: 057zh3y96
+  - name: Graduate School of Advanced Science and Engineering, Hiroshima University, Japan
     index: 2
-  - name: Independent Researcher, Country
+    ror: 03t78wx29
+  - name: Department of Strategic Studies, Institute of Engineering Innovation, Graduate School of Engineering, The University of Tokyo
     index: 3
+    ror: 057zh3y96
 date: 13 August 2017
 bibliography: paper.bib
 ---
