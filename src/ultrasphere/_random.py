@@ -42,9 +42,9 @@ def _random_sphere(
 
     References
     ----------
-        Barthe, F., Guedon, O., Mendelson, S., & Naor, A. (2005).
-        A probabilistic approach to the geometry of the \ell_p^n-ball.
-        arXiv, math/0503650. Retrieved from https://arxiv.org/abs/math/0503650v1
+    Barthe, F., Guédon, O., Mendelson, S., & Naor, A. (2005).
+    A probabilistic approach to the geometry of the ? P n -ball.
+    The Annals of Probability, 33. https://doi.org/10.1214/009117904000000874
 
     """
     rng = np.random.default_rng() if rng is None else rng
@@ -133,9 +133,9 @@ def random_ball(
 
     References
     ----------
-        Barthe, F., Guedon, O., Mendelson, S., & Naor, A. (2005).
-        A probabilistic approach to the geometry of the \ell_p^n-ball.
-        arXiv, math/0503650. Retrieved from https://arxiv.org/abs/math/0503650v1
+    Barthe, F., Guédon, O., Mendelson, S., & Naor, A. (2005).
+    A probabilistic approach to the geometry of the ? P n -ball.
+    The Annals of Probability, 33. https://doi.org/10.1214/009117904000000874
 
     """
     rng = np.random.default_rng() if rng is None else rng
