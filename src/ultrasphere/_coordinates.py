@@ -318,7 +318,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         """The number of Cartesian dimensions."""
         return len(self.c_nodes)
 
-    def __init__(self, tree: nx.DiGraph, cache: bool | None = None) -> None:
+    def __init__(self, tree: nx.DiGraph, /) -> None:
         """
         Initialize the spherical coordinates.
 
@@ -335,8 +335,6 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             - If the node has 2 successors, one of the outgoing edges has
             attribute "type" of "cos" and
             the other has attribute "type" of "sin".
-        cache : bool | None, optional
-            Whether to cache the harmonics twins expansion, by default None
 
         """
         check_tree(tree)
@@ -351,7 +349,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         self.cos_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "cos"]
         self.sin_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "sin"]
 
-    def surface_area(self, r: float = 1) -> float:
+    def surface_area(self, r: float = 1, /) -> float:
         r"""
         The surface area of the unit sphere.
 
@@ -371,7 +369,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             * r**self.s_ndim
         )
 
-    def volume(self, r: float = 1) -> float:
+    def volume(self, r: float = 1, /) -> float:
         r"""
         The volume of the unit sphere.
 
@@ -396,7 +394,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         )
 
     def from_cartesian(
-        self, cartesian: Mapping[TCartesian, Array]
+        self, cartesian: Mapping[TCartesian, Array], /
     ) -> Mapping[TSpherical | Literal["r"], Array]:
         """
         Convert the Cartesian coordinates to the spherical coordinates.
@@ -444,6 +442,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
+        *,
         as_array: Literal[False] = ...,
     ) -> Mapping[TCartesian, Array]: ...
 
@@ -453,6 +453,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
+        *,
         as_array: Literal[True] = ...,
     ) -> Array: ...
 
@@ -461,6 +463,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
+        *,
         as_array: bool = False,
     ) -> Mapping[TCartesian, Array] | Array:
         """
@@ -517,6 +521,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
     ) -> Array:
         """
         Calculate the Jacobian of the spherical coordinates.
