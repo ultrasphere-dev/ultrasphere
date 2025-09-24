@@ -73,7 +73,7 @@ def draw(
 
     .. skip: end
 
-    .. image:: coordinates.*
+    .. image:: /_static/coordinates.*
 
     """
 
