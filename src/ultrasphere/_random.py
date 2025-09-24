@@ -137,6 +137,31 @@ def random_ball(
     A probabilistic approach to the geometry of the ? P n -ball.
     The Annals of Probability, 33. https://doi.org/10.1214/009117904000000874
 
+    Examples
+    --------
+    >>> from array_api_compat import numpy as xp
+    >>> import ultrasphere as us
+    >>> c = us.create_standard(4)
+    >>> rng = np.random.default_rng(0)
+    >>> points_ball = random_ball(c, shape=(2,), xp=xp, rng=rng)
+    >>> points_ball
+    array([[ 0.04083225, -0.08099814],
+           [ 0.20798418,  0.06431795],
+           [-0.17396442,  0.22170665],
+           [ 0.4234881 ,  0.58068866],
+           [-0.22854562, -0.77587443]])
+    >>> xp.linalg.vector_norm(points_ball, axis=0)
+    array([0.55386242, 0.99951577])
+    >>> points_sphere = random_ball(c, shape=(2,), xp=xp, rng=rng, surface=True)
+    >>> points_sphere
+    array([[-0.85238384, -0.11470655],
+           [-0.45676572, -0.38390797],
+           [-0.19953179, -0.16582762],
+           [ 0.15090863,  0.54656157],
+           [-0.04712233,  0.71639984]])
+    >>> xp.linalg.vector_norm(points_sphere, axis=0)
+    array([1., 1.])
+
     """
     rng = np.random.default_rng() if rng is None else rng
     if type == "uniform":
