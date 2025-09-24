@@ -349,7 +349,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         self.cos_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "cos"]
         self.sin_edges = [e for e in self.G.edges if self.G.edges[e]["type"] == "sin"]
 
-    def surface_area(self, r: float = 1, /) -> float:
+    def surface_area(self, r: float = 1) -> float:
         r"""
         The surface area of the unit sphere.
 
@@ -369,7 +369,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             * r**self.s_ndim
         )
 
-    def volume(self, r: float = 1, /) -> float:
+    def volume(self, r: float = 1) -> float:
         r"""
         The volume of the unit sphere.
 
