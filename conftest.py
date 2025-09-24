@@ -5,10 +5,11 @@ from sybil.parsers.myst import PythonCodeBlockParser as MarkdownPythonCodeBlockP
 from sybil.parsers.myst import SkipParser as MarkdownSkipParser
 from sybil.parsers.rest import DocTestParser as ReSTDocTestParser
 from sybil.parsers.rest import PythonCodeBlockParser as ReSTPythonCodeBlockParser
+from sybil.parsers.rest import SkipParser as ReSTSkipParser
 
 markdown_examples = Sybil(
     parsers=[
-        MarkdownDocTestParser(),
+        MarkdownDocTestParser(NUMBER),
         MarkdownPythonCodeBlockParser(doctest_optionflags=NUMBER),
         MarkdownSkipParser(),
     ],
@@ -17,8 +18,9 @@ markdown_examples = Sybil(
 
 rest_examples = Sybil(
     parsers=[
-        ReSTDocTestParser(),
+        ReSTDocTestParser(NUMBER),
         ReSTPythonCodeBlockParser(),
+        ReSTSkipParser(),
     ],
     patterns=["*.py", "*.rst"],
 )

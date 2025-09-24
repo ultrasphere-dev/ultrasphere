@@ -56,6 +56,27 @@ def roots(
     ValueError
         If the branching type is invalid.
 
+    Example
+    -------
+    >>> from array_api_compat import numpy as np
+    >>> import ultrasphere as us
+    >>> c = us.create_spherical()
+    >>> xs, ws = us.roots(c, 5, expand_dims_x=True, expand_dims_w=True, xp=np)
+    >>> xs
+    {'theta': array([[2.7049577 ],
+           [2.13941585],
+           [1.57079633],
+           [1.0021768 ],
+           [0.43663495]]), 'phi': array([[0.        , 0.62831853, 1.25663706, 1.88495559, 2.51327412,
+            3.14159265, 3.76991118, 4.39822972, 5.02654825, 5.65486678]])}
+    >>> ws
+    {'theta': array([[0.23692689],
+           [0.47862867],
+           [0.56888889],
+           [0.47862867],
+           [0.23692689]]), 'phi': array([[0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853,
+            0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853]])}
+
     """
     xs = {}
     ws = {}
@@ -187,6 +208,21 @@ def integrate(
     Array | Mapping[TSpherical, Array]
         The integrated value.
         Has the same shape as the return values of f or the values of f.
+
+    Example
+    -------
+    >>> from array_api_compat import numpy as np
+    >>> import ultrasphere as us
+    >>> c = us.create_spherical()
+    >>> f = lambda spherical: spherical["theta"] ** 2 * spherical["phi"]
+    >>> np.round(us.integrate(
+    ...     c,
+    ...     f,
+    ...     False, # does not support separation of variables
+    ...     10, # number of quadrature points
+    ...     xp=np # the array namespace
+    ... ), 5)
+    np.float64(110.02621)
 
     """
     xs, ws = roots(

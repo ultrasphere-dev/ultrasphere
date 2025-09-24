@@ -62,6 +62,19 @@ def draw(
     tuple[float, float]
         The recommended width and height of the figure (in inches).
 
+    Example
+    -------
+    .. skip: start
+
+    >>> import ultrasphere as us
+    >>> c = us.create_from_branching_types("ccabbab'b'ba")
+    >>> us.draw(c)
+    (6.5, 3.5)
+
+    .. skip: end
+
+    .. image:: /_static/coordinates.*
+
     """
 
     # plt.rcParams["text.usetex"] = True

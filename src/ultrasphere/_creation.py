@@ -110,6 +110,16 @@ def create_polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
     SphericalCoordinates
         The polar coordinates.
 
+    Examples
+    --------
+    >>> c = create_polar()
+    >>> c
+    SphericalCoordinates(a)
+    >>> c.s_nodes
+    ['phi']
+    >>> c.c_nodes
+    [0, 1]
+
     """
     G = _get_digraph_from_branching_type("a")
     G = nx.relabel_nodes(G, {"theta0": "phi"})
@@ -131,6 +141,16 @@ def create_spherical() -> (
     -------
     SphericalCoordinates
         The spherical coordinates.
+
+    Examples
+    --------
+    >>> c = create_spherical()
+    >>> c
+    SphericalCoordinates(ba)
+    >>> c.s_nodes
+    ['theta', 'phi']
+    >>> c.c_nodes
+    [0, 1, 2]
 
     """
     G = _get_digraph_from_branching_type("ba")
@@ -160,6 +180,16 @@ def create_standard(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
     SphericalCoordinates
         The standard coordinates.
 
+    Examples
+    --------
+    >>> c = create_standard(4)
+    >>> c
+    SphericalCoordinates(bbba)
+    >>> c.s_nodes
+    ['theta0', 'theta1', 'theta2', 'theta3']
+    >>> c.c_nodes
+    [0, 1, 2, 3, 4]
+
     """
     if s_ndim == 0:
         return create_from_branching_types("")
@@ -187,6 +217,16 @@ def create_standard_prime(s_ndim: int) -> "SphericalCoordinates[Any, Any]":
     SphericalCoordinates
         The standard prime coordinates.
 
+    Examples
+    --------
+    >>> c = create_standard_prime(4)
+    >>> c
+    SphericalCoordinates(b'b'b'a)
+    >>> c.s_nodes
+    ['theta0', 'theta1', 'theta2', 'theta3']
+    >>> c.c_nodes
+    [0, 1, 2, 3, 4]
+
     """
     if s_ndim == 0:
         return create_from_branching_types("")
@@ -206,6 +246,16 @@ def create_hopf(q: int) -> "SphericalCoordinates[Any, Any]":
     -------
     SphericalCoordinates
         The Hopf coordinates.
+
+    Examples
+    --------
+    >>> c = create_hopf(3)
+    >>> c
+    SphericalCoordinates(ccaacaa)
+    >>> c.s_nodes
+    ['theta0', 'theta1', 'theta2', 'theta3', 'theta4', 'theta5', 'theta6']
+    >>> c.c_nodes
+    [0, 1, 2, 3, 4, 5, 6, 7]
 
     """
 
@@ -337,6 +387,19 @@ def create_random(
     -------
     SphericalCoordinates
         The random spherical coordinates.
+
+
+    Examples
+    --------
+    >>> from array_api_compat import numpy as np
+    >>> rng = np.random.default_rng(0)
+    >>> c = create_random(5, rng=rng)
+    >>> c
+    SphericalCoordinates(bcb'aa)
+    >>> c.s_nodes
+    ['theta0', 'theta1', 'theta2', 'theta3', 'theta4']
+    >>> c.c_nodes
+    [0, 1, 2, 3, 4, 5]
 
     """
     return cls(_get_random_digraph(s_ndim, rng=rng))

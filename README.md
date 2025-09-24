@@ -38,7 +38,7 @@
 
 ---
 
-Hyperspherical coordinates in NumPy / PyTorch
+Vilenkin–Kuznetsov–Smorodinsky (VKS) polyspherical (hyperspherical) coordinates in NumPy / PyTorch
 
 ## Installation
 
@@ -77,7 +77,7 @@ Getting cartesian coordinates from spherical coordinates:
 {0: tensor(1.), 1: tensor(2.0000), 2: tensor(3.)}
 ```
 
-### Using various spherical coordinates
+### Using various VKS polyspherical coordinates
 
 ```python
 >>> us.create_polar()
@@ -95,6 +95,29 @@ SphericalCoordinates(cbab'a)
 >>> us.create_random(10, rng=rng)
 SphericalCoordinates(cacccaaaba)
 ```
+
+One can convert between Cartesian coordinates and VKS polyspherical coordinates in the same way as above.
+
+The name of the spherical nodes and cartesian nodes can be obtained by:
+
+```python
+>>> c = us.create_standard(5)
+>>> c.s_nodes
+['theta0', 'theta1', 'theta2', 'theta3', 'theta4']
+>>> c.s_ndim
+5
+>>> c.c_nodes
+[0, 1, 2, 3, 4, 5]
+>>> c.c_ndim
+6
+```
+
+`"r"` is a special node which represents the radius and is not included in `s_nodes`.
+
+The definition and notation of VKS polyspherical coordinates follows [Cohl2012, Appendix B].
+Following sections would also help understand the VKS polyspherical coordinates.
+
+- [Cohl2012] Cohl, H. (2012). Fourier, Gegenbauer and Jacobi Expansions for a Power-Law Fundamental Solution of the Polyharmonic Equation and Polyspherical Addition Theorems. Symmetry, Integrability and Geometry: Methods and Applications (SIGMA), 9. https://doi.org/10.3842/SIGMA.2013.042
 
 ### Drawing spherical coordinates using rooted trees (Vilenkin's method of trees)
 
@@ -120,12 +143,25 @@ Output:
 
 ![ccabbab'b'ba](https://raw.githubusercontent.com/ultrasphere-dev/ultrasphere/main/coordinates.jpg)
 
+The image shows how Cartesian coordinates (leaf nodes) are calculated from spherical coordinates (internal nodes).
+
+For example, $x_{10}$, corresponding to node `10`, is a leaf node which ancestors are `[θ0, θ2, θ7, θ8, θ9]`. The edges which connect these nodes are named `[sin, cos, cos, sin, sin]`, respectively. Thus, $x_{10}$ is calculated as:
+
+$$
+x_{10} = \sin \theta_0 \cos \theta_2 \cos \theta_7 \sin \theta_8 \sin \theta_9
+$$
+
 ### Integration over sphere using spherical coordinates
 
 ```python
 >>> c = us.create_spherical()
+>>> f = lambda spherical: spherical["theta"] ** 2 * spherical["phi"]
 >>> np.round(us.integrate(
-...     c, lambda spherical: spherical["theta"] ** 2 * spherical["phi"], False, 10, xp=np
+...     c,
+...     f,
+...     False, # does not support separation of variables
+...     10, # number of quadrature points
+...     xp=np # the array namespace
 ... ), 5)
 np.float64(110.02621)
 ```
@@ -155,7 +191,7 @@ np.float64(1.0)
 
 #### References
 
-- Barthe, F., Guedon, O., Mendelson, S., & Naor, A. (2005). A probabilistic approach to the geometry of the \ell_p^n-ball. arXiv, math/0503650. Retrieved from https://arxiv.org/abs/math/0503650v1
+- Barthe, F., Guédon, O., Mendelson, S., & Naor, A. (2005). A probabilistic approach to the geometry of the ? P n -ball. The Annals of Probability, 33. https://doi.org/10.1214/009117904000000874
 
 ## Contributors ✨
 

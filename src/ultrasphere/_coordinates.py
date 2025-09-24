@@ -243,7 +243,27 @@ def get_branching_type_from_digraph(G: nx.DiGraph, /) -> Iterable[BranchingType]
 
 
 class SphericalCoordinates[TSpherical, TCartesian]:
-    """Stores the spherical coordinates using the method of trees by Vilenkin."""
+    """Stores the spherical coordinates using the method of trees by Vilenkin.
+
+    Examples
+    --------
+    >>> import ultrasphere as us
+    >>> c = us.create_standard(3)
+    >>> c
+    SphericalCoordinates(bba)
+    >>> c.s_nodes
+    ['theta0', 'theta1', 'theta2']
+    >>> c.c_nodes
+    [0, 1, 2, 3]
+    >>> c.branching_types
+    {'theta0': <BranchingType.B: 'b'>, 'theta1': <BranchingType.B: 'b'>, 'theta2': <BranchingType.A: 'a'>}
+    >>> c.cos_edges
+    [('theta0', 0), ('theta1', 1), ('theta2', 2)]
+    >>> c.sin_edges
+    [('theta0', 'theta1'), ('theta1', 'theta2'), ('theta2', 3)]
+    >>> c.S
+    {3: nan, 2: nan, 'theta2': 0, 1: nan, 'theta1': 1, 0: nan, 'theta0': 2}
+    """
 
     G: nx.DiGraph
     """The rooted tree representing the coordinates."""
@@ -288,7 +308,14 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
     @property
     def root(self) -> Any:
-        """The root node."""
+        """The root node.
+
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> us.create_standard(3).root
+        'theta0'
+        """
         return next(nx.topological_sort(self.G))
 
     @property
@@ -298,27 +325,53 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
     @property
     def branching_types_expression(self) -> Sequence[BranchingType]:
-        """The branching types."""
+        """The branching types.
+
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> us.create_standard(2).branching_types_expression
+        [<BranchingType.B: 'b'>, <BranchingType.A: 'a'>]
+        """
         return list(get_branching_type_from_digraph(self.G))
 
     @property
     def branching_types_expression_str(self) -> str:
-        """The branching types as a string."""
+        """The branching types as a string.
+
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> us.create_standard(3).branching_types_expression_str
+        'bba'
+        """
         return "".join(
             branching_type.value for branching_type in self.branching_types_expression
         )
 
     @property
     def s_ndim(self) -> int:
-        """The number of spherical dimensions."""
+        """The number of spherical dimensions.
+
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> us.create_standard(3).s_ndim
+        3"""
         return len(self.s_nodes)
 
     @property
     def c_ndim(self) -> int:
-        """The number of Cartesian dimensions."""
+        """The number of Cartesian dimensions.
+
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> us.create_standard(3).c_ndim
+        4"""
         return len(self.c_nodes)
 
-    def __init__(self, tree: nx.DiGraph, cache: bool | None = None) -> None:
+    def __init__(self, tree: nx.DiGraph, /) -> None:
         """
         Initialize the spherical coordinates.
 
@@ -335,8 +388,6 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             - If the node has 2 successors, one of the outgoing edges has
             attribute "type" of "cos" and
             the other has attribute "type" of "sin".
-        cache : bool | None, optional
-            Whether to cache the harmonics twins expansion, by default None
 
         """
         check_tree(tree)
@@ -363,6 +414,13 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         float
             The surface area.
 
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> from array_api_compat import numpy as np
+        >>> np.round(us.create_standard(2).surface_area(), 6)
+        np.float64(12.566371)
+
         """
         return (
             2
@@ -388,6 +446,12 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         McLean, W. (2000). Strongly Elliptic Systems and
         Boundary Integral Equations. p.247 (Upsilon_n)
 
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> from array_api_compat import numpy as np
+        >>> np.round(us.create_standard(2).volume(), 6)
+        np.float64(4.18879)
         """
         return (
             (np.pi ** (self.c_ndim / 2))
@@ -396,7 +460,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         )
 
     def from_cartesian(
-        self, cartesian: Mapping[TCartesian, Array]
+        self, cartesian: Mapping[TCartesian, Array], /
     ) -> Mapping[TSpherical | Literal["r"], Array]:
         """
         Convert the Cartesian coordinates to the spherical coordinates.
@@ -410,6 +474,15 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         -------
         Array
             The spherical coordinates.
+
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> from array_api_compat import numpy as np
+        >>> c = us.create_spherical()
+        >>> s = c.from_cartesian(np.asarray([1.0, 2.0, 3.0]))
+        >>> {k: np.round(s[k], 6) for k in c.s_nodes + ["r"]}
+        {'theta': np.float64(0.640522), 'phi': np.float64(1.107149), 'r': np.float64(3.741657)}
 
         """
         xp = array_namespace(*[cartesian[k] for k in self.c_nodes])
@@ -444,6 +517,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
+        *,
         as_array: Literal[False] = ...,
     ) -> Mapping[TCartesian, Array]: ...
 
@@ -453,6 +528,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
+        *,
         as_array: Literal[True] = ...,
     ) -> Array: ...
 
@@ -461,6 +538,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
+        *,
         as_array: bool = False,
     ) -> Mapping[TCartesian, Array] | Array:
         """
@@ -473,12 +552,19 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         as_array : bool, optional
             Whether to return as an array, by default False
 
-
         Returns
         -------
         Array
             The Cartesian coordinates.
 
+        Examples
+        --------
+        >>> import ultrasphere as us
+        >>> from array_api_compat import numpy as np
+        >>> c = us.create_spherical()
+        >>> e = c.to_cartesian({"theta": np.float64(0.640522), "phi": np.float64(1.107149), "r": np.float64(3.741657)})
+        >>> {k: np.round(e[k], 5) for k in c.c_nodes}
+        {0: np.float64(1.0), 1: np.float64(2.0), 2: np.float64(3.0)}
         """
         xp = array_namespace(*[spherical[k] for k in self.s_nodes])
         result = {self.root: spherical.get("r", 1)}  # type: ignore
@@ -517,6 +603,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         spherical: (
             Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
         ),
+        /,
     ) -> Array:
         """
         Calculate the Jacobian of the spherical coordinates.
