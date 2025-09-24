@@ -15,7 +15,7 @@ from sphinx.ext import apidoc
 project = "ultrasphere"
 copyright = "2025, ultrasphere-dev"
 author = "ultrasphere-dev"
-release = "2.0.1"
+release = "2.0.2"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

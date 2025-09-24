@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.2 (2025-09-24)
+
+### Bug fixes
+
+- Add more docs ([`a808516`](https://github.com/ultrasphere-dev/ultrasphere/commit/a8085168a538e04c1c1ac4c5edf315d762a8e54d))
+
 ## v2.0.1 (2025-09-23)
 
 ### Bug fixes
