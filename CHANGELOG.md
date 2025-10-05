@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.3-rc.1 (2025-10-05)
+
+### Bug fixes
+
+- Fix bessel ([`cd7c5ee`](https://github.com/ultrasphere-dev/ultrasphere/commit/cd7c5ee91247aa53b3fb5c01445ed3319872777d))
+
 ## v2.0.2 (2025-09-24)
 
 ### Bug fixes
