@@ -70,7 +70,7 @@ def szv(
         else:
             zv = hankel2
 
-    dtype = xp.result_type(v, d, z)
+    dtype = xp.result_type(v, d, z, xp.float32)
     if type in ("h1", "h2"):
         dtype = xp.result_type(dtype, xp.complex64)
     return (
