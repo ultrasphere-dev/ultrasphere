@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.3 (2025-10-05)
+
+### Bug fixes
+
+- Fix `szv` for int input ([`d3febe9`](https://github.com/ultrasphere-dev/ultrasphere/commit/d3febe9a3288254ad8c13d505df9ea9919004842))
+
 ## v2.0.2 (2025-09-24)
 
 ### Bug fixes
