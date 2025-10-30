@@ -18,7 +18,7 @@ _ASCII_TO_GREEK = {
     "delta": "δ",
     "epsilon": "ε",
     "zeta": "ζ",
-    "theta": "θ",
+    "theta": "Θ",
     "iota": "ι",  # noqa
     "kappa": "κ",
     "lambda": "λ",
@@ -40,7 +40,8 @@ _ASCII_TO_GREEK = {
 
 def _ascii_to_greek(s: str) -> str:
     for k, v in _ASCII_TO_GREEK.items():
-        s = s.replace(k, v)
+        if s.startswith(k):
+            s = s.replace(k, v + "_")
     return s
 
 
@@ -85,7 +86,7 @@ def draw(
     ax.grid(False)
     width = max(c.c_ndim * 0.5 + 1, 3.5)
     height = max((len(dag_longest_path(c.G)) + 1) * 0.5, 3.5)
-    additional_width = 0.8
+    additional_width = 1.2
     fig.set_size_inches(width + additional_width, height)
     fig.subplots_adjust(
         right=0.9 - additional_width / (width + additional_width),
@@ -126,7 +127,7 @@ def draw(
         c.G,
         pos,
         labels={
-            n: f"{_ascii_to_greek(str(n))}\n{c.branching_types[n].value}/{c.S[n]}"
+            n: f"${_ascii_to_greek(str(n))}$\n{c.branching_types[n].value}/{c.S[n]}"
             for n in c.s_nodes
         },
         ax=ax,
@@ -166,9 +167,9 @@ def draw(
             (0, 0),
             0.25,
             facecolor="darkgray",
-            label="Spherical(Name\nBranching type\n/Descendants)",
+            label="Spherical (Name\nBranching type\n/Descendants)",
         ),
-        Circle((0, 0), 0.12, facecolor="lightgray", label="Cartesian(Name)"),
+        Circle((0, 0), 0.12, facecolor="lightgray", label="Cartesian (Name)"),
         Line2D([0], [0], color=cos_color, lw=2, label="cos", linestyle="dashed"),
         Line2D([0], [0], color=sin_color, lw=2, label="sin"),
     ]

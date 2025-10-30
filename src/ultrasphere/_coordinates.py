@@ -242,6 +242,72 @@ def get_branching_type_from_digraph(G: nx.DiGraph, /) -> Iterable[BranchingType]
         yield branching_type
 
 
+def surface_area(c_ndim: int, /, r: float = 1) -> float:
+    r"""
+    The surface area of the unit sphere.
+
+    .. math::
+        |\mathbb{S}^{d-1}| = \frac{2 \pi^{d/2}}{\Gamma(d/2)} r^{d-1}
+
+    Parameters
+    ----------
+    c_ndim : int
+        The number of Cartesian dimensions.
+    r : float, optional
+        The radius, by default 1
+
+    Returns
+    -------
+    float
+        The surface area.
+
+    Examples
+    --------
+    >>> import ultrasphere as us
+    >>> from array_api_compat import numpy as np
+    >>> np.round(us.create_standard(2).surface_area(), 6)
+    np.float64(12.566371)
+
+    """
+    return (
+        2 * (np.pi ** (c_ndim / 2)) / np.exp(lgamma(c_ndim / 2.0)) * r ** (c_ndim - 1)
+    )
+
+
+def volume(c_ndim: int, /, r: float = 1) -> float:
+    r"""
+    The volume of the unit sphere.
+
+    .. math::
+        \Upsilon_d = \frac{\pi^{d/2}}{\Gamma(d/2 + 1)} r^d
+
+    Parameters
+    ----------
+    c_ndim : int
+        The number of Cartesian dimensions.
+    r : float, optional
+        The radius, by default 1
+
+    Returns
+    -------
+    float
+        The volume.
+
+    References
+    ----------
+    McLean, W. (2000). Strongly Elliptic Systems and
+    Boundary Integral Equations. p.247 (Upsilon_n)
+
+    Examples
+    --------
+    >>> import ultrasphere as us
+    >>> from array_api_compat import numpy as np
+    >>> np.round(us.create_standard(2).volume(), 6)
+    np.float64(4.18879)
+    """
+    return (np.pi ** (c_ndim / 2)) / np.exp(lgamma(c_ndim / 2.0 + 1.0)) * r**c_ndim
+
+
 class SphericalCoordinates[TSpherical, TCartesian]:
     """Stores the spherical coordinates using the method of trees by Vilenkin.
 
@@ -409,6 +475,11 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         .. math::
             |\mathbb{S}^{d-1}| = \frac{2 \pi^{d/2}}{\Gamma(d/2)} r^{d-1}
 
+        Parameters
+        ----------
+        r : float, optional
+            The radius, by default 1
+
         Returns
         -------
         float
@@ -422,12 +493,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         np.float64(12.566371)
 
         """
-        return (
-            2
-            * (np.pi ** (self.c_ndim / 2))
-            / np.exp(lgamma(self.c_ndim / 2.0))
-            * r**self.s_ndim
-        )
+        return surface_area(self.c_ndim, r=r)
 
     def volume(self, r: float = 1) -> float:
         r"""
@@ -435,6 +501,11 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
         .. math::
             \Upsilon_d = \frac{\pi^{d/2}}{\Gamma(d/2 + 1)} r^d
+
+        Parameters
+        ----------
+        r : float, optional
+            The radius, by default 1
 
         Returns
         -------
@@ -453,11 +524,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> np.round(us.create_standard(2).volume(), 6)
         np.float64(4.18879)
         """
-        return (
-            (np.pi ** (self.c_ndim / 2))
-            / np.exp(lgamma(self.c_ndim / 2.0 + 1.0))
-            * r**self.c_ndim
-        )
+        return volume(self.c_ndim, r=r)
 
     def from_cartesian(
         self, cartesian: Mapping[TCartesian, Array], /

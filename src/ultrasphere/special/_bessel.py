@@ -47,6 +47,9 @@ def szv(
     """
 
     xp = array_namespace(v, d, z)
+    device = z.device
+    v = xp.asarray(v, device=device)
+    d = xp.asarray(d, device=device)
     if xp.any((d > 2) & (v < 0)):
         raise ValueError(
             "The hyperspherical Bessel function of "
