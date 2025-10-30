@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.4-rc.1 (2025-10-30)
+
+### Bug fixes
+
+- Better figure ([`81dd621`](https://github.com/ultrasphere-dev/ultrasphere/commit/81dd62172350f32de48bd980d6074fcc2b667415))
+
 ## v2.0.3 (2025-10-05)
 
 ### Bug fixes
