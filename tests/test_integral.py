@@ -74,7 +74,7 @@ def test_integrate(
 
 
 @pytest.mark.parametrize("n", [3, 4, 5])
-def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
+def test_integrate_match(n: int, xp: ArrayNamespaceFull, device: Any) -> None:
     cs: list[SphericalCoordinates[Any, Any]] = [create_random(n - 1) for _ in range(4)]
     k = xp.random.random_uniform(low=0, high=1, shape=(n,))
 
@@ -89,8 +89,13 @@ def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
 
     actual = [
         integrate(
-            c, create_f(c), does_f_support_separation_of_variables=False, n=8, xp=xp
+            c,
+            create_f(c),
+            does_f_support_separation_of_variables=False,
+            n=8,
+            xp=xp,
+            device=device,
         )
         for c in cs
     ]
-    assert xp.all(xpx.isclose(xp.asarray(actual), actual[0], rtol=1e-3, atol=1e-3))
+    assert xp.all(xpx.isclose(xp.stack(actual), actual[0], rtol=1e-3, atol=1e-3))

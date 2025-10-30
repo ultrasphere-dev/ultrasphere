@@ -1,13 +1,17 @@
+from typing import Any
+
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 
 
-@pytest.fixture(scope="session", params=["numpy", "torch"])
-def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
+@pytest.fixture(
+    scope="session", params=[("numpy", "cpu"), ("torch", "cpu"), ("torch", "cuda")]
+)
+def xp_device(request: pytest.FixtureRequest) -> tuple[ArrayNamespaceFull, Any]:
     """
-    Get the array namespace for the given backend.
+    Get the array namespace and device for the given backend.
     """
-    backend = request.param
+    backend, device = request.param
     if backend == "numpy":
         from array_api_compat import numpy as xp
 
@@ -22,20 +26,36 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
     elif backend == "torch":
+        import torch
         from array_api_compat import torch as xp
 
+        if device == "cuda" and not torch.cuda.is_available():
+            pytest.skip("CUDA is not available")
+
         def random_uniform(low=0, high=1, shape=None):
-            return xp.rand(shape) * (high - low) + low
+            return xp.rand(shape, device=device) * (high - low) + low
 
         def integers(low, high=None, shape=None):
             return xp.randint(low, high, size=shape)
 
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
-        import torch
-
-        if torch.cuda.is_available():
-            xp.set_default_device("cuda")
     else:
         raise ValueError(f"Unknown backend: {backend}")
-    return xp
+    return xp, device
+
+
+@pytest.fixture(scope="session")
+def xp(xp_device: tuple[ArrayNamespaceFull, Any]) -> ArrayNamespaceFull:
+    """
+    Get the array namespace for the given backend.
+    """
+    return xp_device[0]
+
+
+@pytest.fixture(scope="session")
+def device(xp_device: tuple[ArrayNamespaceFull, Any]) -> Any:
+    """
+    Get the device for the given backend.
+    """
+    return xp_device[1]

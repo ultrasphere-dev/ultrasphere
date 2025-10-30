@@ -41,7 +41,7 @@ _ASCII_TO_GREEK = {
 def _ascii_to_greek(s: str) -> str:
     for k, v in _ASCII_TO_GREEK.items():
         if s.startswith(k):
-            s = s.replace(k, v + "_")
+            s = s.replace(k, v + "_{") + "}"
     return s
 
 
