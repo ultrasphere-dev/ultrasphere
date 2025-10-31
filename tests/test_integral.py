@@ -25,13 +25,14 @@ def test_sphere_surface_integrate(
     n: int,
     expected: float,
     xp: ArrayNamespaceFull,
+    device: Any,
 ) -> None:
     def f2(s):
-        return xp.asarray(f(s)) * xp.ones_like(s["theta"])
+        return xp.asarray(f(s), device=device) * xp.ones_like(s["theta"], device=device)
 
     c = create_spherical()
     assert integrate(
-        c, f2, does_f_support_separation_of_variables=False, n=n, xp=xp
+        c, f2, does_f_support_separation_of_variables=False, n=n, xp=xp, device=device
     ).item() == pytest.approx(expected, rel=1e-2)
 
 
@@ -52,13 +53,17 @@ def test_integrate(
     concat: bool,
     r: float,
     xp: ArrayNamespaceFull,
+    device: Any,
 ) -> None:
     # surface integral (area) of the sphere
     def f(s: Mapping[TSpherical, Array]) -> Array:
         if concat:
             return xp.asarray(r**c.s_ndim) * xp.ones_like(next(iter(s.values())))
         else:
-            return {k: xp.asarray(r) * xp.ones_like(s[k]) for k in c.s_nodes}
+            return {
+                k: xp.asarray(r, device=device) * xp.ones_like(s[k], device=device)
+                for k in c.s_nodes
+            }
 
     actual = integrate(
         c,
@@ -66,6 +71,7 @@ def test_integrate(
         does_f_support_separation_of_variables=not concat,  # type: ignore
         n=n,
         xp=xp,
+        device=device,
     )
     if not concat:
         actual = xp.prod(xp.stack(list(actual.values())))
