@@ -237,7 +237,7 @@ def integrate(
         try:
             val = f(xs)  # type: ignore
         except Exception as e:
-            raise RuntimeError(f"Error occurred while evaluating {f=}") from e
+            raise e
     else:
         val = f
 

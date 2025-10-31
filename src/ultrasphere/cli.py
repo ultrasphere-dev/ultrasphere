@@ -9,7 +9,11 @@ app = typer.Typer()
 
 
 @app.command()
-def main(branching_types: str, format: str = "jpg", theme: str = "boxy_dark") -> None:
+def main(
+    branching_types: str,
+    format: str = "jpg",
+    theme: str = "boxy_dark",
+) -> None:
     """
     Create a spherical coordinate system from branching types.
 

@@ -25,13 +25,14 @@ def test_sphere_surface_integrate(
     n: int,
     expected: float,
     xp: ArrayNamespaceFull,
+    device: Any,
 ) -> None:
     def f2(s):
-        return xp.asarray(f(s)) * xp.ones_like(s["theta"])
+        return xp.asarray(f(s), device=device) * xp.ones_like(s["theta"], device=device)
 
     c = create_spherical()
     assert integrate(
-        c, f2, does_f_support_separation_of_variables=False, n=n, xp=xp
+        c, f2, does_f_support_separation_of_variables=False, n=n, xp=xp, device=device
     ).item() == pytest.approx(expected, rel=1e-2)
 
 
@@ -52,13 +53,17 @@ def test_integrate(
     concat: bool,
     r: float,
     xp: ArrayNamespaceFull,
+    device: Any,
 ) -> None:
     # surface integral (area) of the sphere
     def f(s: Mapping[TSpherical, Array]) -> Array:
         if concat:
             return xp.asarray(r**c.s_ndim) * xp.ones_like(next(iter(s.values())))
         else:
-            return {k: xp.asarray(r) * xp.ones_like(s[k]) for k in c.s_nodes}
+            return {
+                k: xp.asarray(r, device=device) * xp.ones_like(s[k], device=device)
+                for k in c.s_nodes
+            }
 
     actual = integrate(
         c,
@@ -66,6 +71,7 @@ def test_integrate(
         does_f_support_separation_of_variables=not concat,  # type: ignore
         n=n,
         xp=xp,
+        device=device,
     )
     if not concat:
         actual = xp.prod(xp.stack(list(actual.values())))
@@ -74,7 +80,7 @@ def test_integrate(
 
 
 @pytest.mark.parametrize("n", [3, 4, 5])
-def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
+def test_integrate_match(n: int, xp: ArrayNamespaceFull, device: Any) -> None:
     cs: list[SphericalCoordinates[Any, Any]] = [create_random(n - 1) for _ in range(4)]
     k = xp.random.random_uniform(low=0, high=1, shape=(n,))
 
@@ -89,8 +95,13 @@ def test_integrate_match(n: int, xp: ArrayNamespaceFull) -> None:
 
     actual = [
         integrate(
-            c, create_f(c), does_f_support_separation_of_variables=False, n=8, xp=xp
+            c,
+            create_f(c),
+            does_f_support_separation_of_variables=False,
+            n=8,
+            xp=xp,
+            device=device,
         )
         for c in cs
     ]
-    assert xp.all(xpx.isclose(xp.asarray(actual), actual[0], rtol=1e-3, atol=1e-3))
+    assert xp.all(xpx.isclose(xp.stack(actual), actual[0], rtol=1e-3, atol=1e-3))

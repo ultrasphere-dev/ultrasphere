@@ -2,7 +2,7 @@
   description = "A flake providing a dev shell for Numba with CUDA without installing Numba via nix. Also supports PyTorch yet being minimal for Numba with CUDA.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
   };
 
   outputs =
