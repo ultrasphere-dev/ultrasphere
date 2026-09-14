@@ -7,7 +7,7 @@ from scipy.special import hankel1, hankel2, jv, jvp, yv, yvp
 TArray = TypeVar("TArray", bound=Array)
 
 
-def szv(
+def szv[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -93,7 +93,7 @@ def szv(
     )
 
 
-def sjv(
+def sjv[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -131,7 +131,7 @@ def sjv(
     return szv(v, d, z, type="j", derivative=derivative)
 
 
-def syv(
+def syv[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -169,7 +169,7 @@ def syv(
     return szv(v, d, z, type="y", derivative=derivative)
 
 
-def shn1(
+def shn1[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -202,7 +202,7 @@ def shn1(
     return szv(v, d, z, type="h1", derivative=derivative)
 
 
-def shn2(
+def shn2[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
