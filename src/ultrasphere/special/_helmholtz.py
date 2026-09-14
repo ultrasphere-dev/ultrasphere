@@ -165,7 +165,7 @@ def potential_coef[TArray: Array](
     return result
 
 
-def fundamental_solution(
+def fundamental_solution[TArray: Array](
     d: TArray,
     z: TArray,
     k: TArray,
