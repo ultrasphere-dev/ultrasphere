@@ -29,7 +29,6 @@ __all__ = [
     "create_hopf",
     "create_polar",
     "create_random",
-    "create_random",
     "create_spherical",
     "create_standard",
     "create_standard_prime",
