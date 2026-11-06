@@ -1,15 +1,15 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools" ]
+requires = [ "setuptools>=77.0.3" ]
 
 [project]
 name = "ultrasphere"
 version = "2.0.4"
 description = "Hyperspherical coordinates in NumPy / PyTorch / JAX."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
-  { name = "ultrasphere-dev", email = "34j.95a2p@simplelogin.com" },
+  { name = "ultrasphere-dev" },
 ]
 requires-python = ">=3.12"
 classifiers = [
@@ -17,24 +17,29 @@ classifiers = [
   "Intended Audience :: Developers",
   "Natural Language :: English",
   "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Libraries",
 ]
-
 dependencies = [
   "aquarel>=0.0.7",
-  "array-api-compat>=1.12.0",
-  "array-api-extra>=0.8.0",
+  "array-api-compat>=1.12",
+  "array-api-extra>=0.8",
   "jacobi-poly>=1.0.3",
   "matplotlib>=3.10.3",
   "networkx>=3.5",
-  "pytest-xdist>=3.8.0",
+  "pytest-xdist>=3.8",
   "rich>=10",
   "scipy>=1.15.3",
   "strenum>=0.4.15",
   "typer>=0.15,<1",
   "types-array-api>=1.1.4",
+]
+optional-dependencies.plot = [
+  "pydot>=4.0.1",
+  "pygraphviz>=1.14",
 ]
 urls."Bug Tracker" = "https://github.com/ultrasphere-dev/ultrasphere/issues"
 urls.Changelog = "https://github.com/ultrasphere-dev/ultrasphere/blob/main/CHANGELOG.md"
@@ -42,88 +47,25 @@ urls.documentation = "https://ultrasphere.readthedocs.io"
 urls.repository = "https://github.com/ultrasphere-dev/ultrasphere"
 scripts.ultrasphere = "ultrasphere.cli:app"
 
-[project.optional-dependencies]
-plot = [
-    "pydot>=4.0.1",
-    "pygraphviz>=1.14",
-]
-
 [dependency-groups]
 dev = [
-  "pytest>=9,<10",
-  "pytest-cov>=7,<8",
-  "sybil>=9.2.0",
+  "coverage",
+  "packaging-34j[test]",
+  "pytest",
+  "pytest-cov",
+  "sybil>=9.2",
   "torch>=2.7.1",
+  "ty",
 ]
 docs = [
-  "furo>=2023.5.20; python_version>='3.11'",
-  "myst-parser>=0.16; python_version>='3.11'",
-  "sphinx>=4; python_version>='3.11'",
-  "sphinx-autobuild>=2025,<2026; python_version>='3.11'",
-  "sphinx-math-dollar>=1.2.1",
+  "packaging-34j[docs]",
 ]
 
 [tool.ruff]
-line-length = 88
-lint.select = [
-  "B",   # flake8-bugbear
-  # "D",   # flake8-docstrings
-  "C4",  # flake8-comprehensions
-  "S",   # flake8-bandit
-  "F",   # pyflake
-  "E",   # pycodestyle
-  "W",   # pycodestyle
-  "UP",  # pyupgrade
-  "I",   # isort
-  "RUF", # ruff specific
-  # "TID"
-]
-lint.ignore = [
-  "D203", # 1 blank line required before class docstring
-  "D205",
-  "D212", # Multi-line docstring summary should start at the first line
-  "D100", # Missing docstring in public module
-  "D104", # Missing docstring in public package
-  "D107", # Missing docstring in `__init__`
-  "D401", # First line of docstring should be in imperative mood
-  "E741",
-  "D200",
-  "E501"
-]
-lint.per-file-ignores."conftest.py" = [ "D100" ]
-lint.per-file-ignores."docs/conf.py" = [ "D100" ]
-lint.per-file-ignores."setup.py" = [ "D100" ]
-lint.per-file-ignores."tests/**/*" = [
-  "D100",
-  "D101",
-  "D102",
-  "D103",
-  "D104",
-  "S101",
-]
-lint.isort.known-first-party = [ "ultrasphere", "tests" ]
+extend = ".venv/ruff.toml"
 
-[tool.pytest.ini_options]
-addopts = """\
-    -v
-    -Wdefault
-    --cov=ultrasphere
-    --cov-report=term
-    --cov-report=xml
-    """
-pythonpath = [ "src" ]
-
-[tool.coverage.run]
-branch = true
-
-[tool.coverage.report]
-exclude_lines = [
-  "pragma: no cover",
-  "@overload",
-  "if TYPE_CHECKING",
-  "raise NotImplementedError",
-  'if __name__ == "__main__":',
-]
+[tool.pyproject-fmt]
+max_supported_python = "3.14"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -136,17 +78,33 @@ show_error_codes = true
 warn_unreachable = true
 warn_unused_ignores = true
 exclude = [
-  'docs/.*',
-  'setup.py',
+  "docs/.*",
+  "setup.py",
 ]
+overrides = [ { module = "tests.*", allow_untyped_defs = true }, { module = "docs.*", ignore_errors = true } ]
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-allow_untyped_defs = true
+[tool.ty]
+terminal.error-on-warning = true
 
-[[tool.mypy.overrides]]
-module = "docs.*"
-ignore_errors = true
+[tool.pytest]
+ini_options.addopts = """\
+    -v
+    -Wdefault
+    --cov=ultrasphere
+    --cov-report=term
+    --cov-report=xml
+    """
+ini_options.pythonpath = [ "src" ]
+
+[tool.coverage]
+run.branch = true
+report.exclude_lines = [
+  "@overload",
+  'if __name__ == "__main__":',
+  "if TYPE_CHECKING",
+  "pragma: no cover",
+  "raise NotImplementedError",
+]
 
 [tool.semantic_release]
 version_toml = [ "pyproject.toml:project.version" ]
@@ -160,25 +118,17 @@ uv lock
 git add uv.lock
 uv build
 """
-
-[tool.semantic_release.changelog]
-exclude_commit_patterns = [
-  '''chore(?:\([^)]*?\))?: .+''',
-  '''ci(?:\([^)]*?\))?: .+''',
-  '''refactor(?:\([^)]*?\))?: .+''',
-  '''style(?:\([^)]*?\))?: .+''',
-  '''test(?:\([^)]*?\))?: .+''',
-  '''build\((?!deps\): .+)''',
-  '''Merged? .*''',
-  '''Initial [Cc]ommit.*''', # codespell:ignore
+branches.main.match = "main"
+branches.noop.match = "(?!main$)"
+branches.noop.prerelease = true
+changelog.exclude_commit_patterns = [
+  "chore(?:\\([^)]*?\\))?: .+",
+  "ci(?:\\([^)]*?\\))?: .+",
+  "refactor(?:\\([^)]*?\\))?: .+",
+  "style(?:\\([^)]*?\\))?: .+",
+  "test(?:\\([^)]*?\\))?: .+",
+  "build\\((?!deps\\): .+)",
+  "Merged? .*",
+  "Initial [Cc]ommit.*",         # codespell:ignore
 ]
-
-[tool.semantic_release.changelog.environment]
-keep_trailing_newline = true
-
-[tool.semantic_release.branches.main]
-match = "main"
-
-[tool.semantic_release.branches.noop]
-match = "(?!main$)"
-prerelease = true
+changelog.environment.keep_trailing_newline = true
