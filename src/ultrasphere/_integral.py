@@ -215,13 +215,16 @@ def integrate(
     >>> import ultrasphere as us
     >>> c = us.create_spherical()
     >>> f = lambda spherical: spherical["theta"] ** 2 * spherical["phi"]
-    >>> np.round(us.integrate(
-    ...     c,
-    ...     f,
-    ...     False, # does not support separation of variables
-    ...     10, # number of quadrature points
-    ...     xp=np # the array namespace
-    ... ), 5)
+    >>> np.round(
+    ...     us.integrate(
+    ...         c,
+    ...         f,
+    ...         False,  # does not support separation of variables
+    ...         10,  # number of quadrature points
+    ...         xp=np,  # the array namespace
+    ...     ),
+    ...     5,
+    ... )
     np.float64(110.02621)
 
     """

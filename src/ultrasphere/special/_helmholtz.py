@@ -109,17 +109,9 @@ def potential_coef[TArray: Array](
     inner = xp.where(
         x_abs < y_abs,
         shn1(n, d, k * y_abs, derivative=y_abs_derivative)
-        * (
-            sjv(n, d, k * x_abs, derivative=x_abs_derivative)
-            if for_func == "harmonics"
-            else 1
-        ),
+        * (sjv(n, d, k * x_abs, derivative=x_abs_derivative) if for_func == "harmonics" else 1),
         sjv(n, d, k * y_abs, derivative=y_abs_derivative)
-        * (
-            shn1(n, d, k * x_abs, derivative=x_abs_derivative)
-            if for_func == "harmonics"
-            else 1
-        ),
+        * (shn1(n, d, k * x_abs, derivative=x_abs_derivative) if for_func == "harmonics" else 1),
     )
     derivative_count = int(x_abs_derivative) + int(y_abs_derivative)
     result = (k) ** derivative_count * 1j * (k ** (d - 2)) * (y_abs ** (d - 1)) * inner

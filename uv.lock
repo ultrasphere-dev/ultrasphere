@@ -2250,14 +2250,14 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "aquarel", specifier = ">=0.0.7" },
-    { name = "array-api-compat", specifier = ">=1.12.0" },
-    { name = "array-api-extra", specifier = ">=0.8.0" },
+    { name = "array-api-compat", specifier = ">=1.12" },
+    { name = "array-api-extra", specifier = ">=0.8" },
     { name = "jacobi-poly", specifier = ">=1.0.3" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "networkx", specifier = ">=3.5" },
     { name = "pydot", marker = "extra == 'plot'", specifier = ">=4.0.1" },
     { name = "pygraphviz", marker = "extra == 'plot'", specifier = ">=1.14" },
-    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "pytest-xdist", specifier = ">=3.8" },
     { name = "rich", specifier = ">=10" },
     { name = "scipy", specifier = ">=1.15.3" },
     { name = "strenum", specifier = ">=0.4.15" },
@@ -2272,7 +2272,7 @@ dev = [
     { name = "packaging-34j", extras = ["test"] },
     { name = "pytest" },
     { name = "pytest-cov" },
-    { name = "sybil", specifier = ">=9.2.0" },
+    { name = "sybil", specifier = ">=10" },
     { name = "torch", specifier = ">=2.7.1" },
     { name = "ty" },
 ]

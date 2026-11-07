@@ -104,8 +104,7 @@ def draw(
             pos = {k: (x, 2 * y_center - y) for k, (x, y) in pos.items()}
     except FileNotFoundError as e:
         warnings.warn(
-            "Graphviz is not installed. "
-            "The layout will be calculated by spring layout.",
+            "Graphviz is not installed. The layout will be calculated by spring layout.",
             RuntimeWarning,
             stacklevel=2,
             source=e,
@@ -157,9 +156,7 @@ def draw(
         style="dashed",
         ax=ax,
     )
-    nx.draw_networkx_edges(
-        c.G, pos, edgelist=c.sin_edges, edge_color=sin_color, label="sin", ax=ax
-    )
+    nx.draw_networkx_edges(c.G, pos, edgelist=c.sin_edges, edge_color=sin_color, label="sin", ax=ax)
 
     # legend
     handles = [

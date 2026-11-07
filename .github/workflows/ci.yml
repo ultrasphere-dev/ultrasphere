@@ -17,6 +17,8 @@ jobs:
       attestations: write
       contents: write
       id-token: write
+    with:
+      tkinter: true
   publish:
     if: needs.ci.outputs.released == 'true'
     needs: ci

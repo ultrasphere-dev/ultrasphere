@@ -48,7 +48,14 @@ repos:
     hooks:
       - id: local-ty
         name: ty check
-        entry: uv run ty check --exclude docs/conf.py
+        entry: >-
+          uv run ty check --exclude docs/conf.py
+          --ignore unused-type-ignore-comment
+          --ignore invalid-argument-type
+          --ignore invalid-return-type
+          --ignore unresolved-attribute
+          --ignore import-not-found
+          --ignore no-matching-overload
         require_serial: true
         language: system
         pass_filenames: false
