@@ -126,9 +126,7 @@ def create_polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
     return cls(G)
 
 
-def create_spherical() -> (
-    'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]'
-):
+def create_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]':
     r"""
     Spherical coordinates.
 
@@ -328,9 +326,7 @@ def _e_node_name_default(idx: int) -> Any:
     return idx
 
 
-def _get_random_digraph(
-    s_ndim: int, *, rng: np.random.Generator | None = None
-) -> nx.DiGraph:
+def _get_random_digraph(s_ndim: int, *, rng: np.random.Generator | None = None) -> nx.DiGraph:
     """
     Get a random rooted tree representing the coordinates.
 

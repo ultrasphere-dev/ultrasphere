@@ -59,8 +59,7 @@ def check_tree(graph: nx.DiGraph, /) -> None:
     for node in graph.nodes:
         if (degree := graph.out_degree(node)) not in {0, 2}:
             raise ValueError(
-                f"Each node should have 0 or 2 successors, "
-                f"but {node} has {degree} successors."
+                f"Each node should have 0 or 2 successors, but {node} has {degree} successors."
             )
     # check every node except the root has attribute
     # "direction" of type Literal["cos", "sin"]
@@ -78,7 +77,7 @@ def check_tree(graph: nx.DiGraph, /) -> None:
             )
 
 
-def get_non_leaf_descendants(graph: nx.DiGraph, /) -> dict[Any, int]:
+def get_non_leaf_descendants(graph: nx.DiGraph, /) -> dict[Any, float]:
     """
     Calculate the number of non-leaf descendants for each node in a rooted tree.
 
@@ -89,7 +88,7 @@ def get_non_leaf_descendants(graph: nx.DiGraph, /) -> dict[Any, int]:
 
     Returns
     -------
-    dict[Any, int]
+    dict[Any, float]
         NaN for leaf nodes, otherwise the number of non-leaf descendants.
 
     """
@@ -98,11 +97,10 @@ def get_non_leaf_descendants(graph: nx.DiGraph, /) -> dict[Any, int]:
     non_leaf_descendants = {}
     for node in reversed(list(nx.topological_sort(graph))):
         if node in leaf_nodes:
-            non_leaf_descendants[node] = -1
+            non_leaf_descendants[node] = -1.0
         else:
             non_leaf_descendants[node] = sum(
-                non_leaf_descendants[successor] + 1
-                for successor in graph.successors(node)
+                non_leaf_descendants[successor] + 1 for successor in graph.successors(node)
             )
     for node in leaf_nodes:
         non_leaf_descendants[node] = np.nan
@@ -269,9 +267,7 @@ def surface_area(c_ndim: int, /, r: float = 1) -> float:
     np.float64(12.566371)
 
     """
-    return (
-        2 * (np.pi ** (c_ndim / 2)) / np.exp(lgamma(c_ndim / 2.0)) * r ** (c_ndim - 1)
-    )
+    return 2 * (np.pi ** (c_ndim / 2)) / np.exp(lgamma(c_ndim / 2.0)) * r ** (c_ndim - 1)
 
 
 def volume(c_ndim: int, /, r: float = 1) -> float:
@@ -328,12 +324,12 @@ class SphericalCoordinates[TSpherical, TCartesian]:
     >>> c.sin_edges
     [('theta0', 'theta1'), ('theta1', 'theta2'), ('theta2', 3)]
     >>> c.S
-    {3: nan, 2: nan, 'theta2': 0, 1: nan, 'theta1': 1, 0: nan, 'theta0': 2}
+    {3: nan, 2: nan, 'theta2': 0.0, 1: nan, 'theta1': 1.0, 0: nan, 'theta0': 2.0}
     """
 
     G: nx.DiGraph
     """The rooted tree representing the coordinates."""
-    S: Mapping[TSpherical, int]
+    S: Mapping[TSpherical, float]
     """The number of non-leaf descendants for each spherical node."""
     branching_types: Mapping[TSpherical, BranchingType]
     """The branching types of each node."""
@@ -411,9 +407,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> us.create_standard(3).branching_types_expression_str
         'bba'
         """
-        return "".join(
-            branching_type.value for branching_type in self.branching_types_expression
-        )
+        return "".join(branching_type.value for branching_type in self.branching_types_expression)
 
     @property
     def s_ndim(self) -> int:
@@ -573,17 +567,13 @@ class SphericalCoordinates[TSpherical, TCartesian]:
             cos = tmp[cos_child]
             sin = tmp[sin_child]
             result[node] = xp.atan2(sin, cos)
-            tmp[node] = xp.linalg.vector_norm(
-                xp.stack(xp.broadcast_arrays(sin, cos)), axis=0
-            )
+            tmp[node] = xp.linalg.vector_norm(xp.stack(xp.broadcast_arrays(sin, cos)), axis=0)
         return result
 
     @overload
     def to_cartesian(
         self,
-        spherical: (
-            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
-        ),
+        spherical: (Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]),
         /,
         *,
         as_array: Literal[False] = ...,
@@ -592,9 +582,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
     @overload
     def to_cartesian(
         self,
-        spherical: (
-            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
-        ),
+        spherical: (Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]),
         /,
         *,
         as_array: Literal[True] = ...,
@@ -602,9 +590,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
     def to_cartesian(
         self,
-        spherical: (
-            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
-        ),
+        spherical: (Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]),
         /,
         *,
         as_array: bool = False,
@@ -629,7 +615,11 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> import ultrasphere as us
         >>> from array_api_compat import numpy as np
         >>> c = us.create_spherical()
-        >>> e = c.to_cartesian({"theta": np.float64(0.640522), "phi": np.float64(1.107149), "r": np.float64(3.741657)})
+        >>> e = c.to_cartesian({
+        ...     "theta": np.float64(0.640522),
+        ...     "phi": np.float64(1.107149),
+        ...     "r": np.float64(3.741657),
+        ... })
         >>> {k: np.round(e[k], 5) for k in c.c_nodes}
         {0: np.float64(1.0), 1: np.float64(2.0), 2: np.float64(3.0)}
         """
@@ -667,9 +657,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
     def jacobian(
         self,
-        spherical: (
-            Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]
-        ),
+        spherical: (Mapping[TSpherical | Literal["r"], Array] | Mapping[TSpherical, Array]),
         /,
     ) -> Array:
         """
