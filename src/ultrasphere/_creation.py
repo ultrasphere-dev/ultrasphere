@@ -38,7 +38,7 @@ def _get_digraph_from_branching_type(
             if branching_types_str.startswith("b'"):
                 branching_types_.append(BranchingType.BP)
                 branching_types_str = branching_types_str[2:]
-            elif branching_types_str[0] in ["a", "b", "c"]:
+            elif branching_types_str[0] in {"a", "b", "c"}:
                 branching_types_.append(BranchingType(branching_types_str[0]))
                 branching_types_str = branching_types_str[1:]
             else:
@@ -63,11 +63,10 @@ def _get_digraph_from_branching_type(
             next_e_idx += 1
             if i == len(branching_types_) - 1:
                 break
-            else:
-                try:
-                    next_node = type_c_stack.pop()
-                except IndexError as e:
-                    raise ValueError("Invalid branching types.") from e
+            try:
+                next_node = type_c_stack.pop()
+            except IndexError as e:
+                raise ValueError("Invalid branching types.") from e
         elif branching_type == BranchingType.B:
             G.add_node(next_e_idx)
             G.add_edge(current_node, next_e_idx, type="cos")
@@ -126,9 +125,7 @@ def create_polar() -> 'SphericalCoordinates[Literal["phi"], Literal[0, 1]]':
     return cls(G)
 
 
-def create_spherical() -> (
-    'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]'
-):
+def create_spherical() -> 'SphericalCoordinates[Literal["theta", "phi"], Literal[0, 1, 2]]':
     r"""
     Spherical coordinates.
 
@@ -263,9 +260,9 @@ def create_hopf(q: int) -> "SphericalCoordinates[Any, Any]":
     def _hoph(q: int) -> str:
         if q < 0:
             raise ValueError("q should be non-negative.")
-        elif q == 0:
+        if q == 0:
             return ""
-        elif q == 1:
+        if q == 1:
             return "a"
         return f"c{_hoph(q - 1)}{_hoph(q - 1)}"
 
@@ -328,9 +325,7 @@ def _e_node_name_default(idx: int) -> Any:
     return idx
 
 
-def _get_random_digraph(
-    s_ndim: int, *, rng: np.random.Generator | None = None
-) -> nx.DiGraph:
+def _get_random_digraph(s_ndim: int, *, rng: np.random.Generator | None = None) -> nx.DiGraph:
     """
     Get a random rooted tree representing the coordinates.
 
@@ -362,12 +357,11 @@ def _get_random_digraph(
             G.add_edge(node_parent, node, type=type)
             leaf_nodes.append(node)
     non_leaf_nodes = set(G.nodes) - set(leaf_nodes)
-    G = nx.relabel_nodes(
+    return nx.relabel_nodes(
         G,
         {node: _e_node_name_default(i) for i, node in enumerate(leaf_nodes)}
         | {node: _s_node_name_default(i) for i, node in enumerate(non_leaf_nodes)},
     )
-    return G
 
 
 def create_random(

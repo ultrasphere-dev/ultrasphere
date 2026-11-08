@@ -4,9 +4,7 @@ import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 
 
-@pytest.fixture(
-    scope="session", params=[("numpy", "cpu"), ("torch", "cpu"), ("torch", "cuda")]
-)
+@pytest.fixture(scope="session", params=[("numpy", "cpu"), ("torch", "cpu"), ("torch", "cuda")])
 def xp_device(request: pytest.FixtureRequest) -> tuple[ArrayNamespaceFull, Any]:
     """
     Get the array namespace and device for the given backend.

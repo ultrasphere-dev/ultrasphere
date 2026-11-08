@@ -215,13 +215,16 @@ def integrate(
     >>> import ultrasphere as us
     >>> c = us.create_spherical()
     >>> f = lambda spherical: spherical["theta"] ** 2 * spherical["phi"]
-    >>> np.round(us.integrate(
-    ...     c,
-    ...     f,
-    ...     False, # does not support separation of variables
-    ...     10, # number of quadrature points
-    ...     xp=np # the array namespace
-    ... ), 5)
+    >>> np.round(
+    ...     us.integrate(
+    ...         c,
+    ...         f,
+    ...         False,  # does not support separation of variables
+    ...         10,  # number of quadrature points
+    ...         xp=np,  # the array namespace
+    ...     ),
+    ...     5,
+    ... )
     np.float64(110.02621)
 
     """
@@ -233,13 +236,7 @@ def integrate(
         expand_dims_x=not does_f_support_separation_of_variables,
         xp=xp,
     )
-    if isinstance(f, Callable):  # type: ignore
-        try:
-            val = f(xs)  # type: ignore
-        except Exception as e:
-            raise e
-    else:
-        val = f
+    val = f(xs) if isinstance(f, Callable) else f  # type: ignore
 
     # in case f(theta1, ...) = f_1(theta1) * f_2(theta2) * ...
     if isinstance(val, Mapping):

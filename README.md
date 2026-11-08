@@ -7,19 +7,19 @@
   <a href="https://ultrasphere.readthedocs.io">
     <img src="https://img.shields.io/readthedocs/ultrasphere.svg?logo=read-the-docs&logoColor=fff&style=flat-square" alt="Documentation Status">
   </a>
+</p>
+<p align="center">
   <a href="https://codecov.io/gh/ultrasphere-dev/ultrasphere">
     <img src="https://img.shields.io/codecov/c/github/ultrasphere-dev/ultrasphere.svg?logo=codecov&logoColor=fff&style=flat-square" alt="Test coverage percentage">
   </a>
-</p>
-<p align="center">
   <a href="https://github.com/astral-sh/uv">
     <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv">
   </a>
   <a href="https://github.com/astral-sh/ruff">
     <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
   </a>
-  <a href="https://github.com/pre-commit/pre-commit">
-    <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&style=flat-square" alt="pre-commit">
+  <a href="https://github.com/j178/prek">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json" alt="prek">
   </a>
 </p>
 <p align="center">
@@ -192,28 +192,3 @@ np.float64(1.0)
 #### References
 
 - Barthe, F., Guédon, O., Mendelson, S., & Naor, A. (2005). A probabilistic approach to the geometry of the ? P n -ball. The Annals of Probability, 33. https://doi.org/10.1214/009117904000000874
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- prettier-ignore-start -->
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- markdownlint-disable -->
-<!-- markdownlint-enable -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-<!-- prettier-ignore-end -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
-
-## Credits
-
-[![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json)](https://github.com/copier-org/copier)
-
-This package was created with
-[Copier](https://copier.readthedocs.io/) and the
-[browniebroke/pypackage-template](https://github.com/browniebroke/pypackage-template)
-project template.
-
-The code examples in the documentation and docstrings are
-automatically tested as doctests using [Sybil](https://sybil.readthedocs.io/).

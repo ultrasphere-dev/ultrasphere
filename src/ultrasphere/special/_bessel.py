@@ -7,7 +7,7 @@ from scipy.special import hankel1, hankel2, jv, jvp, yv, yvp
 TArray = TypeVar("TArray", bound=Array)
 
 
-def szv(
+def szv[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -45,7 +45,6 @@ def szv(
     Boundary Integral Equations. p.279
 
     """
-
     xp = array_namespace(v, d, z)
     device = z.device
     v = xp.asarray(v, device=device)
@@ -59,28 +58,20 @@ def szv(
         return v / z * szv(v, d, z, type=type) - szv(v + 1, d, z, type=type)
     d_half_minus_1 = d / 2 - 1
     if type == "j":
-        if derivative:
-            zv = jvp
-        else:
-            zv = jv
+        zv = jvp if derivative else jv
     elif type == "y":
-        if derivative:
-            zv = yvp
-        else:
-            zv = yv
+        zv = yvp if derivative else yv
     elif type == "h1":
         if derivative:
-            raise AssertionError()
-        else:
-            zv = hankel1
+            raise AssertionError
+        zv = hankel1
     elif type == "h2":
         if derivative:
-            raise AssertionError()
-        else:
-            zv = hankel2
+            raise AssertionError
+        zv = hankel2
 
     dtype = xp.result_type(v, d, z, xp.float32)
-    if type in ("h1", "h2"):
+    if type in {"h1", "h2"}:
         dtype = xp.result_type(dtype, xp.complex64)
     return (
         xp.sqrt(xp.asarray(xp.pi / 2, device=z.device, dtype=dtype))
@@ -93,7 +84,7 @@ def szv(
     )
 
 
-def sjv(
+def sjv[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -131,7 +122,7 @@ def sjv(
     return szv(v, d, z, type="j", derivative=derivative)
 
 
-def syv(
+def syv[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -169,7 +160,7 @@ def syv(
     return szv(v, d, z, type="y", derivative=derivative)
 
 
-def shn1(
+def shn1[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,
@@ -202,7 +193,7 @@ def shn1(
     return szv(v, d, z, type="h1", derivative=derivative)
 
 
-def shn2(
+def shn2[TArray: Array](
     v: TArray,
     d: TArray,
     z: TArray,

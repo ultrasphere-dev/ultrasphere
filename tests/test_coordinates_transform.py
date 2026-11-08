@@ -58,9 +58,7 @@ def to_spherical(*, x: Array, y: Array, z: Array) -> tuple[Array, Array, Array]:
         (4, 5, 6),
     ],
 )
-def test_cartesian_to_spherical_3d(
-    shape: tuple[int, ...], xp: ArrayNamespaceFull
-) -> None:
+def test_cartesian_to_spherical_3d(shape: tuple[int, ...], xp: ArrayNamespaceFull) -> None:
     x = xp.random.random_uniform(low=-1, high=1, shape=shape)
     y = xp.random.random_uniform(low=-1, high=1, shape=shape)
     z = xp.random.random_uniform(low=-1, high=1, shape=shape)

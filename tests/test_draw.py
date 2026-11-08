@@ -18,7 +18,7 @@ Path.mkdir(PATH, exist_ok=True)
 
 
 @pytest.mark.parametrize(
-    "name, c",
+    ("name", "c"),
     [
         ("spherical", create_spherical()),
         ("hoph", create_hopf(3)),
