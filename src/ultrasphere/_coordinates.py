@@ -29,6 +29,7 @@ class BranchingType(StrEnum):
 def check_tree(graph: nx.DiGraph, /) -> None:
     """
     Check if the graph is a valid tree representing the coordinates.
+
     Definition of "a tree representing the coordinates":
     - The graph is a tree.
     - The graph is rooted.
@@ -686,10 +687,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
 
         """
         xp = array_namespace(*[spherical[k] for k in self.s_nodes])
-        if "r" in spherical:
-            jacobian = spherical["r"]  # type: ignore
-        else:
-            jacobian = 1
+        jacobian = spherical.get("r", 1)  # type: ignore
         for node in self.s_nodes:
             cos = xp.cos(spherical[node])
             sin = xp.sin(spherical[node])

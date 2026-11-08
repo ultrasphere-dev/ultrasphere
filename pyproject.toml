@@ -62,6 +62,24 @@ docs = [
 
 [tool.ruff]
 extend = ".venv/ruff.toml"
+lint.extend-ignore = [
+  "A001",   # builtin-variable-shadowing
+  "A002",   # builtin-argument-shadowing
+  "D401",   # non-imperative-mood
+  "D417",   # undocumented-param
+  "DOC201", # docstring-missing-returns
+  "DOC202", # docstring-extraneous-returns
+  "DOC402", # docstring-missing-yields
+  "DOC501", # docstring-missing-exception
+  "DOC502", # docstring-extraneous-exception
+  "E501",   # line-too-long in doctest and math examples
+  "FBT001", # boolean-type-hint-positional-argument
+  "FBT002", # boolean-default-value-positional-argument
+  "FBT003", # boolean-positional-value-in-call
+  "NPY002", # numpy-legacy-random
+  "S404",   # suspicious-subprocess-import in tests
+  "S603",   # subprocess-without-shell-equals-true in tests
+]
 
 [tool.pyproject-fmt]
 max_supported_python = "3.14"
