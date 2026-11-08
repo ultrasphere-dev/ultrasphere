@@ -170,7 +170,7 @@ def random_ball(
             device=device,
             dtype=dtype,
         )
-    elif type == "spherical":
+    if type == "spherical":
         d = {
             BranchingType.A: (0, 2 * xp.pi),
             BranchingType.B: (0, xp.pi),
@@ -188,5 +188,4 @@ def random_ball(
                 rng.uniform(low=0, high=1, size=shape), device=device, dtype=dtype
             )
         return result
-    else:
-        raise ValueError(f"Invalid type {type}.")
+    raise ValueError(f"Invalid type {type}.")

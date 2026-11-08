@@ -132,7 +132,7 @@ def get_child(G: nx.DiGraph, node: Any, type: COSSIN, /) -> Any:
     ]
     if len(child_candidates) == 0:
         raise ValueError(f"No {type} child for node {node}.")
-    elif len(child_candidates) > 1:
+    if len(child_candidates) > 1:
         raise ValueError(f"Multiple {type} children for node {node}.")
     return child_candidates[0]
 
@@ -162,7 +162,7 @@ def get_parent(G: nx.DiGraph, node: Any, /) -> Any | None:
     predecessors = list(G.predecessors(node))
     if len(predecessors) == 0:
         return None
-    elif len(predecessors) > 1:
+    if len(predecessors) > 1:
         raise ValueError("The node has multiple parents.")
     return predecessors[0]
 
@@ -221,7 +221,7 @@ def get_branching_type_from_digraph(G: nx.DiGraph, /) -> Iterable[BranchingType]
     while stack:
         node = stack.pop()
         if G.out_degree(node) == 0:
-            raise AssertionError()
+            raise AssertionError
         cos_child = get_child(G, node, "cos")
         sin_child = get_child(G, node, "sin")
         cos_child_is_leaf = G.out_degree(cos_child) == 0
@@ -300,6 +300,7 @@ def volume(c_ndim: int, /, r: float = 1) -> float:
     >>> from array_api_compat import numpy as np
     >>> np.round(us.create_standard(2).volume(), 6)
     np.float64(4.18879)
+
     """
     return (np.pi ** (c_ndim / 2)) / np.exp(lgamma(c_ndim / 2.0 + 1.0)) * r**c_ndim
 
@@ -325,6 +326,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
     [('theta0', 'theta1'), ('theta1', 'theta2'), ('theta2', 3)]
     >>> c.S
     {3: nan, 2: nan, 'theta2': 0.0, 1: nan, 'theta1': 1.0, 0: nan, 'theta0': 2.0}
+
     """
 
     G: nx.DiGraph
@@ -354,7 +356,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         """__setstate__."""
         return self.__init__(nx.from_dict_of_dicts(state["G"]))  # type: ignore
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check if the spherical coordinates are equal."""
         if not isinstance(other, SphericalCoordinates):
             return False
@@ -377,6 +379,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> import ultrasphere as us
         >>> us.create_standard(3).root
         'theta0'
+
         """
         return next(nx.topological_sort(self.G))
 
@@ -394,6 +397,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> import ultrasphere as us
         >>> us.create_standard(2).branching_types_expression
         [<BranchingType.B: 'b'>, <BranchingType.A: 'a'>]
+
         """
         return list(get_branching_type_from_digraph(self.G))
 
@@ -406,6 +410,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> import ultrasphere as us
         >>> us.create_standard(3).branching_types_expression_str
         'bba'
+
         """
         return "".join(branching_type.value for branching_type in self.branching_types_expression)
 
@@ -417,7 +422,9 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         --------
         >>> import ultrasphere as us
         >>> us.create_standard(3).s_ndim
-        3"""
+        3
+
+        """
         return len(self.s_nodes)
 
     @property
@@ -428,7 +435,9 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         --------
         >>> import ultrasphere as us
         >>> us.create_standard(3).c_ndim
-        4"""
+        4
+
+        """
         return len(self.c_nodes)
 
     def __init__(self, tree: nx.DiGraph, /) -> None:
@@ -517,6 +526,7 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         >>> from array_api_compat import numpy as np
         >>> np.round(us.create_standard(2).volume(), 6)
         np.float64(4.18879)
+
         """
         return volume(self.c_ndim, r=r)
 
@@ -560,8 +570,8 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         for node in reversed(list(nx.topological_sort(self.G))):
             if node in self.c_nodes:
                 continue
-            elif node not in self.s_nodes:
-                raise AssertionError()
+            if node not in self.s_nodes:
+                raise AssertionError
             cos_child = get_child(self.G, node, "cos")
             sin_child = get_child(self.G, node, "sin")
             cos = tmp[cos_child]
@@ -622,14 +632,15 @@ class SphericalCoordinates[TSpherical, TCartesian]:
         ... })
         >>> {k: np.round(e[k], 5) for k in c.c_nodes}
         {0: np.float64(1.0), 1: np.float64(2.0), 2: np.float64(3.0)}
+
         """
         xp = array_namespace(*[spherical[k] for k in self.s_nodes])
         result = {self.root: spherical.get("r", 1)}  # type: ignore
         for node in nx.topological_sort(self.G):
             if node in self.c_nodes:
                 continue
-            elif node not in self.s_nodes:
-                raise AssertionError()
+            if node not in self.s_nodes:
+                raise AssertionError
             cos_child = get_child(self.G, node, "cos")
             sin_child = get_child(self.G, node, "sin")
             cos = xp.cos(spherical[node])

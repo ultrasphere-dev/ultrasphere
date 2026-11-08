@@ -239,8 +239,8 @@ def integrate(
     if isinstance(f, Callable):  # type: ignore
         try:
             val = f(xs)  # type: ignore
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
     else:
         val = f
 

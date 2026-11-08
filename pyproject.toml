@@ -50,10 +50,9 @@ scripts.ultrasphere = "ultrasphere.cli:app"
 [dependency-groups]
 dev = [
   "coverage",
-  "packaging-34j[test]",
+  "packaging-34j[test]>=1.1.7",
   "pytest",
   "pytest-cov",
-  "sybil>=10",
   "torch>=2.7.1",
   "ty",
 ]

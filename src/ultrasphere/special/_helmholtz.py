@@ -97,8 +97,8 @@ def potential_coef[TArray: Array](
     """
     xp = array_namespace(n, d, k, x_abs, y_abs)
     if x_abs_derivative is None and y_abs_derivative is None:
-        x_abs_derivative = derivative in ["D*", "N"]
-        y_abs_derivative = derivative in ["D", "N"]
+        x_abs_derivative = derivative in {"D*", "N"}
+        y_abs_derivative = derivative in {"D", "N"}
     elif x_abs_derivative is not None and y_abs_derivative is not None:
         pass
     else:
@@ -116,8 +116,8 @@ def potential_coef[TArray: Array](
     derivative_count = int(x_abs_derivative) + int(y_abs_derivative)
     result = (k) ** derivative_count * 1j * (k ** (d - 2)) * (y_abs ** (d - 1)) * inner
     if derivative_count == 1:
-        if for_func == "solution" and limit in ["x_larger", "y_larger"]:
-            raise NotImplementedError()
+        if for_func == "solution" and limit in {"x_larger", "y_larger"}:
+            raise NotImplementedError
         addition = None
         if limit == "x_larger":
             if x_abs_derivative:
@@ -157,7 +157,7 @@ def potential_coef[TArray: Array](
     return result
 
 
-def fundamental_solution(
+def fundamental_solution[TArray: Array](
     d: TArray,
     z: TArray,
     k: TArray,

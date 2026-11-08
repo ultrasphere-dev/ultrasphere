@@ -77,7 +77,6 @@ def draw(
     .. image:: /_static/coordinates.*
 
     """
-
     # plt.rcParams["text.usetex"] = True
     # remove spines
     ax = ax or plt.gca()
