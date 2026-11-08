@@ -63,55 +63,9 @@ docs = [
 
 [tool.ruff]
 extend = ".venv/ruff.toml"
-lint.select = [ "B", "C4", "E", "F", "I", "RUF", "S", "UP", "W" ]
-lint.ignore = [
-  "D100",
-  "D104",
-  "D107",
-  "D203",
-  "D205",
-  "D212",
-  "D401",
-  "E501",
-  "E741",
-  "S404",
-  "UP047",
-]
-lint.per-file-ignores."conftest.py" = [ "D100" ]
-lint.per-file-ignores."docs/conf.py" = [ "D100" ]
-lint.per-file-ignores."tests/**/*" = [
-  "D100",
-  "D101",
-  "D102",
-  "D103",
-  "D104",
-  "S101",
-  "S603",
-]
-lint.isort.known-first-party = [ "ultrasphere", "tests" ]
 
 [tool.pyproject-fmt]
 max_supported_python = "3.14"
 
 [tool.ty]
 terminal.error-on-warning = true
-
-[tool.pytest]
-ini_options.addopts = """\
-    -v
-    -Wdefault
-    --cov=ultrasphere
-    --cov-report=term
-    --cov-report=xml
-    """
-ini_options.pythonpath = [ "src" ]
-
-[tool.coverage]
-run.branch = true
-report.exclude_lines = [
-  "@overload",
-  'if __name__ == "__main__":',
-  "if TYPE_CHECKING",
-  "pragma: no cover",
-  "raise NotImplementedError",
-]
