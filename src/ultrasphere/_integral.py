@@ -236,13 +236,7 @@ def integrate(
         expand_dims_x=not does_f_support_separation_of_variables,
         xp=xp,
     )
-    if isinstance(f, Callable):  # type: ignore
-        try:
-            val = f(xs)  # type: ignore
-        except Exception:
-            raise
-    else:
-        val = f
+    val = f(xs) if isinstance(f, Callable) else f  # type: ignore
 
     # in case f(theta1, ...) = f_1(theta1) * f_2(theta2) * ...
     if isinstance(val, Mapping):
